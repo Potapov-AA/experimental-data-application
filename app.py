@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from settings import ParametrSettings
 from model import Model
 from analysis import Analysis
 from config import Config
@@ -8,6 +9,7 @@ from config import Config
 class App(Tk):
     def __init__(self):
         super().__init__()
+        Config().DownloadSettings()
         self.title("МОЭД")
         self.centerWindow()
         self.initUI()
@@ -23,6 +25,9 @@ class App(Tk):
         y = (sh - h) / 2
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
+    def openParametrSettings(self):
+        ParametrSettings(self)
+    
     def initUI(self):
         mainmenu = Menu()
         self.config(menu=mainmenu)
@@ -32,7 +37,7 @@ class App(Tk):
         mainmenu.add_cascade(label="Файл", menu=filemenu)
         
         settings = Menu(mainmenu, tearoff=0)
-        settings.add_command(label="Настройки параметров")
+        settings.add_command(label="Настройки параметров", command=self.openParametrSettings)
         mainmenu.add_cascade(label="Настройки", menu=settings)
         
         
