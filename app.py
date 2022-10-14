@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 from model import Model
 from analysis import Analysis
+from config import Config
 
 
 class App(Tk):
@@ -23,6 +24,19 @@ class App(Tk):
         self.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def initUI(self):
+        mainmenu = Menu()
+        self.config(menu=mainmenu)
+        
+        filemenu = Menu(mainmenu, tearoff=0)
+        filemenu.add_command(label="Выход", command=self.destroy)
+        mainmenu.add_cascade(label="Файл", menu=filemenu)
+        
+        settings = Menu(mainmenu, tearoff=0)
+        settings.add_command(label="Настройки параметров")
+        mainmenu.add_cascade(label="Настройки", menu=settings)
+        
+        
+        
         table_control = ttk.Notebook()
         table_lab_1 = ttk.Frame(table_control)
         table_lab_2 = ttk.Frame(table_control)
@@ -399,7 +413,7 @@ class App(Tk):
             dt=float(self.entry_dt.get()),
             thetta=float(self.entry_tetta.get())
         )
-        
+
     def drawHarmonics(self):
         Model().drawHarms(
             N=int(self.entry_N_harmonic.get()),
@@ -408,7 +422,7 @@ class App(Tk):
             dt=float(self.entry_dt.get()),
             step=int(self.entry_step.get())
         )
-        
+
     def drawSumHarmonics(self):
         Model().draw3In1Harm(
             N=int(self.entry_N_harmonic.get()),
