@@ -4,27 +4,26 @@ from model import Model
 from analysis import Analysis
 
 
-class App(Frame):
-    def __init__(self, parent):
-        Frame.__init__(self, parent, background="white")
-        self.parent = parent
-        self.parent.title("МОЭД")
+class App(Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("МОЭД")
         self.centerWindow()
         self.initUI()
 
     def centerWindow(self):
-        w = 600
-        h = 400
+        w = 1000
+        h = 800
 
-        sw = self.parent.winfo_screenwidth()
-        sh = self.parent.winfo_screenheight()
+        sw = self.winfo_screenwidth()
+        sh = self.winfo_screenheight()
 
         x = (sw - w) / 2
         y = (sh - h) / 2
-        self.parent.geometry('%dx%d+%d+%d' % (w, h, x, y))
+        self.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
     def initUI(self):
-        table_control = ttk.Notebook(self.parent)
+        table_control = ttk.Notebook()
         table_lab_1 = ttk.Frame(table_control)
         table_lab_2 = ttk.Frame(table_control)
         table_lab_3 = ttk.Frame(table_control)

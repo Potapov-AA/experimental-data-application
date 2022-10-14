@@ -3,10 +3,8 @@ from tkinter import *
 
 
 def main():
-    root = Tk()
-    App(root)    
-    root.mainloop()
-    print(112)
+    app = App()
+    app.mainloop()
 
 if __name__ == "__main__":
     main()
