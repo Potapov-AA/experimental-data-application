@@ -53,6 +53,15 @@ class ParametrSettings(Toplevel):
         Button(self, text="Сохранить", width=10,
                command=lambda: self.save("beta", self.entry_beta.get())).grid(column=2, row=7, padx=5)
 
+        Label(self, text="Шумы").grid(column=0, row=8, columnspan=3, sticky=E+W, padx=5, pady=5)
+        
+        Label(self, text="R =").grid(column=0, row=9, padx=10, sticky=W)
+        self.entry_R = Entry(self, width=10, justify=CENTER)
+        self.entry_R.grid(column=1, row=9, padx=5, sticky=E)
+        self.entry_R.insert(0, self.parametrs.GetParametr("Parametrs", "R"))
+        Button(self, text="Сохранить", width=10,
+               command=lambda: self.save("R", self.entry_R.get())).grid(column=2, row=9, padx=5)
+        
     def centerWindow(self):
         w = 235
         h = 400
