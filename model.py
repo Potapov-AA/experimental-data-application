@@ -11,20 +11,20 @@ class Model:
     def __init__(self):
         self.e = np.e
 
-    def drawLinerTrend(self, a, b, N, N1, N2, type):
+    def drawLinerTrend(self,  a=1, b=1, N=1000, N1=0, N2=999, type=0):
         '''
         Выводит график линейных трендов
-        Если type = 1, выводит массив данные по Y восходящего тренда
-        Если type = 2, выводит массив данные по Y низходящего тренда
-        Если type = 3, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, выводит массив данные по Y восходящего тренда
+        Если type = 1, выводит массив данные по Y низходящего тренда
+        Если type = 2, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYlinear(a, b, N)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Линейный восходящий тренд")
             plt.show()
-        elif type == 2:
+        elif type == 1:
             dataX = [i for i in range(N)]
             dataY = -self.__calculateYlinear(a, b, N)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
@@ -45,12 +45,12 @@ class Model:
 
             plt.show()
 
-    def getLinerTrend(self, a, b, N, type):
+    def getLinerTrend(self, a=1, b=1, N=1000, type=1):
         '''
         Получить массив данных линейных трендов
-        Если type = 1, возвращает массив данные по Y восходящего тренда
-        Если type = 2, возвращает массив данные по Y низходящего тренда
-        Если type = 3, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, возвращает массив данные по Y восходящего тренда
+        Если type = 1, возвращает массив данные по Y низходящего тренда
+        Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
         if type == 1:
             return self.__calculateYlinear(a, b, N)
@@ -59,20 +59,20 @@ class Model:
         else:
             return [self.__calculateYlinear(a, b, N), -self.__calculateYlinear(a, b, N)]
 
-    def drawExponentaTrend(self, alpha, beta, N, N1, N2, type):
+    def drawExponentaTrend(self, alpha=0.01, beta=1, N=1000, N1=0, N2=999, type=0):
         '''
         Выводит график экспонентных трендов
-        Если type = 1, выводит массив данные по Y восходящего тренда
-        Если type = 2, выводит массив данные по Y низходящего тренда
-        Если type = 3, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, выводит массив данные по Y восходящего тренда
+        Если type = 1, выводит массив данные по Y низходящего тренда
+        Если type = 2, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYexponenta(alpha, beta, N)[1]
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Экспонентный восходящий тренд")
             plt.show()
-        elif type == 2:
+        elif type == 1:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYexponenta(alpha, beta, N)[0]
             plt.plot(dataX[N1:N2], dataY[N1:N2])
@@ -93,12 +93,12 @@ class Model:
 
             plt.show()
 
-    def getExponentaTrend(self, alpha, beta, N, type):
+    def getExponentaTrend(self, alpha=0.01, beta=1, N=1000, type=0):
         '''
         Получить массив данных экспонентных трендов
-        Если type = 1, возвращает массив данные по Y восходящего тренда
-        Если type = 2, возвращает массив данные по Y низходящего тренда
-        Если type = 3, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, возвращает массив данные по Y восходящего тренда
+        Если type = 1, возвращает массив данные по Y низходящего тренда
+        Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
         if type == 1:
             return self.__calculateYexponenta(alpha, beta, N)[1]
@@ -107,7 +107,7 @@ class Model:
         else:
             return self.__calculateYexponenta(alpha, beta, N)
 
-    def drawTrend(self, a, b, alpha, beta, N):
+    def drawTrend(self, a=1, b=1, alpha=0.01, beta=1, N=1000):
         '''
         Выводит график всех трендов
         '''
