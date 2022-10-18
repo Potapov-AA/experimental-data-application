@@ -16,6 +16,8 @@ class Config():
         self.config.set("Parametrs", "N", "1000")
         self.config.set("Parametrs", "a", "1")
         self.config.set("Parametrs", "b", "1")
+        self.config.set("Parametrs", "alpha", "0.01")
+        self.config.set("Parametrs", "beta", "1")
 
         with open(self.path, "w") as configFiles:
             self.config .write(configFiles)
