@@ -17,7 +17,7 @@ class App(Tk):
         self.initUI()
 
     def centerWindow(self):
-        w = 400
+        w = 420
         h = 800
 
         sw = self.winfo_screenwidth()
@@ -67,7 +67,7 @@ class App(Tk):
                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
                 type=int(self.choseGraph.get())
             )
-        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=10)
+        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)
 
         Button(
             self,
@@ -90,38 +90,40 @@ class App(Tk):
                 beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=4, column=0, columnspan=3, padx=10,  pady=10)
+        ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)
+        
+        Label(self,
+              text="ШУМЫ"
+              ).grid(row=5, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
 
+        Button(
+            self,
+            text="Построить график шума на основе линейного конгруэнтного ПСЧ",
+            command=lambda: self.model.drawMyRandomNoise(
+                Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                N=int(self.parametrs.GetParametr("Parametrs", "N"))
+            )
+        ).grid(row=6, column=0, columnspan=3, padx=10,  pady=5)
+        
+        Button(
+            self,
+            text="Построить график шума основанного на встроенном ПСЧ",
+            command=lambda: self.model.drawRandomNoise(
+                Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                N=int(self.parametrs.GetParametr("Parametrs", "N"))
+            )
+        ).grid(row=7, column=0, columnspan=3, padx=10)
+
+        Button(
+            self,
+            text="Построить график всех шумов",
+            command=lambda: self.model.drawNoise(
+                Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                N=int(self.parametrs.GetParametr("Parametrs", "N"))
+            )
+        ).grid(row=8, column=0, columnspan=3, padx=10,  pady=5)
     
-    
-    
-
-    # def lab2UI(self, table_lab_2):
-    #     Label(table_lab_2, text='R = ', width=5).place(x=25, y=20)
-    #     self.entry_R = Entry(table_lab_2, width=5)
-    #     self.entry_R.place(x=60, y=22)
-
-    #     Label(table_lab_2, text='N = ', width=5).place(x=95, y=20)
-    #     self.entry_N_Noise = Entry(table_lab_2, width=5)
-    #     self.entry_N_Noise.place(x=130, y=22)
-
-    #     Button(
-    #         table_lab_2,
-    #         text="Построить график шума встроенного линейного конгруэнтного ПСЧ",
-    #         command=self.drawMyRandomNoise
-    #     ).place(x=25, y=50)
-
-    #     Button(
-    #         table_lab_2,
-    #         text="Построить график шума основанного на встроенном ПСЧ",
-    #         command=self.drawRandomNoise
-    #     ).place(x=25, y=80)
-
-    #     Button(
-    #         table_lab_2,
-    #         text="Построить график всех шумов",
-    #         command=self.drawAllNoise
-    #     ).place(x=25, y=110)
+  
 
     # def lab3UI(self, table_lab_3):
     #     Label(table_lab_3, text='Выбирите график', width=15).place(x=25, y=20)
@@ -256,24 +258,6 @@ class App(Tk):
     #     pass
 
     
-
-    # def drawAllNoise(self):
-    #     Model().drawNoise(
-    #         Range=float(self.entry_R.get()),
-    #         N=int(self.entry_N_Noise.get())
-    #     )
-
-    # def drawMyRandomNoise(self):
-    #     Model().drawMyRandomNoise(
-    #         Range=float(self.entry_R.get()),
-    #         N=int(self.entry_N_Noise.get())
-    #     )
-
-    # def drawRandomNoise(self):
-    #     Model().drawRandomNoise(
-    #         Range=float(self.entry_R.get()),
-    #         N=int(self.entry_N_Noise.get())
-    #     )
 
     # def drawShift(self):
     #     if self.combobox_chose_to_shift.get() == 'Линейный восходящий':
