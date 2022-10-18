@@ -13,7 +13,9 @@ class Config():
 
     def DefaultSettings(self):
         self.config.add_section("Parametrs")
+        self.config.set("Parametrs", "N", "1000")
         self.config.set("Parametrs", "a", "1")
+        self.config.set("Parametrs", "b", "1")
 
         with open(self.path, "w") as configFiles:
             self.config .write(configFiles)
@@ -24,4 +26,5 @@ class Config():
             self.config.write(configFiles)
 
     def GetParametr(self, section, parametrName):
+        self.config.read(self.path)
         return self.config.get(section, parametrName)
