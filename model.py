@@ -135,7 +135,7 @@ class Model:
 
         plt.show()
 
-    def drawRandomNoise(self, Range, N):
+    def drawRandomNoise(self, Range=1000, N=1000):
         '''
         Выводит график шума основанного на встроенном ПСЧ
         '''
@@ -147,7 +147,7 @@ class Model:
 
         plt.show()
 
-    def drawMyRandomNoise(self, Range, N):
+    def drawMyRandomNoise(self, Range=1000, N=1000):
         '''
          Выводит график шума основанного на линейном конгруэнтном ПСЧ
         '''
@@ -159,7 +159,7 @@ class Model:
 
         plt.show()
 
-    def drawNoise(self, Range, N):
+    def drawNoise(self, Range=1000, N=1000):
         '''
         Выводит график шума
         '''
@@ -177,16 +177,16 @@ class Model:
 
         plt.show()
 
-    def getNoise(self, Range, N, type):
+    def getNoise(self, Range=1000, N=1000, type=0):
         '''
         Получить массив данных экспонентных трендов
-        Если type = 1, возвращает массив данные по Y встроенного рандомайзера
-        Если type = 2, возвращает массив данные по Y написанного рандомайзера
-        Если type = 3, возвращает массив массивов данных по Y встроенного рандомайзера и написанного рандомайзера
+        Если type = 0, возвращает массив данные по Y встроенного рандомайзера
+        Если type = 1, возвращает массив данные по Y написанного рандомайзера
+        Если type = 2, возвращает массив массивов данных по Y встроенного рандомайзера и написанного рандомайзера
         '''
-        if type == 1:
+        if type == 0:
             return self.__calculateRandomNoise(Range, N)
-        elif type == 2:
+        elif type == 1:
             return self.__calculateMyRandomNoise(time.time(), Range, N)
         else:
             return [self.__calculateRandomNoise(Range, N), self.__calculateMyRandomNoise(time.time(), Range, N)]
