@@ -52,9 +52,9 @@ class Model:
         Если type = 1, возвращает массив данные по Y низходящего тренда
         Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             return self.__calculateYlinear(a, b, N)
-        elif type == 2:
+        elif type == 1:
             return -self.__calculateYlinear(a, b, N)
         else:
             return [self.__calculateYlinear(a, b, N), -self.__calculateYlinear(a, b, N)]
@@ -100,9 +100,9 @@ class Model:
         Если type = 1, возвращает массив данные по Y низходящего тренда
         Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             return self.__calculateYexponenta(alpha, beta, N)[1]
-        elif type == 2:
+        elif type == 1:
             return self.__calculateYexponenta(alpha, beta, N)[0]
         else:
             return self.__calculateYexponenta(alpha, beta, N)
@@ -191,7 +191,7 @@ class Model:
         else:
             return [self.__calculateRandomNoise(Range, N), self.__calculateMyRandomNoise(time.time(), Range, N)]
 
-    def drawShiftData(self, data, shift, N1, N2):
+    def drawShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
         '''
         Отрисовывает смещеные переданные данные на указанном диапозоне
         Если диапазон не передан, то смещение идет по всем данным
@@ -219,7 +219,7 @@ class Model:
         plt.title("Смещенные данные")
         plt.show()
 
-    def getShiftData(self, data, shift, N1, N2):
+    def getShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
         '''
         Возвращает смещеные переданные данные на указанном диапозоне
         Если диапазон не передан, то смещение идет по всем данным
@@ -240,7 +240,7 @@ class Model:
 
         return shiftData
 
-    def drawImpulseNoise(self, N, R, Rs):
+    def drawImpulseNoise(self, N=1000, R=1000, Rs=900):
         '''
         Выводит импульс на переданных данных
         data = передаваемые данные
@@ -270,7 +270,7 @@ class Model:
         plt.title("Импульсы")
         plt.show()
 
-    def getImpulseNoise(self, N, R, Rs):
+    def getImpulseNoise(self, N=1000, R=1000, Rs=900):
         dataX = [i for i in range(N)]
 
         M = randint(N * 0.005, N*0.01+1)
