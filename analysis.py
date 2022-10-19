@@ -24,10 +24,12 @@ class Analysis:
         result += f'Среднее значение: {meanValue}\n'
         result += f'Дисперсия: {variance}\n'
         result += f'Стандартное отклонение: {standardDeviation}\n'
-        result += f'Ассиметрия: {assymetry}\tКоэффицент ассиметрии: {assymetryCoef}\n'
-        result += f'Эксцесс: {excess}\tкуртозис: {kurtosis}\n'
+        result += f'Ассиметрия: {assymetry}\n'
+        result += f'Коэффицент ассиметрии: {assymetryCoef}\n'
+        result += f'Эксцесс: {excess}\n'
+        result += f'куртозис: {kurtosis}\n'
         result += f'Средний квадрат: {meanSquare}\n'
-        result += f'Среднеквадратическая ошибка: {meanSquareError}'
+        result += f'Ср. квад. ошибка: {meanSquareError}'
         
         return result
 
