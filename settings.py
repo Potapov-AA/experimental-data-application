@@ -3,76 +3,75 @@ from config import Config
 
 
 class ParametrSettings(Toplevel):
-    def __init__(self, parent):
-        self.parametrs = Config()
-        super().__init__(parent)
-        self.title("Настройки параметров")
-        self.centerWindow()
+       def __init__(self, parent):
+              self.parametrs = Config()
+              super().__init__(parent)
+              self.title("Настройки параметров")
+              self.centerWindow()
 
-        Label(self, text="Общие параметры").grid(
-            column=0, row=0, columnspan=3, sticky=E+W, padx=5, pady=5)
+              Label(self, text="Общие параметры").grid(
+              column=0, row=0, columnspan=3, sticky=E+W, padx=5, pady=5)
+
+              self.drawParameter("N =", 1, "N")
+
+              Label(self, text="Линейный тренд (y=ax+b)").grid(column=0,
+                                                               row=2, columnspan=3, sticky=E+W, padx=5, pady=5)
+
+              self.drawParameter("a =", 3, "a")
+              self.drawParameter("b =", 4, "b")
+
+              Label(self, text="Экспонентный тренд (y=beta*e^alpha*x)").grid(column=0,
+                                                                             row=5, columnspan=3, sticky=E+W, padx=5, pady=5)
+
+              self.drawParameter("alpha =", 6, "alpha")
+              self.drawParameter("beta =", 7, "beta")
+
+              Label(self, text="Шумы").grid(column=0, row=8,
+                                          columnspan=3, sticky=E+W, padx=5, pady=5)
+
+              self.drawParameter("R =", 9, "R")
+              
+              Label(self, text="Смещение и импульсы").grid(column=0, row=10, 
+                                                columnspan=3, sticky=E+W, padx=5, pady=5)
+              
+              self.drawParameter("Shift =", 11, "Shift")
+              self.drawParameter("From =", 12, "ShiftFrom")
+              self.drawParameter("To =", 13, "ShiftTo")
+              self.drawParameter("R1 =", 14, "R1")
+              self.drawParameter("R2 =", 15, "R2")
+              
+              Label(self, text="Гармоники").grid(column=0, row=16, 
+                                                columnspan=3, sticky=E+W, padx=5, pady=5)
+              
+              self.drawParameter("A0 =", 17, "A0")
+              self.drawParameter("A1 =", 18, "A1")
+              self.drawParameter("A2 =", 19, "A2")
+              self.drawParameter("f0 =", 20, "f0")
+              self.drawParameter("f1 =", 21, "f1")
+              self.drawParameter("f2 =", 22, "f2")
+              self.drawParameter("dt =", 23, "dt")
+              self.drawParameter("step =", 24, "step")
+              self.drawParameter("thetta =", 25, "thetta")
+              
+       def centerWindow(self):
+              w = 235
+              h = 800
+
+              sw = self.winfo_screenwidth()
+              sh = self.winfo_screenheight()
+
+              x = (sw - w) / 2
+              y = (sh - h) / 2
+              self.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
+       def drawParameter(self, text, row, parametrName):
+              Label(self, text=text).grid(column=0, row=row, padx=10, sticky=W)
+              entry = Entry(self, width=10, justify=CENTER)
+              entry.grid(column=1, row=row, padx=5, sticky=E)
+              entry.insert(0, self.parametrs.GetParametr("Parametrs", parametrName))
+              Button(self, text="Сохранить", width=10,
+                     command=lambda: self.save(parametrName, entry.get())).grid(column=2, row=row, padx=5)
+       
+       def save(self, parameterName, value):
+              self.parametrs.UpdateParametr("Parametrs", parameterName, value)
         
-        Label(self, text="N =").grid(column=0, row=1, padx=10, sticky=W)
-        self.entry_N = Entry(self, width=10, justify=CENTER)
-        self.entry_N.grid(column=1, row=1, padx=5, sticky=E)
-        self.entry_N.insert(0, self.parametrs.GetParametr("Parametrs", "N"))
-        Button(self, text="Сохранить", width=10,
-               command=lambda: self.save("N", self.entry_N.get())).grid(column=2, row=1, padx=5)
-
-        Label(self, text="Линейный тренд (y=ax+b)").grid(column=0,
-                                                         row=2, columnspan=3, sticky=E+W, padx=5, pady=5)
-
-        Label(self, text="a =").grid(column=0, row=3, padx=10, sticky=W)
-        self.entry_a = Entry(self, width=10, justify=CENTER)
-        self.entry_a.grid(column=1, row=3, padx=5, sticky=E)
-        self.entry_a.insert(0, self.parametrs.GetParametr("Parametrs", "a"))
-        Button(self, text="Сохранить", width=10,
-               command=lambda: self.save("a", self.entry_a.get())).grid(column=2, row=3, padx=5)
-
-        Label(self, text="b =").grid(column=0, row=4, padx=10, sticky=W)
-        self.entry_b = Entry(self, width=10, justify=CENTER)
-        self.entry_b.grid(column=1, row=4, padx=5, sticky=E)
-        self.entry_b.insert(0, self.parametrs.GetParametr("Parametrs", "b"))
-        Button(self, text="Сохранить", width=10,
-               command=lambda: self.save("b", self.entry_b.get())).grid(column=2, row=4, padx=5)
-
-        Label(self, text="Экспонентный тренд (y=beta*e^alpha*x)").grid(column=0,
-                                                         row=5, columnspan=3, sticky=E+W, padx=5, pady=5)
-        
-        Label(self, text="alpha =").grid(column=0, row=6, padx=10, sticky=W)
-        self.entry_alpha = Entry(self, width=10, justify=CENTER)
-        self.entry_alpha.grid(column=1, row=6, padx=5, sticky=E)
-        self.entry_alpha.insert(0, self.parametrs.GetParametr("Parametrs", "alpha"))
-        Button(self, text="Сохранить", width=10,
-               command=lambda: self.save("alpha", self.entry_alpha.get())).grid(column=2, row=6, padx=5)
-        
-        Label(self, text="beta =").grid(column=0, row=7, padx=10, sticky=W)
-        self.entry_beta = Entry(self, width=10, justify=CENTER)
-        self.entry_beta.grid(column=1, row=7, padx=5, sticky=E)
-        self.entry_beta.insert(0, self.parametrs.GetParametr("Parametrs", "beta"))
-        Button(self, text="Сохранить", width=10,
-               command=lambda: self.save("beta", self.entry_beta.get())).grid(column=2, row=7, padx=5)
-
-        Label(self, text="Шумы").grid(column=0, row=8, columnspan=3, sticky=E+W, padx=5, pady=5)
-        
-        Label(self, text="R =").grid(column=0, row=9, padx=10, sticky=W)
-        self.entry_R = Entry(self, width=10, justify=CENTER)
-        self.entry_R.grid(column=1, row=9, padx=5, sticky=E)
-        self.entry_R.insert(0, self.parametrs.GetParametr("Parametrs", "R"))
-        Button(self, text="Сохранить", width=10,
-               command=lambda: self.save("R", self.entry_R.get())).grid(column=2, row=9, padx=5)
-        
-    def centerWindow(self):
-        w = 235
-        h = 400
-
-        sw = self.winfo_screenwidth()
-        sh = self.winfo_screenheight()
-
-        x = (sw - w) / 2
-        y = (sh - h) / 2
-        self.geometry('%dx%d+%d+%d' % (w, h, x, y))
-    
-    
-    def save(self, parameterName, value):
-        self.parametrs.UpdateParametr("Parametrs", parameterName, value)
