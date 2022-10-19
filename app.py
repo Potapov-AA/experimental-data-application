@@ -10,6 +10,7 @@ class App(Tk):
     def __init__(self):
         super().__init__()
         self.model = Model()
+        self.analysis = Analysis()
         self.parametrs = Config()
         self.parametrs.DownloadSettings()
         self.title("МОЭД")
@@ -17,7 +18,7 @@ class App(Tk):
         self.initUI()
 
     def centerWindow(self):
-        w = 420
+        w = 450
         h = 800
 
         sw = self.winfo_screenwidth()
@@ -42,46 +43,58 @@ class App(Tk):
         settings.add_command(label="Настройки параметров", command=self.openParametrSettings)
         mainmenu.add_cascade(label="Настройки", menu=settings)
 
-        Label(self,
+        canvas=Canvas(self)
+        canvas.pack(side=LEFT,fill=BOTH,expand=1)
+        scrollbar=Scrollbar(self,orient=VERTICAL,command=canvas.yview)
+        scrollbar.pack(side=RIGHT,fill=Y)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.bind("<Configure>",lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        mainFrame=Frame(canvas)
+        canvas.create_window((0,0),window=mainFrame,anchor="nw")
+        
+        
+        
+        Label(mainFrame,
               text="ТРЕНДЫ"
               ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
 
         typeGraph = ["Восходящий", "Низходящий", "Восходящий и низходящий"]
 
-        self.choseGraph = StringVar(value=0)
+        self.choseGraph1 = StringVar(value=0)
 
         column = 0
         for index in range(len(typeGraph)):
-            print(index)
-            radiobtn_graph = ttk.Radiobutton(text=typeGraph[index], value=index, variable=self.choseGraph)
+            radiobtn_graph = ttk.Radiobutton(mainFrame, text=typeGraph[index], value=index, variable=self.choseGraph1)
             radiobtn_graph.grid(row=1, column=column, padx=5)
             column += 1
+        
         del column
+        del typeGraph
 
         Button(
-            self,
+            mainFrame,
             text="Построить линейный тренд",
             command=lambda: self.model.drawLinerTrend(
                 a=float(self.parametrs.GetParametr("Parametrs", "a")),
                 b=float(self.parametrs.GetParametr("Parametrs", "b")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                type=int(self.choseGraph.get())
+                type=int(self.choseGraph1.get())
             )
         ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)
 
         Button(
-            self,
+            mainFrame,
             text="Построить экспонентный тренд",
             command=lambda: self.model.drawExponentaTrend(
                 alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
                 beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                type=int(self.choseGraph.get())
+                type=int(self.choseGraph1.get())
             )
         ).grid(row=3, column=0, columnspan=3, padx=10)
 
         Button(
-            self,
+            mainFrame,
             text="Вывести график всех трендов",
             command=lambda: self.model.drawTrend(
                 a=float(self.parametrs.GetParametr("Parametrs", "a")),
@@ -92,12 +105,12 @@ class App(Tk):
             )
         ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)
         
-        Label(self,
+        Label(mainFrame,
               text="ШУМЫ"
               ).grid(row=5, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
 
         Button(
-            self,
+            mainFrame,
             text="Построить график шума на основе линейного конгруэнтного ПСЧ",
             command=lambda: self.model.drawMyRandomNoise(
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
@@ -106,7 +119,7 @@ class App(Tk):
         ).grid(row=6, column=0, columnspan=3, padx=10,  pady=5)
         
         Button(
-            self,
+            mainFrame,
             text="Построить график шума основанного на встроенном ПСЧ",
             command=lambda: self.model.drawRandomNoise(
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
@@ -115,7 +128,7 @@ class App(Tk):
         ).grid(row=7, column=0, columnspan=3, padx=10)
 
         Button(
-            self,
+            mainFrame,
             text="Построить график всех шумов",
             command=lambda: self.model.drawNoise(
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
@@ -123,221 +136,187 @@ class App(Tk):
             )
         ).grid(row=8, column=0, columnspan=3, padx=10,  pady=5)
     
-  
+        Label(mainFrame,
+              text="СТАТИСТИКА"
+              ).grid(row=9, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        
+        
+        typeGraph = ['Шум на основе встроенного генератора', 'Шум на основе написанного генератора']
 
-    # def lab3UI(self, table_lab_3):
-    #     Label(table_lab_3, text='Выбирите график', width=15).place(x=25, y=20)
-    #     self.combobox_chose_to_statistic = ttk.Combobox(table_lab_3)
-    #     self.combobox_chose_to_statistic['values'] = (
-    #         'Шум на основе встроенного генератора',
-    #         'Шум на основе написанного генератора'
-    #     )
-    #     self.combobox_chose_to_statistic.current(0)
-    #     self.combobox_chose_to_statistic.place(x=140, y=21)
+        self.choseNoise = StringVar(value=0)
 
-    #     Label(table_lab_3, text='N = ', width=5).place(x=290, y=20)
-    #     self.entry_N_statistic = Entry(table_lab_3, width=10)
-    #     self.entry_N_statistic.place(x=325, y=21)
+        row = 10
+        for index in range(len(typeGraph)):
+            radiobtn_graph = ttk.Radiobutton(mainFrame, text=typeGraph[index], value=index, variable=self.choseNoise)
+            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
+            row += 1
+       
+        del row
+        del typeGraph
+        
+        Button(
+            mainFrame,
+            text='Расчитать статистику',
+            command=self.printStatistic
+        ).grid(row=12, column=0, columnspan=3, padx=10,  pady=5)
 
-    #     Button(
-    #         table_lab_3,
-    #         text='Расчитать статистику',
-    #         command=self.printStatistic
-    #     ).place(x=25, y=60)
+        result = f'Количество значенией:\n'
+        result += f'Минимальное значение:\n'
+        result += f'Максимальное значение:\n'
+        result += f'Среднее значение:\n'
+        result += f'Дисперсия:\n'
+        result += f'Стандартное отклонение:\n'
+        result += f'Ассиметрия:\tКоэффицент ассиметрии:\n'
+        result += f'Эксцесс:\tкуртозис:\n'
+        result += f'Средний квадрат:\n'
+        result += f'Среднеквадратическая ошибка:\n\n'
+        
+        self.label_statistic = Label(mainFrame, text=result)
+        self.label_statistic.grid(row=13, column=0, columnspan=3, padx=10,  pady=5)
+        
+        
+        Label(mainFrame,
+              text="СМЕЩЕНИЕ И ИМПУЛЬСЫ"
+              ).grid(row=14, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        
+        typeGraph = ['Линейный восходящий', 'Линейный низходящий', 'Экспонента восходящая', 'Экспонента низходящая']
+        self.choseGraph2 = StringVar(value=0)
 
-    #     self.label_statistic = Label(table_lab_3, text='')
-    #     self.label_statistic.place(x=150, y=100)
+        row = 15
+        for index in range(len(typeGraph)):
+            radiobtn_graph = ttk.Radiobutton(mainFrame, text=typeGraph[index], value=index, variable=self.choseGraph2)
+            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
+            row += 1
+       
+        del row
+        del typeGraph
+    
+        Button(
+            mainFrame,
+            text='Построить смещение на графике',
+            command=self.drawShift
+        ).grid(row=19, column=0, columnspan=3, padx=10,  pady=5)
+        
+        Button(
+            mainFrame,
+            text="Построить импульсы",
+            command=lambda: self.model.drawImpulseNoise(
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                R=int(self.parametrs.GetParametr("Parametrs", "R2")),
+                Rs=int(self.parametrs.GetParametr("Parametrs", "R1"))
+            )
+        ).grid(row=20, column=0, columnspan=3, padx=10,  pady=5)
+    
+        Label(mainFrame,
+              text="ГАРМОНИКИ"
+              ).grid(row=21, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+    
+        Button(
+            mainFrame,
+            text='Вывести гармонический процесс',
+            command=lambda: self.model.drawHarm(
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+            )
+        ).grid(row=22, column=0, columnspan=3, padx=10,  pady=5)
+        
+        Button(
+            mainFrame,
+            text='Вывести гармонический процесс с суммой трех гармоник',
+            command=lambda: self.model.draw3In1Harm(
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                A1=float(self.parametrs.GetParametr("Parametrs", "A1")),
+                A2=float(self.parametrs.GetParametr("Parametrs", "A2")),
+                f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                f1=float(self.parametrs.GetParametr("Parametrs", "f1")),
+                f2=float(self.parametrs.GetParametr("Parametrs", "f2")),
+                dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+            )
+        ).grid(row=23, column=0, columnspan=3, padx=10,  pady=5)
 
-    # def lab4UI(self, table_lab_4):
-    #     self.combobox_chose_to_shift = ttk.Combobox(table_lab_4)
-    #     self.combobox_chose_to_shift['values'] = (
-    #         'Линейный восходящий',
-    #         'Линейный низходящий',
-    #         'Экспонента восходящая',
-    #         'Экспонента низходящая'
-    #     )
-    #     self.combobox_chose_to_shift.current(0)
-    #     self.combobox_chose_to_shift.place(x=25, y=20)
-
-    #     Label(table_lab_4, text='Смещение =', width=10).place(x=180, y=20)
-    #     self.entry_shift = Entry(table_lab_4, width=5)
-    #     self.entry_shift.place(x=260, y=22)
-
-    #     Label(table_lab_4, text='От', width=5).place(x=300, y=20)
-    #     self.entry_N1_shift = Entry(table_lab_4, width=5)
-    #     self.entry_N1_shift.place(x=340, y=22)
-
-    #     Label(table_lab_4, text='До', width=5).place(x=370, y=20)
-    #     self.entry_N2_shift = Entry(table_lab_4, width=5)
-    #     self.entry_N2_shift.place(x=410, y=22)
-
-    #     Label(table_lab_4, text='N =', width=5).place(x=25, y=80)
-    #     self.entry_N_impulse = Entry(table_lab_4, width=5)
-    #     self.entry_N_impulse.place(x=60, y=82)
-
-    #     Label(table_lab_4, text='R =', width=5).place(x=90, y=80)
-    #     self.entry_R_impulse = Entry(table_lab_4, width=5)
-    #     self.entry_R_impulse.place(x=125, y=82)
-
-    #     Label(table_lab_4, text='Rs =', width=5).place(x=160, y=80)
-    #     self.entry_Rs_impulse = Entry(table_lab_4, width=5)
-    #     self.entry_Rs_impulse.place(x=200, y=82)
-
-    #     Button(
-    #         table_lab_4,
-    #         text='Построить смещение на графике',
-    #         command=self.drawShift
-    #     ).place(x=25, y=50)
-
-    #     Button(
-    #         table_lab_4,
-    #         text="Построить импульсы",
-    #         command=self.drawImpulse
-    #     ).place(x=25, y=110)
-
-    # def lab5UI(self, table_lab_5):
-    #     Label(table_lab_5, text='N =', width=5).place(x=25, y=20)
-    #     self.entry_N_harmonic = Entry(table_lab_5, width=5)
-    #     self.entry_N_harmonic.place(x=60, y=21)
-
-    #     Label(table_lab_5, text='A0 =', width=5).place(x=100, y=20)
-    #     self.entry_A0 = Entry(table_lab_5, width=5)
-    #     self.entry_A0.place(x=135, y=21)
-
-    #     Label(table_lab_5, text='A1 =', width=5).place(x=100, y=45)
-    #     self.entry_A1 = Entry(table_lab_5, width=5)
-    #     self.entry_A1.place(x=135, y=46)
-
-    #     Label(table_lab_5, text='A2 =', width=5).place(x=100, y=70)
-    #     self.entry_A2 = Entry(table_lab_5, width=5)
-    #     self.entry_A2.place(x=135, y=71)
-
-    #     Label(table_lab_5, text='f0 =', width=5).place(x=170, y=20)
-    #     self.entry_f0 = Entry(table_lab_5, width=5)
-    #     self.entry_f0.place(x=205, y=21)
-
-    #     Label(table_lab_5, text='f1 =', width=5).place(x=170, y=45)
-    #     self.entry_f1 = Entry(table_lab_5, width=5)
-    #     self.entry_f1.place(x=205, y=46)
-
-    #     Label(table_lab_5, text='f0 =', width=5).place(x=170, y=70)
-    #     self.entry_f2 = Entry(table_lab_5, width=5)
-    #     self.entry_f2.place(x=205, y=71)
-
-    #     Label(table_lab_5, text='dt =', width=5).place(x=240, y=20)
-    #     self.entry_dt = Entry(table_lab_5, width=5)
-    #     self.entry_dt.place(x=275, y=21)
-
-    #     Label(table_lab_5, text='thetta =', width=5).place(x=320, y=20)
-    #     self.entry_tetta = Entry(table_lab_5, width=5)
-    #     self.entry_tetta.place(x=365, y=21)
-
-    #     Label(table_lab_5, text='step =', width=5).place(x=400, y=20)
-    #     self.entry_step = Entry(table_lab_5, width=5)
-    #     self.entry_step.place(x=440, y=21)
-
-    #     Button(
-    #         table_lab_5,
-    #         text='Вывести гармонический процесс',
-    #         command=self.drawHarmonic
-    #     ).place(x=25, y=100)
-
-    #     Button(
-    #         table_lab_5,
-    #         text='Вывести гармонический процесс с суммой трех гармоник',
-    #         command=self.drawHarmonics
-    #     ).place(x=25, y=130)
-
-    #     Button(
-    #         table_lab_5,
-    #         text='Вывести гармонический процесс с повышением f0 с указанным шагом',
-    #         command=self.drawSumHarmonics
-    #     ).place(x=25, y=160)
-
-    # def lab6UI(self, table_lab_5):
-    #     pass
+        Button(
+            mainFrame,
+            text='Вывести гармонический процесс с повышением f0 с указанным шагом',
+            command=lambda: self.model.drawHarms(
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                step=float(self.parametrs.GetParametr("Parametrs", "step"))
+            )
+        ).grid(row=24, column=0, columnspan=3, padx=10,  pady=5)
+        
+     
+    def printStatistic(self):
+        result = self.analysis.statistics(
+            self.model.getNoise(
+                Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                type=int(self.choseNoise.get())
+            )
+        )
+        result += '\n\n'
+        result += self.analysis.stationarity(
+            self.model.getNoise(
+                Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                type=int(self.choseNoise.get())
+            )
+        )
+        
+        self.label_statistic.configure(text=result)
 
     
-
-    # def drawShift(self):
-    #     if self.combobox_chose_to_shift.get() == 'Линейный восходящий':
-    #         Model().drawShiftData(
-    #             data=Model().getLinerTrend(a=10, b=12, N=1000, type=1),
-    #             shift=float(self.entry_shift.get()),
-    #             N1=int(self.entry_N1_shift.get()),
-    #             N2=int(self.entry_N2_shift.get())
-    #         )
-    #     elif self.combobox_chose_to_shift.get() == 'Линейный низходящий':
-    #         Model().drawShiftData(
-    #             data=Model().getLinerTrend(a=10, b=12, N=1000, type=2),
-    #             shift=float(self.entry_shift.get()),
-    #             N1=int(self.entry_N1_shift.get()),
-    #             N2=int(self.entry_N2_shift.get())
-    #         )
-    #     elif self.combobox_chose_to_shift.get() == 'Экспонента восходящая':
-    #         Model().drawShiftData(
-    #             data=Model().getExponentaTrend(alpha=0.15, beta=10, N=1000, type=1),
-    #             shift=float(self.entry_shift.get()),
-    #             N1=int(self.entry_N1_shift.get()),
-    #             N2=int(self.entry_N2_shift.get())
-    #         )
-    #     elif self.combobox_chose_to_shift.get() == 'Экспонента низходящая':
-    #         Model().drawShiftData(
-    #             data=Model().getExponentaTrend(alpha=0.15, beta=10, N=1000, type=2),
-    #             shift=float(self.entry_shift.get()),
-    #             N1=int(self.entry_N1_shift.get()),
-    #             N2=int(self.entry_N2_shift.get())
-    #         )
-
-    # def drawImpulse(self):
-    #     Model().drawImpulseNoise(
-    #         N=int(self.entry_N_impulse.get()),
-    #         R=int(self.entry_R_impulse.get()),
-    #         Rs=int(self.entry_Rs_impulse.get())
-    #     )
-
-    # def printStatistic(self):
-    #     if self.combobox_chose_to_statistic.get() == 'Шум на основе встроенного генератора':
-    #         result = Analysis().statistics(Model().getNoise(
-    #             100, int(self.entry_N_statistic.get()), 1))
-    #         result += '\n\n'
-    #         result += Analysis().stationarity(Model().getNoise(100,
-    #                                                            int(self.entry_N_statistic.get()), 1))
-    #         self.label_statistic.configure(text=result)
-    #     elif self.combobox_chose_to_statistic.get() == 'Шум на основе написанного генератора':
-    #         result = Analysis().statistics(Model().getNoise(
-    #             100, int(self.entry_N_statistic.get()), 2))
-    #         result += '\n\n'
-    #         result += Analysis().stationarity(Model().getNoise(100,
-    #                                                            int(self.entry_N_statistic.get()), 2))
-    #         self.label_statistic.configure(text=result)
-
-    # def drawHarmonic(self):
-    #     Model().drawHarm(
-    #         N=int(self.entry_N_harmonic.get()),
-    #         A0=float(self.entry_A0.get()),
-    #         f0=float(self.entry_f0.get()),
-    #         dt=float(self.entry_dt.get()),
-    #         thetta=float(self.entry_tetta.get())
-    #     )
-
-    # def drawHarmonics(self):
-    #     Model().drawHarms(
-    #         N=int(self.entry_N_harmonic.get()),
-    #         A0=float(self.entry_A0.get()),
-    #         f0=float(self.entry_f0.get()),
-    #         dt=float(self.entry_dt.get()),
-    #         step=int(self.entry_step.get())
-    #     )
-
-    # def drawSumHarmonics(self):
-    #     Model().draw3In1Harm(
-    #         N=int(self.entry_N_harmonic.get()),
-    #         A0=float(self.entry_A0.get()),
-    #         A1=float(self.entry_A1.get()),
-    #         A2=float(self.entry_A2.get()),
-    #         f0=float(self.entry_f0.get()),
-    #         f1=float(self.entry_f1.get()),
-    #         f2=float(self.entry_f2.get()),
-    #         dt=float(self.entry_dt.get())
-    #     )
+    def drawShift(self):
+        if int(self.choseGraph2.get()) == 0:
+            self.model.drawShiftData(
+                data=self.model.getLinerTrend(
+                    a=float(self.parametrs.GetParametr("Parametrs", "a")),
+                    b=float(self.parametrs.GetParametr("Parametrs", "b")),
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type=0
+                    ),
+                shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
+                N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
+                N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
+            )
+        elif int(self.choseGraph2.get()) == 1:
+            self.model.drawShiftData(
+                data=self.model.getLinerTrend(
+                    a=float(self.parametrs.GetParametr("Parametrs", "a")),
+                    b=float(self.parametrs.GetParametr("Parametrs", "b")),
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type=1
+                    ),
+                shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
+                N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
+                N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
+            )
+        elif int(self.choseGraph2.get()) == 2:
+            self.model.drawShiftData(
+                data=self.model.getExponentaTrend(
+                    alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
+                    beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type=0
+                    ),
+                shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
+                N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
+                N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
+            )
+        elif int(self.choseGraph2.get()) == 3:
+            self.model.drawShiftData(
+                data=self.model.getExponentaTrend(
+                    alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
+                    beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type=1
+                    ),
+                shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
+                N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
+                N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
+            )
