@@ -11,20 +11,20 @@ class Model:
     def __init__(self):
         self.e = np.e
 
-    def drawLinerTrend(self, a, b, N, N1, N2, type):
+    def drawLinerTrend(self,  a=1, b=1, N=1000, N1=0, N2=999, type=0):
         '''
         Выводит график линейных трендов
-        Если type = 1, выводит массив данные по Y восходящего тренда
-        Если type = 2, выводит массив данные по Y низходящего тренда
-        Если type = 3, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, выводит массив данные по Y восходящего тренда
+        Если type = 1, выводит массив данные по Y низходящего тренда
+        Если type = 2, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYlinear(a, b, N)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Линейный восходящий тренд")
             plt.show()
-        elif type == 2:
+        elif type == 1:
             dataX = [i for i in range(N)]
             dataY = -self.__calculateYlinear(a, b, N)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
@@ -45,34 +45,34 @@ class Model:
 
             plt.show()
 
-    def getLinerTrend(self, a, b, N, type):
+    def getLinerTrend(self, a=1, b=1, N=1000, type=1):
         '''
         Получить массив данных линейных трендов
-        Если type = 1, возвращает массив данные по Y восходящего тренда
-        Если type = 2, возвращает массив данные по Y низходящего тренда
-        Если type = 3, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, возвращает массив данные по Y восходящего тренда
+        Если type = 1, возвращает массив данные по Y низходящего тренда
+        Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             return self.__calculateYlinear(a, b, N)
-        elif type == 2:
+        elif type == 1:
             return -self.__calculateYlinear(a, b, N)
         else:
             return [self.__calculateYlinear(a, b, N), -self.__calculateYlinear(a, b, N)]
 
-    def drawExponentaTrend(self, alpha, beta, N, N1, N2, type):
+    def drawExponentaTrend(self, alpha=0.01, beta=1, N=1000, N1=0, N2=999, type=0):
         '''
         Выводит график экспонентных трендов
-        Если type = 1, выводит массив данные по Y восходящего тренда
-        Если type = 2, выводит массив данные по Y низходящего тренда
-        Если type = 3, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, выводит массив данные по Y восходящего тренда
+        Если type = 1, выводит массив данные по Y низходящего тренда
+        Если type = 2, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYexponenta(alpha, beta, N)[1]
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Экспонентный восходящий тренд")
             plt.show()
-        elif type == 2:
+        elif type == 1:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYexponenta(alpha, beta, N)[0]
             plt.plot(dataX[N1:N2], dataY[N1:N2])
@@ -93,21 +93,21 @@ class Model:
 
             plt.show()
 
-    def getExponentaTrend(self, alpha, beta, N, type):
+    def getExponentaTrend(self, alpha=0.01, beta=1, N=1000, type=0):
         '''
         Получить массив данных экспонентных трендов
-        Если type = 1, возвращает массив данные по Y восходящего тренда
-        Если type = 2, возвращает массив данные по Y низходящего тренда
-        Если type = 3, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
+        Если type = 0, возвращает массив данные по Y восходящего тренда
+        Если type = 1, возвращает массив данные по Y низходящего тренда
+        Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
         '''
-        if type == 1:
+        if type == 0:
             return self.__calculateYexponenta(alpha, beta, N)[1]
-        elif type == 2:
+        elif type == 1:
             return self.__calculateYexponenta(alpha, beta, N)[0]
         else:
             return self.__calculateYexponenta(alpha, beta, N)
 
-    def drawTrend(self, a, b, alpha, beta, N):
+    def drawTrend(self, a=1, b=1, alpha=0.01, beta=1, N=1000):
         '''
         Выводит график всех трендов
         '''
@@ -135,7 +135,7 @@ class Model:
 
         plt.show()
 
-    def drawRandomNoise(self, Range, N):
+    def drawRandomNoise(self, Range=1000, N=1000):
         '''
         Выводит график шума основанного на встроенном ПСЧ
         '''
@@ -147,7 +147,7 @@ class Model:
 
         plt.show()
 
-    def drawMyRandomNoise(self, Range, N):
+    def drawMyRandomNoise(self, Range=1000, N=1000):
         '''
          Выводит график шума основанного на линейном конгруэнтном ПСЧ
         '''
@@ -159,7 +159,7 @@ class Model:
 
         plt.show()
 
-    def drawNoise(self, Range, N):
+    def drawNoise(self, Range=1000, N=1000):
         '''
         Выводит график шума
         '''
@@ -177,21 +177,21 @@ class Model:
 
         plt.show()
 
-    def getNoise(self, Range, N, type):
+    def getNoise(self, Range=1000, N=1000, type=0):
         '''
         Получить массив данных экспонентных трендов
-        Если type = 1, возвращает массив данные по Y встроенного рандомайзера
-        Если type = 2, возвращает массив данные по Y написанного рандомайзера
-        Если type = 3, возвращает массив массивов данных по Y встроенного рандомайзера и написанного рандомайзера
+        Если type = 0, возвращает массив данные по Y встроенного рандомайзера
+        Если type = 1, возвращает массив данные по Y написанного рандомайзера
+        Если type = 2, возвращает массив массивов данных по Y встроенного рандомайзера и написанного рандомайзера
         '''
-        if type == 1:
+        if type == 0:
             return self.__calculateRandomNoise(Range, N)
-        elif type == 2:
+        elif type == 1:
             return self.__calculateMyRandomNoise(time.time(), Range, N)
         else:
             return [self.__calculateRandomNoise(Range, N), self.__calculateMyRandomNoise(time.time(), Range, N)]
 
-    def drawShiftData(self, data, shift, N1, N2):
+    def drawShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
         '''
         Отрисовывает смещеные переданные данные на указанном диапозоне
         Если диапазон не передан, то смещение идет по всем данным
@@ -219,7 +219,7 @@ class Model:
         plt.title("Смещенные данные")
         plt.show()
 
-    def getShiftData(self, data, shift, N1, N2):
+    def getShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
         '''
         Возвращает смещеные переданные данные на указанном диапозоне
         Если диапазон не передан, то смещение идет по всем данным
@@ -240,7 +240,7 @@ class Model:
 
         return shiftData
 
-    def drawImpulseNoise(self, N, R, Rs):
+    def drawImpulseNoise(self, N=1000, R=1000, Rs=900):
         '''
         Выводит импульс на переданных данных
         data = передаваемые данные
@@ -270,7 +270,7 @@ class Model:
         plt.title("Импульсы")
         plt.show()
 
-    def getImpulseNoise(self, N, R, Rs):
+    def getImpulseNoise(self, N=1000, R=1000, Rs=900):
         dataX = [i for i in range(N)]
 
         M = randint(N * 0.005, N*0.01+1)
