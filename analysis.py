@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
 class Analysis:
     def __init__(self):
@@ -51,3 +52,19 @@ class Analysis:
                     return 'Процесс нестационарный'
         return 'Процесс стационарный'
         
+    def histograma(self, data=[i for i in range(10000)], M=100):
+        min = int(round(np.min(data), 2))
+        max = int(round(np.max(data), 2))
+        
+        step = int(round((max-min)/M))
+        
+        lstep = []
+        for i in range(min, max, step):
+            lstep.append(i)
+        lstep.append(max)
+        
+        fig, ax = plt.subplots(figsize =(10, 7))
+        ax.hist(data, bins = lstep)
+ 
+        # Show plot
+        plt.show()
