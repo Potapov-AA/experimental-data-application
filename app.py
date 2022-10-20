@@ -52,6 +52,7 @@ class App(Tk):
         frame4 = ttk.Frame(notebook)
         frame5 = ttk.Frame(notebook)
         frame6 = ttk.Frame(notebook)
+        frame7 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -59,6 +60,7 @@ class App(Tk):
         frame4.pack(fill=BOTH, expand=True)
         frame5.pack(fill=BOTH, expand=True)
         frame6.pack(fill=BOTH, expand=True)
+        frame7.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Лаб. 1")
         notebook.add(frame2, text="Лаб. 2")
@@ -66,12 +68,14 @@ class App(Tk):
         notebook.add(frame4, text="Лаб. 4")
         notebook.add(frame5, text="Лаб. 5")
         notebook.add(frame6, text="Лаб. 6")
+        notebook.add(frame7, text="Лаб. 7")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
         self.lab3UI(frame3)
         self.lab4UI(frame4)
         self.lab5UI(frame5)
+        self.lab6UI(frame6)
         
     
     def lab1UI(self, parent):
@@ -129,7 +133,7 @@ class App(Tk):
     def lab2UI(self, parent):
         Label(parent,
               text="ШУМЫ"
-              ).grid(row=5, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
 
         Button(
             parent,
@@ -138,7 +142,7 @@ class App(Tk):
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=6, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)
         
         Button(
             parent,
@@ -147,7 +151,7 @@ class App(Tk):
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=7, column=0, columnspan=3, padx=10)
+        ).grid(row=2, column=0, columnspan=3, padx=10)
 
         Button(
             parent,
@@ -156,19 +160,19 @@ class App(Tk):
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=8, column=0, columnspan=3, padx=10,  pady=5)     
+        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)     
     
     def lab3UI(self, parent):
         Label(parent,
               text="СТАТИСТИКА"
-              ).grid(row=9, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
         
         
         typeGraph = ['Шум на основе встроенного генератора', 'Шум на основе написанного генератора']
 
         self.choseNoise = StringVar(value=0)
 
-        row = 10
+        row = 1
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseNoise)
             radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
@@ -181,7 +185,7 @@ class App(Tk):
             parent,
             text='Расчитать статистику',
             command=self.printStatistic
-        ).grid(row=12, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)
 
         result = f'Количество значенией:\n'
         result += f'Минимальное значение:\n'
@@ -202,12 +206,12 @@ class App(Tk):
     def lab4UI(self, parent):
         Label(parent,
               text="СМЕЩЕНИЕ И ИМПУЛЬСЫ"
-              ).grid(row=14, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
         
         typeGraph = ['Линейный восходящий', 'Линейный низходящий', 'Экспонента восходящая', 'Экспонента низходящая']
         self.choseGraph2 = StringVar(value=0)
 
-        row = 15
+        row = 1
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseGraph2)
             radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
@@ -220,7 +224,7 @@ class App(Tk):
             parent,
             text='Построить смещение на графике',
             command=self.drawShift
-        ).grid(row=19, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
         
         Button(
             parent,
@@ -230,12 +234,12 @@ class App(Tk):
                 R=int(self.parametrs.GetParametr("Parametrs", "R2")),
                 Rs=int(self.parametrs.GetParametr("Parametrs", "R1"))
             )
-        ).grid(row=20, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=6, column=0, columnspan=3, padx=10,  pady=5)
     
     def lab5UI(self, parent):
         Label(parent,
               text="ГАРМОНИКИ"
-              ).grid(row=21, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
     
         Button(
             parent,
@@ -247,7 +251,7 @@ class App(Tk):
                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                 thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
             )
-        ).grid(row=22, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)
         
         Button(
             parent,
@@ -262,7 +266,7 @@ class App(Tk):
                 f2=float(self.parametrs.GetParametr("Parametrs", "f2")),
                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
             )
-        ).grid(row=23, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)
 
         Button(
             parent,
@@ -274,7 +278,31 @@ class App(Tk):
                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                 step=float(self.parametrs.GetParametr("Parametrs", "step"))
             )
-        ).grid(row=24, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)
+    
+    def lab6UI(self, parent):
+        Label(parent,
+              text="ГИСТАГРАМА"
+              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+    
+        typeGraph = ['Линейный тренд', 'Экспонентный тренд', 'Шум', 'Гармоника']
+
+        self.choseHis = StringVar(value=0)
+
+        row = 1
+        for index in range(len(typeGraph)):
+            radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseHis)
+            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
+            row += 1
+       
+        del row
+        del typeGraph
+        
+        Button(
+            parent,
+            text="Построить гистаграмму",
+            command=self.drawHistogram
+        ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
      
     def printStatistic(self):
         result = self.analysis.statistics(
@@ -344,3 +372,33 @@ class App(Tk):
                 N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
                 N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
             )
+    
+    def drawHistogram(self):
+        if int(self.choseHis.get()) == 0:
+            self.analysis.histograma(
+                self.model.getLinerTrend(
+                    a=float(self.parametrs.GetParametr("Parametrs", "a")),
+                    b=float(self.parametrs.GetParametr("Parametrs", "b")),
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type=0
+                )
+            )
+        elif int(self.choseHis.get()) == 1:
+            self.analysis.histograma(
+                self.model.getExponentaTrend(
+                    alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
+                    beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type=0
+                )
+            )
+        elif int(self.choseHis.get()) == 2:
+            self.analysis.histograma(
+                self.model.getNoise(
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type=0
+                )
+            )
+        elif int(self.choseHis.get()) == 3:
+            print("ИДЕТ СТРОИТЕЛЬСТВО")
