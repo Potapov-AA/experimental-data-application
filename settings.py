@@ -14,25 +14,41 @@ class ParametrSettings(Toplevel):
 
               self.drawParameter("N =", 1, "N")
 
-              Label(self, text="Линейный тренд (y=ax+b)").grid(column=0,
-                                                               row=2, columnspan=3, sticky=E+W, padx=5, pady=5)
+              Label(self, text="Линейный тренд").grid(column=0,
+                                                      row=2, 
+                                                      columnspan=3, 
+                                                      sticky=E+W, 
+                                                      padx=5, 
+                                                      pady=5)
 
               self.drawParameter("a =", 3, "a")
               self.drawParameter("b =", 4, "b")
 
-              Label(self, text="Экспонентный тренд (y=beta*e^alpha*x)").grid(column=0,
-                                                                             row=5, columnspan=3, sticky=E+W, padx=5, pady=5)
+              Label(self, text="Экспонентный тренд").grid(column=0,
+                                                          row=5, 
+                                                          columnspan=3, 
+                                                          sticky=E+W, 
+                                                          padx=5, 
+                                                          pady=5)
 
               self.drawParameter("alpha =", 6, "alpha")
               self.drawParameter("beta =", 7, "beta")
 
-              Label(self, text="Шумы").grid(column=0, row=8,
-                                          columnspan=3, sticky=E+W, padx=5, pady=5)
+              Label(self, text="Шумы").grid(column=0, 
+                                            row=8,
+                                            columnspan=3, 
+                                            sticky=E+W, 
+                                            padx=5, 
+                                            pady=5)
 
               self.drawParameter("R =", 9, "R")
               
-              Label(self, text="Смещение и импульсы").grid(column=0, row=10, 
-                                                columnspan=3, sticky=E+W, padx=5, pady=5)
+              Label(self, text="Смещение и импульсы").grid(column=0, 
+                                                           row=10, 
+                                                           columnspan=3, 
+                                                           sticky=E+W, 
+                                                           padx=5, 
+                                                           pady=5)
               
               self.drawParameter("Shift =", 11, "Shift")
               self.drawParameter("From =", 12, "ShiftFrom")
@@ -40,8 +56,12 @@ class ParametrSettings(Toplevel):
               self.drawParameter("R1 =", 14, "R1")
               self.drawParameter("R2 =", 15, "R2")
               
-              Label(self, text="Гармоники").grid(column=0, row=16, 
-                                                columnspan=3, sticky=E+W, padx=5, pady=5)
+              Label(self, text="Гармоники").grid(column=0, 
+                                                 row=16, 
+                                                 columnspan=3, 
+                                                 sticky=E+W, 
+                                                 padx=5, 
+                                                 pady=5)
               
               self.drawParameter("A0 =", 17, "A0")
               self.drawParameter("A1 =", 18, "A1")
@@ -52,6 +72,15 @@ class ParametrSettings(Toplevel):
               self.drawParameter("dt =", 23, "dt")
               self.drawParameter("step =", 24, "step")
               self.drawParameter("thetta =", 25, "thetta")
+              
+              Label(self, text="Гистограмма").grid(column=0, 
+                                                   row=26, 
+                                                   columnspan=3, 
+                                                   sticky=E+W, 
+                                                   padx=5, 
+                                                   pady=5)
+              
+              self.drawParameter("M =", 27, "M")
               
        def centerWindow(self):
               w = 235

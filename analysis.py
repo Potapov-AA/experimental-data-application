@@ -1,10 +1,16 @@
+from turtle import color
 import numpy as np
+from scipy.stats import norm
+from matplotlib import pyplot as plt
 
 class Analysis:
     def __init__(self):
         pass
 
     def statistics(self, data):
+        '''
+        Возвращает статистику по переданным данным
+        '''
         data = np.asarray(data)
         min = round(np.min(data), 2)
         max = round(np.max(data), 2)
@@ -24,10 +30,12 @@ class Analysis:
         result += f'Среднее значение: {meanValue}\n'
         result += f'Дисперсия: {variance}\n'
         result += f'Стандартное отклонение: {standardDeviation}\n'
-        result += f'Ассиметрия: {assymetry}\tКоэффицент ассиметрии: {assymetryCoef}\n'
-        result += f'Эксцесс: {excess}\tкуртозис: {kurtosis}\n'
+        result += f'Ассиметрия: {assymetry}\n'
+        result += f'Коэффицент ассиметрии: {assymetryCoef}\n'
+        result += f'Эксцесс: {excess}\n'
+        result += f'куртозис: {kurtosis}\n'
         result += f'Средний квадрат: {meanSquare}\n'
-        result += f'Среднеквадратическая ошибка: {meanSquareError}'
+        result += f'Ср. квад. ошибка: {meanSquareError}'
         
         return result
 
@@ -49,3 +57,68 @@ class Analysis:
                     return 'Процесс нестационарный'
         return 'Процесс стационарный'
         
+    def histograma(self, data=[i for i in range(10000)], M=100):
+        meanValue = round(np.mean(data), 2)
+        standardDeviation = round(np.std(data), 2)
+        
+        normal =  norm.pdf(data, meanValue, standardDeviation)
+        
+        plt.plot(data, normal, color="red")
+        plt.show()
+        
+
+        min = int(round(np.min(data), 2))
+        max = int(round(np.max(data), 2))
+        
+        step = int(round((max-min)/M))
+        
+        lstep = []
+        for i in range(min, max, step):
+            if i+step<=max:
+                lstep.append([i, i+step])
+        
+        normalForBar = []
+        dataForBar = []
+        for i in lstep:
+            middle = 0
+            c = 0
+            for j in range(len(normal)):
+                if j >= i[0] and j < i[1]:
+                    middle += normal[j]
+                    c += 1
+            if middle != 0:
+                normalForBar.append(middle/c) 
+                dataForBar.append(f'{i}')
+                 
+        
+        
+        plt.bar(dataForBar, normalForBar)
+        plt.plot(dataForBar, normalForBar, color="red")
+        plt.show()
+    
+    def acf(self, data=[i for i in range(1000)]):
+        L = [i for i in range(0, len(data)-1)]
+        middleValue = round(np.mean(data), 2)
+        Rxx = []
+        Rl = []
+        
+        for i in L:
+            Rx = 0
+            for j in range(len(data) - i - 1):
+                Rx += (data[j] - middleValue) * (data[j + i] - middleValue)
+            Rxx.append(Rx / len(data))   
+        
+        Rxx = np.array(Rxx)
+        
+        for i in Rxx:
+            Rl.append(i/np.max(Rxx))
+        
+        Rl = np.array(Rl)
+        
+        plt.title("График автокорялляции")
+        plt.plot([i for i in range(len(Rl))], Rl, color="red")
+        
+        plt.show()
+    
+    def ccf(self, *args):
+        pass
