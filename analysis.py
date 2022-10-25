@@ -1,4 +1,6 @@
+from turtle import color
 import numpy as np
+from scipy.stats import norm
 from matplotlib import pyplot as plt
 
 class Analysis:
@@ -6,6 +8,9 @@ class Analysis:
         pass
 
     def statistics(self, data):
+        '''
+        Возвращает статистику по переданным данным
+        '''
         data = np.asarray(data)
         min = round(np.min(data), 2)
         max = round(np.max(data), 2)
@@ -53,6 +58,15 @@ class Analysis:
         return 'Процесс стационарный'
         
     def histograma(self, data=[i for i in range(10000)], M=100):
+        meanValue = round(np.mean(data), 2)
+        standardDeviation = round(np.std(data), 2)
+        
+        normal =  norm.pdf(data, meanValue, standardDeviation)
+        
+        plt.plot(data, normal, color="red")
+        plt.show()
+        
+
         min = int(round(np.min(data), 2))
         max = int(round(np.max(data), 2))
         
@@ -60,11 +74,51 @@ class Analysis:
         
         lstep = []
         for i in range(min, max, step):
-            lstep.append(i)
-        lstep.append(max)
+            if i+step<=max:
+                lstep.append([i, i+step])
         
-        fig, ax = plt.subplots(figsize =(10, 7))
-        ax.hist(data, bins = lstep)
- 
-        # Show plot
+        normalForBar = []
+        dataForBar = []
+        for i in lstep:
+            middle = 0
+            c = 0
+            for j in range(len(normal)):
+                if j >= i[0] and j < i[1]:
+                    middle += normal[j]
+                    c += 1
+            if middle != 0:
+                normalForBar.append(middle/c) 
+                dataForBar.append(f'{i}')
+                 
+        
+        
+        plt.bar(dataForBar, normalForBar)
+        plt.plot(dataForBar, normalForBar, color="red")
         plt.show()
+    
+    def acf(self, data=[i for i in range(1000)]):
+        L = [i for i in range(0, len(data)-1)]
+        middleValue = round(np.mean(data), 2)
+        Rxx = []
+        Rl = []
+        
+        for i in L:
+            Rx = 0
+            for j in range(len(data) - i - 1):
+                Rx += (data[j] - middleValue) * (data[j + i] - middleValue)
+            Rxx.append(Rx / len(data))   
+        
+        Rxx = np.array(Rxx)
+        
+        for i in Rxx:
+            Rl.append(i/np.max(Rxx))
+        
+        Rl = np.array(Rl)
+        
+        plt.title("График автокорялляции")
+        plt.plot([i for i in range(len(Rl))], Rl, color="red")
+        
+        plt.show()
+    
+    def ccf(self, *args):
+        pass
