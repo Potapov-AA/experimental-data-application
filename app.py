@@ -311,10 +311,10 @@ class App(Tk):
     def lab7UI(self, parent):
         Label(
             parent,
-            text="АВТОКОРЯЛЛЯЦИЯ ФУНКЦИИ R(L)"
+            text="АВТОКОРЯЛЛЯЦИЯ И ВЗАИМНОКОРРЕЛЯЦИОННАЯ ФУНКЦИИ"
         ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
         
-        typeGraph = ['Шум', 'Гармоника']
+        typeGraph = ['Шум встроенный', 'Шум написанный', 'Гармоника']
 
         self.choseAuto = StringVar(value=0)
 
@@ -332,6 +332,12 @@ class App(Tk):
             text="Построить график автокорялляции",
             command=self.drawAutoKor
         ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
+
+        Button(
+            parent,
+            text="Построить взаимокорреляционную функцию",
+            command=self.drawTwoAutoKor
+        ).grid(row=6, column=0, columnspan=3, padx=10,  pady=5)
         
     def printStatistic(self):
         result = self.analysis.statistics(
@@ -455,10 +461,63 @@ class App(Tk):
             )
         elif int(self.choseAuto.get()) == 1:
             self.analysis.acf(
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=1
+                )
+            )
+        elif int(self.choseAuto.get()) == 2:
+            self.analysis.acf(
                 self.model.getHarm(
                     N=int(self.parametrs.GetParametr("Parametrs", "N")),
                     A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
                     f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                    thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                )
+            )
+    
+    def drawTwoAutoKor(self):
+        if int(self.choseAuto.get()) == 0:
+            self.analysis.ccf(
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=0
+                ),
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=0
+                ),
+            )
+        elif int(self.choseAuto.get()) == 1:
+            self.analysis.ccf(
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=1
+                ),
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=1
+                )
+            )
+        elif int(self.choseAuto.get()) == 2:
+            self.analysis.ccf(
+                self.model.getHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                    thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                ),
+                self.model.getHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A1")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f1")),
                     dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                     thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
                 )
