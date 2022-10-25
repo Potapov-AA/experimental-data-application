@@ -33,6 +33,7 @@ class Config():
         self.config.set("Parametrs", "dt", "0.001")
         self.config.set("Parametrs", "step", "250")
         self.config.set("Parametrs", "thetta", "0")
+        self.config.set("Parametrs", "M", "100")
 
         with open(self.path, "w") as configFiles:
             self.config .write(configFiles)
