@@ -346,6 +346,13 @@ class Model:
         plt.title("harm")
         plt.show()
     
+    def getHarm(self, N = 1000, A0 = 10, f0 = 10, dt = 0.01, thetta = 0):
+        '''
+        Возвращает данные гармонического процесса
+        '''
+        dataY = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
+
+        return dataY
     
     @private
     def __calculateYlinear(self, a, b, N):
