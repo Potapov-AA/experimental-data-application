@@ -53,6 +53,7 @@ class App(Tk):
         frame5 = ttk.Frame(notebook)
         frame6 = ttk.Frame(notebook)
         frame7 = ttk.Frame(notebook)
+        frame8 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -61,6 +62,7 @@ class App(Tk):
         frame5.pack(fill=BOTH, expand=True)
         frame6.pack(fill=BOTH, expand=True)
         frame7.pack(fill=BOTH, expand=True)
+        frame8.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Лаб. 1")
         notebook.add(frame2, text="Лаб. 2")
@@ -69,6 +71,7 @@ class App(Tk):
         notebook.add(frame5, text="Лаб. 5")
         notebook.add(frame6, text="Лаб. 6")
         notebook.add(frame7, text="Лаб. 7")
+        notebook.add(frame8, text="Лаб. 8")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
@@ -76,6 +79,7 @@ class App(Tk):
         self.lab4UI(frame4)
         self.lab5UI(frame5)
         self.lab6UI(frame6)
+        self.lab7UI(frame7)
         
     
     def lab1UI(self, parent):
@@ -283,7 +287,7 @@ class App(Tk):
     def lab6UI(self, parent):
         Label(parent,
               text="ГИСТАГРАМА"
-              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
     
         typeGraph = ['Линейный тренд', 'Экспонентный тренд', 'Шум', 'Гармоника']
 
@@ -303,7 +307,32 @@ class App(Tk):
             text="Построить гистаграмму",
             command=self.drawHistogram
         ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
-     
+    
+    def lab7UI(self, parent):
+        Label(
+            parent,
+            text="АВТОКОРЯЛЛЯЦИЯ ФУНКЦИИ R(L)"
+        ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        
+        typeGraph = ['Шум', 'Гармоника']
+
+        self.choseAuto = StringVar(value=0)
+
+        row = 1
+        for index in range(len(typeGraph)):
+            radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseAuto)
+            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
+            row += 1
+       
+        del row
+        del typeGraph
+
+        Button(
+            parent,
+            text="Построить график автокорялляции",
+            command=self.drawAutoKor
+        ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
+        
     def printStatistic(self):
         result = self.analysis.statistics(
             self.model.getNoise(
@@ -381,7 +410,8 @@ class App(Tk):
                     b=float(self.parametrs.GetParametr("Parametrs", "b")),
                     N=int(self.parametrs.GetParametr("Parametrs", "N")),
                     type=0
-                )
+                ),
+                M= int(self.parametrs.GetParametr("Parametrs", "M"))
             )
         elif int(self.choseHis.get()) == 1:
             self.analysis.histograma(
@@ -390,7 +420,8 @@ class App(Tk):
                     beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
                     N=int(self.parametrs.GetParametr("Parametrs", "N")),
                     type=0
-                )
+                ),
+                M= int(self.parametrs.GetParametr("Parametrs", "M"))
             )
         elif int(self.choseHis.get()) == 2:
             self.analysis.histograma(
@@ -398,7 +429,38 @@ class App(Tk):
                     Range=int(self.parametrs.GetParametr("Parametrs", "R")),
                     N=int(self.parametrs.GetParametr("Parametrs", "N")),
                     type=0
-                )
+                ),
+                M= int(self.parametrs.GetParametr("Parametrs", "M"))
             )
         elif int(self.choseHis.get()) == 3:
-            print("ИДЕТ СТРОИТЕЛЬСТВО")
+            self.analysis.histograma(
+                self.model.getHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                    thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                ),
+                M= int(self.parametrs.GetParametr("Parametrs", "M"))
+            )
+    
+    def drawAutoKor(self):
+        if int(self.choseAuto.get()) == 0:
+            self.analysis.acf(
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=0
+                )
+            )
+        elif int(self.choseAuto.get()) == 1:
+            self.analysis.acf(
+                self.model.getHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                    thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                )
+            )
+        
