@@ -116,9 +116,28 @@ class Analysis:
         Rl = np.array(Rl)
         
         plt.title("График автокорялляции")
-        plt.plot([i for i in range(len(Rl))], Rl, color="red")
+        plt.plot([i for i in range(len(Rl))], Rl)
         
         plt.show()
     
     def ccf(self, *args):
-        pass
+        L = [i for i in range(0, len(args[0])-1)]
+        
+        middleValue = []
+        for i in args:
+            middleValue.append(round(np.mean(i), 2))
+        
+        Rxx = []
+        for i in L:
+            Rx = 0
+            for j in range(len(args[0]) - i - 1):
+                Rx += (args[0][j] - middleValue[0]) * (args[1][j + i] - middleValue[1])
+            Rxx.append(Rx / len(args[0]))   
+        
+        Rxx = np.array(Rxx)
+        
+        plt.title("График взаимной корреляции")
+        plt.plot([i for i in range(len(Rxx))], Rxx)
+        
+        plt.show()
+        
