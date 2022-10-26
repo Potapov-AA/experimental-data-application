@@ -240,21 +240,21 @@ class Model:
 
         return shiftData
 
-    def drawImpulseNoise(self, N=1000, R=1000, Rs=900):
+    def drawImpulseNoise(self, data=[0 for i in range(1000)], R=1000, Rs=900):
         '''
         Выводит импульс на переданных данных
         data = передаваемые данные
         R = максимальное значение импульса
         Rs = минимальное значение импульса
         '''
-        dataX = [i for i in range(N)]
+        dataX = [i for i in range(len(data))]
 
-        M = randint(N * 0.005, N*0.01+1)
+        M = randint(len(data) * 0.005, len(data)*0.01+1)
 
         impulseList = []
 
         for i in range(M):
-            number = randint(0, N + 1)
+            number = randint(0, len(data) + 1)
             impulseList.append(number)
 
         dataY = []
@@ -264,21 +264,21 @@ class Model:
                 y = randint(R-Rs, R+Rs+1) * sign
                 dataY.append(y)
             else:
-                dataY.append(0)
+                dataY.append(data[i])
 
         plt.plot(dataX, dataY)
         plt.title("Импульсы")
         plt.show()
 
-    def getImpulseNoise(self, N=1000, R=1000, Rs=900):
-        dataX = [i for i in range(N)]
+    def getImpulseNoise(self, data=[0 for i in range(1000)], R=1000, Rs=900):
+        dataX = [i for i in range(len(data))]
 
-        M = randint(N * 0.005, N*0.01+1)
+        M = randint(len(data) * 0.005, len(data)*0.01+1)
 
         impulseList = []
 
         for i in range(M):
-            number = randint(0, N + 1)
+            number = randint(0, len(data) + 1)
             impulseList.append(number)
 
         dataY = []
@@ -288,7 +288,7 @@ class Model:
                 y = randint(R-Rs, R+Rs+1) * sign
                 dataY.append(y)
             else:
-                dataY.append(0)
+                dataY.append(data[i])
 
         return np.asarray(dataY)
 
