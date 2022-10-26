@@ -3,6 +3,7 @@ from tkinter import ttk
 from settings import ParametrSettings
 from model import Model
 from analysis import Analysis
+from processing import Processing
 from config import Config
 
 
@@ -12,6 +13,7 @@ class App(Tk):
         self.model = Model()
         self.analysis = Analysis()
         self.parametrs = Config()
+        self.processing = Processing()
         self.parametrs.DownloadSettings()
         self.title("МОЭД")
         self.centerWindow()
@@ -234,7 +236,6 @@ class App(Tk):
             parent,
             text="Построить импульсы",
             command=lambda: self.model.drawImpulseNoise(
-                N=int(self.parametrs.GetParametr("Parametrs", "N")),
                 R=int(self.parametrs.GetParametr("Parametrs", "R2")),
                 Rs=int(self.parametrs.GetParametr("Parametrs", "R1"))
             )
@@ -314,7 +315,7 @@ class App(Tk):
             text="АВТОКОРЯЛЛЯЦИЯ И ВЗАИМНОКОРРЕЛЯЦИОННАЯ ФУНКЦИИ"
         ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
         
-        typeGraph = ['Шум встроенный', 'Шум написанный', 'Гармоника']
+        typeGraph = ['Шум встроенный', 'Шум написанный', 'Гармоника', 'Линейный тренд', 'Экспонентный тренд']
 
         self.choseAuto = StringVar(value=0)
 
@@ -331,13 +332,40 @@ class App(Tk):
             parent,
             text="Построить график автокорялляции",
             command=self.drawAutoKor
-        ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=7, column=0, columnspan=3, padx=10,  pady=5)
 
         Button(
             parent,
             text="Построить взаимокорреляционную функцию",
             command=self.drawTwoAutoKor
-        ).grid(row=6, column=0, columnspan=3, padx=10,  pady=5)
+        ).grid(row=8, column=0, columnspan=3, padx=10,  pady=5)
+        
+        Button(
+            parent,
+            text="Удалить смещение в данных",
+            command=self.antiShift
+        ).grid(row=9, column=0, columnspan=3, padx=10,  pady=5)
+        
+        typeGraph = ['Шум встроенный c импульсами', 'Гармоника c импульсами']
+        
+        self.choseImpulse = StringVar(value=0)
+
+        row = 10
+        for index in range(len(typeGraph)):
+            radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseImpulse)
+            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
+            row += 1
+       
+        del row
+        del typeGraph
+        
+        Button(
+            parent,
+            text="Удалить неправдоподобных значений в данных",
+            command=self.antiSpike
+        ).grid(row=12, column=0, columnspan=3, padx=10,  pady=5)
+        
+        
         
     def printStatistic(self):
         result = self.analysis.statistics(
@@ -477,6 +505,24 @@ class App(Tk):
                     thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
                 )
             )
+        elif int(self.choseAuto.get()) == 3:
+            self.analysis.acf(
+                self.model.getLinerTrend(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    a=float(self.parametrs.GetParametr("Parametrs", "a")),
+                    b=float(self.parametrs.GetParametr("Parametrs", "b")),
+                    type=0
+                )
+            )
+        elif int(self.choseAuto.get()) == 4:
+            self.analysis.acf(
+                self.model.getExponentaTrend(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
+                    beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
+                    type=1
+                )
+            )
     
     def drawTwoAutoKor(self):
         if int(self.choseAuto.get()) == 0:
@@ -522,4 +568,73 @@ class App(Tk):
                     thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
                 )
             )
-        
+    
+    def antiShift(self):
+        if int(self.choseAuto.get()) == 0:
+            self.processing.antiShift(
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=0
+                )
+            )
+        elif int(self.choseAuto.get()) == 1:
+            self.processing.antiShift(
+                self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=1
+                )
+            )
+        elif int(self.choseAuto.get()) == 2:
+            self.processing.antiShift(
+                self.model.getHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                    thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                )
+            )
+        elif int(self.choseAuto.get()) == 3:
+            self.processing.antiShift(
+                self.model.getLinerTrend(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    a=float(self.parametrs.GetParametr("Parametrs", "a")),
+                    b=float(self.parametrs.GetParametr("Parametrs", "b")),
+                    type=0
+                )
+            )
+        elif int(self.choseAuto.get()) == 4:
+            self.processing.antiShift(
+                self.model.getExponentaTrend(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
+                    beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
+                    type=1
+                )
+            ) 
+    
+    def antiSpike(self):
+        if int(self.choseImpulse.get()) == 0:
+            self.processing.antiSpike(
+                data=self.model.getImpulseNoise(
+                    data=self.model.getNoise(
+                        Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                        N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                        type=0
+                    )
+                )
+            )
+        elif int(self.choseImpulse.get()) == 1:
+            self.processing.antiSpike(
+                data=self.model.getImpulseNoise(
+                    data=self.model.getHarm(
+                        N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                        A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                        f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                        dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                        thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                    )
+                )
+            )
