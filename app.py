@@ -82,6 +82,7 @@ class App(Tk):
         self.lab5UI(frame5)
         self.lab6UI(frame6)
         self.lab7UI(frame7)
+        self.lab8UI(frame8)
         
     
     def lab1UI(self, parent):
@@ -365,7 +366,39 @@ class App(Tk):
             command=self.antiSpike
         ).grid(row=12, column=0, columnspan=3, padx=10,  pady=5)
         
+    def lab8UI(self, parent):
+        Label(parent,
+              text="СЛОЖЕНИЕ ДАННЫХ"
+              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+
+        typeGraph = ["Линейный тренд + гармоника", "Экспонентный тренд + шум"]
+
+        self.choseSum = StringVar(value=0)
+
+        column = 0
+        for index in range(len(typeGraph)):
+            radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseSum)
+            radiobtn_graph.grid(row=1, column=column, padx=5)
+            column += 1
         
+        del column
+        del typeGraph
+        
+        Button(
+            parent,
+            text="Сложить данные",
+            command=self.addModel
+        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)
+        
+        Button(
+            parent,
+            text="Удаление линейного тренда"
+        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)
+        
+        Button(
+            parent,
+            text="Удаление нелинейного тренда"
+        ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)            
         
     def printStatistic(self):
         result = self.analysis.statistics(
@@ -636,5 +669,37 @@ class App(Tk):
                         dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                         thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
                     )
+                )
+            )
+    
+    def addModel(self):
+        if int(self.choseSum.get()) == 0:
+            self.model.addModel(
+                data1=self.model.getLinerTrend(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    a=float(self.parametrs.GetParametr("Parametrs", "a")),
+                    b=float(self.parametrs.GetParametr("Parametrs", "b")),
+                    type=0
+                ),
+                data2=self.model.getHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                    thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                )
+            )
+        elif int(self.choseSum.get()) == 1:
+            self.model.addModel(
+                data1=self.model.getExponentaTrend(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
+                    beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
+                    type=0
+                ),
+                data2=self.model.getNoise(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                    type=0
                 )
             )
