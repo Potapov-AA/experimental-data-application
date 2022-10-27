@@ -392,12 +392,41 @@ class App(Tk):
         
         Button(
             parent,
-            text="Удаление линейного тренда"
+            text="Удаление линейного тренда",
+            command=lambda: self.processing.antiTrendLinear(
+                                a=float(self.parametrs.GetParametr("Parametrs", "a")),
+                                b=float(self.parametrs.GetParametr("Parametrs", "b")),
+                                A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                                f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                                dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                                thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
+                                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                            )
         ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)
         
         Button(
             parent,
-            text="Удаление нелинейного тренда"
+            text="Удаление нелинейного тренда",
+            command= lambda: self.processing.antiTrendNonLinear(
+                data=self.model.getSumModel(
+                        data1=self.model.getExponentaTrend(
+                            N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                            alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
+                            beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
+                            type=0
+                        ),
+                        data2=self.model.getNoise(
+                            N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                            Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                            type=1
+                        )
+                ),
+                W=[
+                    int(self.parametrs.GetParametr("Parametrs", "W1")),
+                    int(self.parametrs.GetParametr("Parametrs", "W2")),
+                    int(self.parametrs.GetParametr("Parametrs", "W3"))
+                ]      
+            )
         ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)            
         
     def printStatistic(self):
@@ -700,6 +729,6 @@ class App(Tk):
                 data2=self.model.getNoise(
                     N=int(self.parametrs.GetParametr("Parametrs", "N")),
                     Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-                    type=0
+                    type=1
                 )
             )
