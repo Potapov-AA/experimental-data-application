@@ -82,9 +82,20 @@ class ParametrSettings(Toplevel):
               
               self.drawParameter("M =", 27, "M")
               
+              Label(self, text="Размеры скользящего среднего").grid(column=0, 
+                                                                    row=28, 
+                                                                    columnspan=3, 
+                                                                    sticky=E+W, 
+                                                                    padx=5, 
+                                                                    pady=5)
+              
+              self.drawParameter("W1 =", 29, "W1")
+              self.drawParameter("W2 =", 30, "W2")
+              self.drawParameter("W3 =", 31, "W3")
+              
        def centerWindow(self):
               w = 235
-              h = 800
+              h = 1000
 
               sw = self.winfo_screenwidth()
               sh = self.winfo_screenheight()

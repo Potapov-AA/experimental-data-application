@@ -303,7 +303,6 @@ class Model:
         plt.title("Гармонического процесс")
         plt.show()
 
-    
     def drawHarms(self, N = 200, A0 = 5, f0 = 10, dt = 0.001, step = 250):
         '''
         Множество графиков гармонического процесса с повышением f0 по 50
@@ -329,8 +328,7 @@ class Model:
             flat.label_outer()
 
         plt.show()
-
-    
+   
     def draw3In1Harm(self, N = 1000, A0 = 100, A1 = 50, A2 = 25, f0 = 4, f1 = 1, f2 = 20, dt = 0.001):
         '''
         Сумма нескольких гармоник на одном графике
@@ -353,6 +351,21 @@ class Model:
         dataY = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
 
         return dataY
+    
+    def addModel(self, data1 = [i for i in range(1000)], data2 = [-i for i in range(1000)]):
+        N = len(data1)
+        dataSum = [data1[i] + data2[i] for i in range(N)]
+        
+        fig, ax = plt.subplots(3, figsize = (10, 8))
+        ax[0].plot([i for i in range(N)], data1)
+        ax[1].plot([i for i in range(N)], data2)
+        ax[2].plot([i for i in range(N)], dataSum)
+        
+        plt.show()
+    
+    def getSumModel(self, data1 = [i for i in range(1000)], data2 = [-i for i in range(1000)]):
+        N = len(data1)
+        return [data1[i] + data2[i] for i in range(N)]
     
     @private
     def __calculateYlinear(self, a, b, N):
@@ -412,4 +425,3 @@ class Model:
             dataY.append(i)
 
         return np.asarray(dataY)
-
