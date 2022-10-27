@@ -356,7 +356,7 @@ class Model:
         N = len(data1)
         dataSum = [data1[i] + data2[i] for i in range(N)]
         
-        fig, ax = plt.subplots(3, figsize = (10, 6))
+        fig, ax = plt.subplots(3, figsize = (10, 8))
         ax[0].plot([i for i in range(N)], data1)
         ax[1].plot([i for i in range(N)], data2)
         ax[2].plot([i for i in range(N)], dataSum)
