@@ -23,16 +23,20 @@ class Processing():
         
         plt.show()
     
-    def antiSpike(self, data = [i for i in range(1000)]):
+    def antiSpike(self, min, max, data = [i for i in range(1000)]):
         
         fig, ax = plt.subplots(3, figsize=(10, 6))
         
         ax[0].plot([i for i in range(len(data))], data)
         
+               
         dataAntiSpike = []
         dataAntiSpike.append(data[0])
         for i in range(1, len(data)-1):
-            dataAntiSpike.append((data[i-1]+data[i+1])/2)
+            if data[i] > max or data[i] < min:
+                dataAntiSpike.append((data[i-1]+data[i+1])/2)
+            else:
+                dataAntiSpike.append((data[i]))
         dataAntiSpike.append(data[-1])
         
         ax[1].plot([i for i in range(len(dataAntiSpike))], dataAntiSpike, color = "red")
