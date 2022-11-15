@@ -58,13 +58,6 @@ class Analysis:
         return 'Процесс стационарный'
         
     def histograma(self, data=[i for i in range(10000)], M=100):
-        meanValue = round(np.mean(data), 2)
-        standardDeviation = round(np.std(data), 2)
-        
-        normal =  norm.pdf(data, meanValue, standardDeviation)
-        
-        plt.plot(data, normal, color="red")
-        plt.show()
         
 
         min = int(round(np.min(data), 2))
@@ -77,23 +70,22 @@ class Analysis:
             if i+step<=max:
                 lstep.append([i, i+step])
         
-        normalForBar = []
-        dataForBar = []
+        
+        dataForBarX = []
+        dataForBarY = []
         for i in lstep:
-            middle = 0
             c = 0
-            for j in range(len(normal)):
+            for j in data:
                 if j >= i[0] and j < i[1]:
-                    middle += normal[j]
                     c += 1
-            if middle != 0:
-                normalForBar.append(middle/c) 
-                dataForBar.append(f'{i}')
+            dataForBarY.append(c) 
+            dataForBarX.append(f'{i}')
                  
+        print(dataForBarX)
+        print(dataForBarY)
         
-        
-        plt.bar(dataForBar, normalForBar)
-        plt.plot(dataForBar, normalForBar, color="red")
+        plt.bar(dataForBarX, dataForBarY)
+        plt.plot(dataForBarX, dataForBarY, color="red")
         plt.show()
     
     def acf(self, data=[i for i in range(1000)]):
