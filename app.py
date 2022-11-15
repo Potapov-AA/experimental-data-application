@@ -57,6 +57,7 @@ class App(Tk):
         frame6 = ttk.Frame(notebook)
         frame7 = ttk.Frame(notebook)
         frame8 = ttk.Frame(notebook)
+        frame9 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -66,6 +67,7 @@ class App(Tk):
         frame6.pack(fill=BOTH, expand=True)
         frame7.pack(fill=BOTH, expand=True)
         frame8.pack(fill=BOTH, expand=True)
+        frame9.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Лаб. 1")
         notebook.add(frame2, text="Лаб. 2")
@@ -75,6 +77,7 @@ class App(Tk):
         notebook.add(frame6, text="Лаб. 6")
         notebook.add(frame7, text="Лаб. 7")
         notebook.add(frame8, text="Лаб. 8")
+        notebook.add(frame9, text="Лаб. 9")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
@@ -84,6 +87,7 @@ class App(Tk):
         self.lab6UI(frame6)
         self.lab7UI(frame7)
         self.lab8UI(frame8)
+        self.lab9UI(frame9)
         
     
     def lab1UI(self, parent):
@@ -429,6 +433,23 @@ class App(Tk):
                 ]      
             )
         ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)            
+    
+    def lab9UI(self, parent):
+        Label(parent, text="Расчет прямого преобразования Фурье").grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        Button(
+            parent,
+            text="Расчитать",
+            command= lambda : self.model.Fourier(
+                data=self.model.getHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                    thetta=float(self.parametrs.GetParametr("Parametrs", "thetta"))
+                ),
+                N=int(self.parametrs.GetParametr("Parametrs", "N"))
+            )
+        ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)   
         
     def printStatistic(self):
         result = self.analysis.statistics(
