@@ -367,6 +367,27 @@ class Model:
         N = len(data1)
         return [data1[i] + data2[i] for i in range(N)]
     
+    def Fourier(self, data = [0 for i in range(1000)], N = 1000):
+        dataX = [i for i in range(N)]
+        dataY = []
+        for n in range(N):
+            Re = 0
+            for k in range(N):
+                Re += data[k]*np.cos((2 * np.pi * n * k)/N)
+            Re /= N
+            
+            Lm = 0
+            for k in range(N):
+                Lm += data[k]*np.sin((2 * np.pi * n * k)/N)
+            Lm /= N
+            dataY.append(np.sqrt(np.square(Re) + np.square(Lm)))
+        
+        dataY = np.asarray(dataY)
+        
+        plt.plot(dataX, dataY)
+        plt.title("Прямое преобразование Фурье")
+        plt.show()
+            
     @private
     def __calculateYlinear(self, a, b, N):
         '''
