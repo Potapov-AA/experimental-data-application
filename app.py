@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import numpy as np
 from settings import ParametrSettings
 from model import Model
 from analysis import Analysis
@@ -679,6 +680,11 @@ class App(Tk):
     
     def antiSpike(self):
         if int(self.choseImpulse.get()) == 0:
+            data = data=self.model.getNoise(
+                        Range=int(self.parametrs.GetParametr("Parametrs", "R")),
+                        N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                        type=0
+                    )
             self.processing.antiSpike(
                 data=self.model.getImpulseNoise(
                     data=self.model.getNoise(
@@ -686,9 +692,17 @@ class App(Tk):
                         N=int(self.parametrs.GetParametr("Parametrs", "N")),
                         type=0
                     )
-                )
+                ),
+                min = np.min(data),
+                max = np.max(data)
             )
         elif int(self.choseImpulse.get()) == 1:
+            data = data=self.model.getHarm(
+                        N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                        A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                        f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                        dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+            )
             self.processing.antiSpike(
                 data=self.model.getImpulseNoise(
                     data=self.model.getHarm(
@@ -698,7 +712,9 @@ class App(Tk):
                         dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                         thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
                     )
-                )
+                ),
+                min = np.min(data),
+                max = np.max(data)
             )
     
     def addModel(self):
