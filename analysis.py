@@ -2,10 +2,11 @@ from turtle import color
 import numpy as np
 from scipy.stats import norm
 from matplotlib import pyplot as plt
+from model import Model
 
 class Analysis:
     def __init__(self):
-        pass
+        self.model = Model()
 
     def statistics(self, data):
         '''
@@ -132,4 +133,28 @@ class Analysis:
         plt.plot([i for i in range(len(Rxx))], Rxx)
         
         plt.show()
+    
+    def spectrFourier(self, data = [i for i in range(1000)], N = 1000, L=[24, 124, 224]):
+        FN = int(N/2)
+        deltaf = FN / (N/2)
+        dataX = []
+        for n in range(FN):
+            dataX.append(n * deltaf)
+        dataX = np.asarray(dataX)
         
+        dataY = self.model.Fourier(data, N)
+        
+        plt.subplot(4,1,1)
+        plt.plot(dataX, dataY[0:FN])
+        plt.title("Амплитудный спектр Фурье")
+        
+        for i in range(len(L)):
+            window = self.model.Fourier(data, N, L=L[i])
+            window = np.asarray(window)
+            plt.subplot(4,1,i+2)
+            plt.plot(dataX, window[0:FN])
+            plt.title(f"L={L[i]}")
+        
+        plt.show()
+        
+            
