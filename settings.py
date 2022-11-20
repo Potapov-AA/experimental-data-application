@@ -93,6 +93,17 @@ class ParametrSettings(Toplevel):
               self.drawParameter("W2 =", 30, "W2")
               self.drawParameter("W3 =", 31, "W3")
               
+              Label(self, text="Размеры прямоугольных окн").grid(column=0, 
+                                                                    row=32, 
+                                                                    columnspan=3, 
+                                                                    sticky=E+W, 
+                                                                    padx=5, 
+                                                                    pady=5)
+              
+              self.drawParameter("L1 =", 33, "L1")
+              self.drawParameter("L2 =", 34, "L2")
+              self.drawParameter("L3 =", 35, "L3")
+              
        def centerWindow(self):
               w = 235
               h = 1000
