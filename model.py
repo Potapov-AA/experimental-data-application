@@ -352,6 +352,19 @@ class Model:
 
         return dataY
     
+    def getPolyHarm(self, N = 1000, A0 = 100, A1 = 50, A2 = 25, f0 = 4, f1 = 1, f2 = 20, dt = 0.001):
+        '''
+        Возвращает данные полигармонического процесса
+        '''
+        dataY = [
+            A0 * math.sin(2 * math.pi * f0 * dt * k)
+            + A1 * math.sin(2 * math.pi * f1 * dt * k)
+            + A2 * math.sin(2 * math.pi * f2 * dt * k)
+            for k in range(N)
+        ]
+        
+        return dataY
+    
     def addModel(self, data1 = [i for i in range(1000)], data2 = [-i for i in range(1000)]):
         N = len(data1)
         dataSum = [data1[i] + data2[i] for i in range(N)]
@@ -367,8 +380,11 @@ class Model:
         N = len(data1)
         return [data1[i] + data2[i] for i in range(N)]
     
-    def Fourier(self, data = [0 for i in range(1000)], N = 1000):
-        dataX = [i for i in range(N)]
+    def Fourier(self, data = [0 for i in range(1000)], N = 1000, L = 0):
+        if L != 0:
+            data = [i for i in data[0:N-L]]
+            data += [0 for i in range(L)]
+        
         dataY = []
         for n in range(N):
             Re = 0
@@ -384,9 +400,8 @@ class Model:
         
         dataY = np.asarray(dataY)
         
-        plt.plot(dataX, dataY)
-        plt.title("Прямое преобразование Фурье")
-        plt.show()
+        return dataY
+        
             
     @private
     def __calculateYlinear(self, a, b, N):
