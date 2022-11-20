@@ -435,11 +435,11 @@ class App(Tk):
         ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)            
     
     def lab9UI(self, parent):
-        Label(parent, text="Расчет прямого преобразования Фурье").grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        Label(parent, text="Спектры Фурье").grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
         Button(
             parent,
-            text="Расчитать",
-            command= lambda : self.model.Fourier(
+            text="Расчитать для гармонического процесса",
+            command= lambda : self.analysis.spectrFourier(
                 data=self.model.getHarm(
                     N=int(self.parametrs.GetParametr("Parametrs", "N")),
                     A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
@@ -450,6 +450,24 @@ class App(Tk):
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
         ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)   
+        
+        Button(
+            parent,
+            text="Расчитать для полигармонического процесса",
+            command= lambda : self.analysis.spectrFourier(
+                data=self.model.getPolyHarm(
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
+                    A1=float(self.parametrs.GetParametr("Parametrs", "A1")),
+                    A2=float(self.parametrs.GetParametr("Parametrs", "A2")),
+                    f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
+                    f1=float(self.parametrs.GetParametr("Parametrs", "f1")),
+                    f2=float(self.parametrs.GetParametr("Parametrs", "f2")),
+                    dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
+                ),
+                N=int(self.parametrs.GetParametr("Parametrs", "N"))
+            )
+        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)  
         
     def printStatistic(self):
         result = self.analysis.statistics(
