@@ -37,7 +37,10 @@ class Config():
         self.config.set("Parametrs", "W1", "10")
         self.config.set("Parametrs", "W2", "15")
         self.config.set("Parametrs", "W3", "20")
-
+        self.config.set("Parametrs", "L1", "24")
+        self.config.set("Parametrs", "L2", "124")
+        self.config.set("Parametrs", "L3", "224")
+        
         with open(self.path, "w") as configFiles:
             self.config .write(configFiles)
 
