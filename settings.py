@@ -104,9 +104,18 @@ class ParametrSettings(Toplevel):
               self.drawParameter("L2 =", 34, "L2")
               self.drawParameter("L3 =", 35, "L3")
               
+              Label(self, text="Метод накопления").grid(column=0, 
+                                                                    row=36, 
+                                                                    columnspan=3, 
+                                                                    sticky=E+W, 
+                                                                    padx=5, 
+                                                                    pady=5)
+              
+              self.drawParameter("M step =", 37, "stepM")
+              
        def centerWindow(self):
-              w = 235
-              h = 1000
+              w = 240
+              h = 1100
 
               sw = self.winfo_screenwidth()
               sh = self.winfo_screenheight()
