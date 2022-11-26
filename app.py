@@ -58,6 +58,7 @@ class App(Tk):
         frame7 = ttk.Frame(notebook)
         frame8 = ttk.Frame(notebook)
         frame9 = ttk.Frame(notebook)
+        frame10 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -68,6 +69,7 @@ class App(Tk):
         frame7.pack(fill=BOTH, expand=True)
         frame8.pack(fill=BOTH, expand=True)
         frame9.pack(fill=BOTH, expand=True)
+        frame10.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Лаб. 1")
         notebook.add(frame2, text="Лаб. 2")
@@ -78,6 +80,7 @@ class App(Tk):
         notebook.add(frame7, text="Лаб. 7")
         notebook.add(frame8, text="Лаб. 8")
         notebook.add(frame9, text="Лаб. 9")
+        notebook.add(frame10, text="Лаб. 10")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
@@ -88,6 +91,7 @@ class App(Tk):
         self.lab7UI(frame7)
         self.lab8UI(frame8)
         self.lab9UI(frame9)
+        self.lab10UI(frame10)
         
     
     def lab1UI(self, parent):
@@ -468,7 +472,22 @@ class App(Tk):
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
         ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)  
-        
+    
+    def lab10UI(self, parent):
+        Label(parent, text="Антишум").grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        Button(
+            parent,
+            text="Убрать шум",
+            command= lambda : self.processing.AntiNoise(
+                data=self.model.getNoise(
+                    Range = int(self.parametrs.GetParametr("Parametrs", "R")),                                    
+                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                    type = 0
+                ),
+                stepM=int(self.parametrs.GetParametr("Parametrs", "stepM"))
+            )
+        ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)
+    
     def printStatistic(self):
         result = self.analysis.statistics(
             self.model.getNoise(
