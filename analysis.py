@@ -82,9 +82,8 @@ class Analysis:
             dataForBarY.append(c) 
             dataForBarX.append(f'{i}')
                  
-        print(dataForBarX)
-        print(dataForBarY)
-        
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.bar(dataForBarX, dataForBarY)
         plt.plot(dataForBarX, dataForBarY, color="red")
         plt.show()
@@ -108,6 +107,8 @@ class Analysis:
         
         Rl = np.array(Rl)
         
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.title("График автокорялляции")
         plt.plot([i for i in range(len(Rl))], Rl)
         
@@ -129,6 +130,8 @@ class Analysis:
         
         Rxx = np.array(Rxx)
         
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.title("График взаимной корреляции")
         plt.plot([i for i in range(len(Rxx))], Rxx)
         
@@ -144,7 +147,9 @@ class Analysis:
         
         dataY = self.model.Fourier(data, N)
         
+        plt.figure(figsize=(10, 10))
         plt.subplot(4,1,1)
+        plt.grid(True)
         plt.plot(dataX, dataY[0:FN])
         plt.title("Амплитудный спектр Фурье")
         
@@ -152,6 +157,7 @@ class Analysis:
             window = self.model.Fourier(data, N, L=L[i])
             window = np.asarray(window)
             plt.subplot(4,1,i+2)
+            plt.grid(True)
             plt.plot(dataX, window[0:FN])
             plt.title(f"L={L[i]}")
         
