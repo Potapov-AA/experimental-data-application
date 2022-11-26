@@ -1,5 +1,6 @@
 from tkinter import *
 from config import Config
+import tkinter.ttk as ttk
 
 
 class ParametrSettings(Toplevel):
@@ -9,104 +10,77 @@ class ParametrSettings(Toplevel):
               self.title("Настройки параметров")
               self.centerWindow()
 
-              Label(self, text="Общие параметры").grid(
-              column=0, row=0, columnspan=3, sticky=E+W, padx=5, pady=5)
-
-              self.drawParameter("N =", 1, "N")
-
-              Label(self, text="Линейный тренд").grid(column=0,
-                                                      row=2, 
-                                                      columnspan=3, 
-                                                      sticky=E+W, 
-                                                      padx=5, 
-                                                      pady=5)
-
-              self.drawParameter("a =", 3, "a")
-              self.drawParameter("b =", 4, "b")
-
-              Label(self, text="Экспонентный тренд").grid(column=0,
-                                                          row=5, 
-                                                          columnspan=3, 
-                                                          sticky=E+W, 
-                                                          padx=5, 
-                                                          pady=5)
-
-              self.drawParameter("alpha =", 6, "alpha")
-              self.drawParameter("beta =", 7, "beta")
-
-              Label(self, text="Шумы").grid(column=0, 
-                                            row=8,
-                                            columnspan=3, 
-                                            sticky=E+W, 
-                                            padx=5, 
-                                            pady=5)
-
-              self.drawParameter("R =", 9, "R")
+              notebook = ttk.Notebook(self)
+              notebook.pack(expand=True, fill=BOTH)       
               
-              Label(self, text="Смещение и импульсы").grid(column=0, 
-                                                           row=10, 
-                                                           columnspan=3, 
-                                                           sticky=E+W, 
-                                                           padx=5, 
-                                                           pady=5)
+              frame1 = ttk.Frame(notebook)
+              frame2 = ttk.Frame(notebook)
               
-              self.drawParameter("Shift =", 11, "Shift")
-              self.drawParameter("From =", 12, "ShiftFrom")
-              self.drawParameter("To =", 13, "ShiftTo")
-              self.drawParameter("R1 =", 14, "R1")
-              self.drawParameter("R2 =", 15, "R2")
+              frame1.pack(fill=BOTH, expand=True)
+              frame2.pack(fill=BOTH, expand=True)
               
-              Label(self, text="Гармоники").grid(column=0, 
-                                                 row=16, 
-                                                 columnspan=3, 
-                                                 sticky=E+W, 
-                                                 padx=5, 
-                                                 pady=5)
+              notebook.add(frame1, text="Стр. 1")
+              notebook.add(frame2, text="Стр. 2")
               
-              self.drawParameter("A0 =", 17, "A0")
-              self.drawParameter("A1 =", 18, "A1")
-              self.drawParameter("A2 =", 19, "A2")
-              self.drawParameter("f0 =", 20, "f0")
-              self.drawParameter("f1 =", 21, "f1")
-              self.drawParameter("f2 =", 22, "f2")
-              self.drawParameter("dt =", 23, "dt")
-              self.drawParameter("step =", 24, "step")
-              self.drawParameter("thetta =", 25, "thetta")
+              self.page1UI(frame1)
+              self.page2UI(frame2)
+       
+       def page1UI(self, parent):
+              Label(parent, text="Общие параметры").pack(anchor=N, fill=X, pady=[20, 10])
+              self.drawParameter("N =", "N", parent)
               
-              Label(self, text="Гистограмма").grid(column=0, 
-                                                   row=26, 
-                                                   columnspan=3, 
-                                                   sticky=E+W, 
-                                                   padx=5, 
-                                                   pady=5)
+              Label(parent, text="Линейный тренд").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("a =", "a", parent)
+              self.drawParameter("b =", "b", parent)
               
-              self.drawParameter("M =", 27, "M")
+              Label(parent, text="Экспонентный тренд").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("alpha =", "alpha", parent)
+              self.drawParameter("beta =", "beta", parent)
               
-              Label(self, text="Размеры скользящего среднего").grid(column=0, 
-                                                                    row=28, 
-                                                                    columnspan=3, 
-                                                                    sticky=E+W, 
-                                                                    padx=5, 
-                                                                    pady=5)
+              Label(parent, text="Шумы").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("R =", "R", parent)
               
-              self.drawParameter("W1 =", 29, "W1")
-              self.drawParameter("W2 =", 30, "W2")
-              self.drawParameter("W3 =", 31, "W3")
+              Label(parent, text="Смещение и импульсы").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("Shift =", "Shift", parent)
+              self.drawParameter("From =", "ShiftFrom", parent)
+              self.drawParameter("To =", "ShiftTo", parent)
+              self.drawParameter("R1 =", "R1", parent)
+              self.drawParameter("R2 =", "R2", parent)
               
-              Label(self, text="Размеры прямоугольных окн").grid(column=0, 
-                                                                    row=32, 
-                                                                    columnspan=3, 
-                                                                    sticky=E+W, 
-                                                                    padx=5, 
-                                                                    pady=5)
+              Label(parent, text="Гармоники").pack(anchor=N, fill=X, pady=[15, 10])
               
-              self.drawParameter("L1 =", 33, "L1")
-              self.drawParameter("L2 =", 34, "L2")
-              self.drawParameter("L3 =", 35, "L3")
+              self.drawParameter("A0 =", "A0", parent)
+              self.drawParameter("A1 =", "A1", parent)
+              self.drawParameter("A2 =", "A2", parent)
+              self.drawParameter("f0 =", "f0", parent)
+              self.drawParameter("f1 =", "f1", parent)
+              self.drawParameter("f2 =", "f2", parent)
+              self.drawParameter("dt =", "dt", parent)
+              self.drawParameter("step =", "step", parent)
+              self.drawParameter("thetta =", "thetta", parent)
+              
+       
+       def page2UI(self, parent):
+              Label(parent, text="Гистограмма").pack(anchor=N, fill=X, pady=[20, 10])
+              self.drawParameter("M =", "M", parent)
+              
+              Label(parent, text="Размеры скользящего \nсреднего").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("W1 =", "W1", parent)
+              self.drawParameter("W2 =", "W2", parent)
+              self.drawParameter("W3 =", "W3", parent)
+              
+              Label(parent, text="Размеры прямоугольных \nокн").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("L1 =", "L1", parent)
+              self.drawParameter("L2 =", "L2", parent)
+              self.drawParameter("L3 =", "L3", parent)
+              
+              Label(parent, text="Метод накопления").pack(anchor=N, fill=X, pady=[15, 10])
+              
+              self.drawParameter("M step =", "stepM", parent)
               
        def centerWindow(self):
-              w = 235
-              h = 1000
+              w = 300
+              h = 780
 
               sw = self.winfo_screenwidth()
               sh = self.winfo_screenheight()
@@ -115,13 +89,17 @@ class ParametrSettings(Toplevel):
               y = (sh - h) / 2
               self.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-       def drawParameter(self, text, row, parametrName):
-              Label(self, text=text).grid(column=0, row=row, padx=10, sticky=W)
-              entry = Entry(self, width=10, justify=CENTER)
-              entry.grid(column=1, row=row, padx=5, sticky=E)
+       def drawParameter(self, text, parametrName, parent):
+              frame = ttk.Frame(parent)
+              frame.pack(anchor=N, fill=X)
+              Label(frame, text=text).pack(anchor=N, side=LEFT, padx=[15, 10], pady=[5,0], fill=X)
+              entry = Entry(frame, width=6, justify=CENTER)
+              entry.pack(anchor=N, side=LEFT, padx=[10, 0], pady=[5,0], fill=X)
               entry.insert(0, self.parametrs.GetParametr("Parametrs", parametrName))
-              Button(self, text="Сохранить", width=10,
-                     command=lambda: self.save(parametrName, entry.get())).grid(column=2, row=row, padx=5)
+              Button(frame, 
+                     text="Сохранить",
+                     command=lambda: self.save(parametrName, entry.get())
+              ).pack(anchor=N, side=RIGHT, fill=X, padx=[0, 15])
        
        def save(self, parameterName, value):
               self.parametrs.UpdateParametr("Parametrs", parameterName, value)

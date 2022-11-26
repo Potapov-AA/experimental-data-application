@@ -13,16 +13,17 @@ class App(Tk):
         super().__init__()
         self.model = Model()
         self.analysis = Analysis()
-        self.parametrs = Config()
         self.processing = Processing()
+        self.parametrs = Config()
+        
         self.parametrs.DownloadSettings()
         self.title("МОЭД")
         self.centerWindow()
         self.initUI()
 
     def centerWindow(self):
-        w = 440
-        h = 400
+        w = 800
+        h = 800
 
         sw = self.winfo_screenwidth()
         sh = self.winfo_screenheight()
@@ -58,6 +59,7 @@ class App(Tk):
         frame7 = ttk.Frame(notebook)
         frame8 = ttk.Frame(notebook)
         frame9 = ttk.Frame(notebook)
+        frame10 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -68,6 +70,7 @@ class App(Tk):
         frame7.pack(fill=BOTH, expand=True)
         frame8.pack(fill=BOTH, expand=True)
         frame9.pack(fill=BOTH, expand=True)
+        frame10.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Лаб. 1")
         notebook.add(frame2, text="Лаб. 2")
@@ -78,6 +81,7 @@ class App(Tk):
         notebook.add(frame7, text="Лаб. 7")
         notebook.add(frame8, text="Лаб. 8")
         notebook.add(frame9, text="Лаб. 9")
+        notebook.add(frame10, text="Лаб. 10")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
@@ -88,24 +92,22 @@ class App(Tk):
         self.lab7UI(frame7)
         self.lab8UI(frame8)
         self.lab9UI(frame9)
+        self.lab10UI(frame10)
         
     
     def lab1UI(self, parent):
         Label(parent,
               text="ТРЕНДЫ"
-              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).pack(anchor=N, fill=X, pady=20)
 
         typeGraph = ["Восходящий", "Низходящий", "Восходящий и низходящий"]
 
         self.choseGraph1 = StringVar(value=0)
-
-        column = 0
+                
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseGraph1)
-            radiobtn_graph.grid(row=1, column=column, padx=5)
-            column += 1
+            radiobtn_graph.pack(anchor=N)
         
-        del column
         del typeGraph
 
         Button(
@@ -117,7 +119,7 @@ class App(Tk):
                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
                 type=int(self.choseGraph1.get())
             )
-        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=[20, 0])
 
         Button(
             parent,
@@ -128,7 +130,7 @@ class App(Tk):
                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
                 type=int(self.choseGraph1.get())
             )
-        ).grid(row=3, column=0, columnspan=3, padx=10)
+        ).pack(anchor=N, fill=X)
 
         Button(
             parent,
@@ -140,12 +142,20 @@ class App(Tk):
                 beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=[0, 20])
+        
+        text = "Выводит график выбранного тренда.\n"
+        text += "Изменяемые параметры в настройках:\n"
+        text += "Для линейного тренда y = ax + b\n"
+        text += "Для экспонетного тренда y = beta * e ^ (-alpha * x)"
+        
+        Label(parent,
+              text=text).pack(anchor=N, fill=X)
     
     def lab2UI(self, parent):
         Label(parent,
               text="ШУМЫ"
-              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).pack(anchor=N, fill=X, pady=20)
 
         Button(
             parent,
@@ -154,7 +164,7 @@ class App(Tk):
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X)
         
         Button(
             parent,
@@ -163,7 +173,7 @@ class App(Tk):
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=2, column=0, columnspan=3, padx=10)
+        ).pack(anchor=N, fill=X)
 
         Button(
             parent,
@@ -172,32 +182,36 @@ class App(Tk):
                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
                 N=int(self.parametrs.GetParametr("Parametrs", "N"))
             )
-        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)     
-    
+        ).pack(anchor=N, fill=X, pady=[0, 20])    
+        
+        text = "Генерирует два вида шума:\n"
+        text += "1) На основе встроенного рандомайзера\n"
+        text += "2) На основе написаного рандомайзера на \nоснове линейного конгруэнтного ПСЧ\n\n"
+        text += "Редактируемый параметр R - максимальное значение,\nкоторое может быть сгенирировано" 
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
+          
     def lab3UI(self, parent):
         Label(parent,
               text="СТАТИСТИКА"
-              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).pack(anchor=N, fill=X, pady=20)
         
         
         typeGraph = ['Шум на основе встроенного генератора', 'Шум на основе написанного генератора']
 
         self.choseNoise = StringVar(value=0)
 
-        row = 1
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseNoise)
-            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
-            row += 1
+            radiobtn_graph.pack(anchor=N)
        
-        del row
         del typeGraph
         
         Button(
             parent,
             text='Расчитать статистику',
             command=self.printStatistic
-        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=20)
 
         result = f'Количество значенией:\n'
         result += f'Минимальное значение:\n'
@@ -213,30 +227,32 @@ class App(Tk):
         result += f'Ср. квад. ошибка:\n\n'
         
         self.label_statistic = Label(parent, text=result)
-        self.label_statistic.grid(row=13, column=0, columnspan=3, padx=10,  pady=5)
+        self.label_statistic.pack(anchor=N, fill=X, pady=[0, 20])
+        
+        text = "Рассчитывает статистику для шума\n\n"
+        text += "Редактируемый параметр R - максимальное значение,\nкоторое может быть сгенирировано" 
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
     
     def lab4UI(self, parent):
         Label(parent,
               text="СМЕЩЕНИЕ И ИМПУЛЬСЫ"
-              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).pack(anchor=N, fill=X, pady=20)
         
         typeGraph = ['Линейный восходящий', 'Линейный низходящий', 'Экспонента восходящая', 'Экспонента низходящая']
         self.choseGraph2 = StringVar(value=0)
 
-        row = 1
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseGraph2)
-            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
-            row += 1
+            radiobtn_graph.pack(anchor=N)
        
-        del row
         del typeGraph
     
         Button(
             parent,
             text='Построить смещение на графике',
             command=self.drawShift
-        ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=[20,0])
         
         Button(
             parent,
@@ -245,12 +261,24 @@ class App(Tk):
                 R=int(self.parametrs.GetParametr("Parametrs", "R2")),
                 Rs=int(self.parametrs.GetParametr("Parametrs", "R1"))
             )
-        ).grid(row=6, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=[0, 20])
+        
+        text = "Отрисовывает смещеные переданные данные на указанном диапозоне\n"
+        text += "Если диапазон не передан, то смещение идет по всем данным\n"
+        text += "И выводит импульс на переданных данных\n\n"
+        text += "Редактируемы параметры:\n"
+        text += "shift - величина смещения\n"
+        text += "from - индекс начала смещения\n"
+        text += "to - индекс конца смещения\n"
+        text += "R1 = минимальное значение импульса\n"
+        text += "R2 = максимальное значение импульса"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
     
     def lab5UI(self, parent):
         Label(parent,
               text="ГАРМОНИКИ"
-              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).pack(anchor=N, fill=X, pady=20)
     
         Button(
             parent,
@@ -262,7 +290,7 @@ class App(Tk):
                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                 thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
             )
-        ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X)
         
         Button(
             parent,
@@ -277,7 +305,7 @@ class App(Tk):
                 f2=float(self.parametrs.GetParametr("Parametrs", "f2")),
                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
             )
-        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X)
 
         Button(
             parent,
@@ -289,111 +317,135 @@ class App(Tk):
                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                 step=float(self.parametrs.GetParametr("Parametrs", "step"))
             )
-        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)
-    
+        ).pack(anchor=N, fill=X, pady=[0, 20])
+        
+        text = "Выводит различные графики гармоник\n\n"
+        text += "Редактируемые параметры:\n"
+        text += "y = A * sin(2 * pi * f * dt * x + thetta\n"
+        text += "A0, A1, A2\n"
+        text += "f0, f1, f2\n"
+        text += "thetta\n"
+        text += "dt\n"
+        text += "step - для повышения f0\n"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
+
     def lab6UI(self, parent):
         Label(parent,
               text="ГИСТАГРАМА"
-        ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        ).pack(anchor=N, fill=X, pady=20)
     
         typeGraph = ['Линейный тренд', 'Экспонентный тренд', 'Шум', 'Гармоника']
 
         self.choseHis = StringVar(value=0)
 
-        row = 1
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseHis)
-            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
-            row += 1
+            radiobtn_graph.pack(anchor=N)
        
-        del row
         del typeGraph
         
         Button(
             parent,
             text="Построить гистаграмму",
             command=self.drawHistogram
-        ).grid(row=5, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=20)
+        
+        text = "Выводит гистаграму переданных данных\n\n"
+        text += "Редактируемые параметры:\n"
+        text += "M - количество разбиений"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
     
     def lab7UI(self, parent):
         Label(
             parent,
             text="АВТОКОРЯЛЛЯЦИЯ И ВЗАИМНОКОРРЕЛЯЦИОННАЯ ФУНКЦИИ"
-        ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        ).pack(anchor=N, fill=X, pady=20)
         
         typeGraph = ['Шум встроенный', 'Шум написанный', 'Гармоника', 'Линейный тренд', 'Экспонентный тренд']
 
         self.choseAuto = StringVar(value=0)
 
-        row = 1
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseAuto)
-            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
-            row += 1
+            radiobtn_graph.pack(anchor=N)
        
-        del row
         del typeGraph
 
         Button(
             parent,
             text="Построить график автокорялляции",
             command=self.drawAutoKor
-        ).grid(row=7, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=[20, 0])
 
         Button(
             parent,
             text="Построить взаимокорреляционную функцию",
             command=self.drawTwoAutoKor
-        ).grid(row=8, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X)
         
         Button(
             parent,
             text="Удалить смещение в данных",
             command=self.antiShift
-        ).grid(row=9, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=[0, 20])
         
         typeGraph = ['Шум встроенный c импульсами', 'Гармоника c импульсами']
         
         self.choseImpulse = StringVar(value=0)
 
-        row = 10
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseImpulse)
-            radiobtn_graph.grid(row=row, column=0, columnspan=3, padx=5)
-            row += 1
+            radiobtn_graph.pack(anchor=N)
        
-        del row
         del typeGraph
         
         Button(
             parent,
             text="Удалить неправдоподобных значений в данных",
             command=self.antiSpike
-        ).grid(row=12, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=20)
+        
+        text = "Рассчитываем и отрисовываект график\n"
+        text += "автокорреляцию и вазимнокорреляцию переданной функции\n\n"
+        
+        text += "Следующая функция, это удаление смещения в данных\n"
+        text += "А также удаление импульсов на данных\n\n"
+        
+        text += "Редактируемые параметры:\n"
+        text += "R - максимальное значение, которое может быть сгенирировано (шум)\n"
+        text += "y = A * sin(2 * pi * f * dt * x + thetta\n"
+        text += "A0\n"
+        text += "f0\n"
+        text += "thetta\n"
+        text += "dt\n"
+        text += "R1 = минимальное значение импульса\n"
+        text += "R2 = максимальное значение импульса"
+
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
         
     def lab8UI(self, parent):
         Label(parent,
               text="СЛОЖЕНИЕ ДАННЫХ"
-              ).grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+              ).pack(anchor=N, fill=X, pady=20)
 
         typeGraph = ["Линейный тренд + гармоника", "Экспонентный тренд + шум"]
 
         self.choseSum = StringVar(value=0)
 
-        column = 0
         for index in range(len(typeGraph)):
             radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseSum)
-            radiobtn_graph.grid(row=1, column=column, padx=5)
-            column += 1
-        
-        del column
+            radiobtn_graph.pack(anchor=N)
+            
         del typeGraph
         
         Button(
             parent,
             text="Сложить данные",
             command=self.addModel
-        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X, pady=[20,0])
         
         Button(
             parent,
@@ -407,7 +459,7 @@ class App(Tk):
                                 thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
                                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
                             )
-        ).grid(row=3, column=0, columnspan=3, padx=10,  pady=5)
+        ).pack(anchor=N, fill=X)
         
         Button(
             parent,
@@ -432,10 +484,20 @@ class App(Tk):
                     int(self.parametrs.GetParametr("Parametrs", "W3"))
                 ]      
             )
-        ).grid(row=4, column=0, columnspan=3, padx=10,  pady=5)            
+        ).pack(anchor=N, fill=X, pady=[0, 20])  
+        
+        text = "Складывает передаваемые данные\n\n"
+        text += "Редактируемые параметры:\n"
+        text += "1) Линейный тренд\n"
+        text += "2) Гармоника\n"
+        text += "3) Экспонетный тренд\n"
+        text += "4) Шум\n"       
+        text += "W1-3 - размер скользящего окна"  
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
     
     def lab9UI(self, parent):
-        Label(parent, text="Спектры Фурье").grid(row=0, column=0, columnspan=3, sticky=E+W, padx=10, pady=10)
+        Label(parent, text="Спектры Фурье").pack(anchor=N, fill=X, pady=20)
         Button(
             parent,
             text="Расчитать для гармонического процесса",
@@ -447,9 +509,14 @@ class App(Tk):
                     dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                     thetta=float(self.parametrs.GetParametr("Parametrs", "thetta"))
                 ),
-                N=int(self.parametrs.GetParametr("Parametrs", "N"))
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                L = [
+                    int(self.parametrs.GetParametr("Parametrs", "L1")),
+                    int(self.parametrs.GetParametr("Parametrs", "L2")),
+                    int(self.parametrs.GetParametr("Parametrs", "L3"))
+                ]
             )
-        ).grid(row=1, column=0, columnspan=3, padx=10,  pady=5)   
+        ).pack(anchor=N, fill=X) 
         
         Button(
             parent,
@@ -465,10 +532,41 @@ class App(Tk):
                     f2=float(self.parametrs.GetParametr("Parametrs", "f2")),
                     dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
                 ),
-                N=int(self.parametrs.GetParametr("Parametrs", "N"))
+                N=int(self.parametrs.GetParametr("Parametrs", "N")),
+                L = [
+                    int(self.parametrs.GetParametr("Parametrs", "L1")),
+                    int(self.parametrs.GetParametr("Parametrs", "L2")),
+                    int(self.parametrs.GetParametr("Parametrs", "L3"))
+                ]
             )
-        ).grid(row=2, column=0, columnspan=3, padx=10,  pady=5)  
+        ).pack(anchor=N, fill=X, pady=[0, 20])
         
+        text = "Рассчитывает и выводит спектр Фурье для переданных данных\n\n"
+        text += "Редактируемые параметры:\n"
+        text += "L1-3 размеры прямоугольного окна"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
+    
+    def lab10UI(self, parent):
+        Label(parent, text="Антишум").pack(anchor=N, fill=X, pady=20)
+        Button(
+            parent,
+            text="Убрать шум",
+            command = lambda : self.processing.AntiNoise(
+                function=self.model.getDefaultNoise,
+                stepM=int(self.parametrs.GetParametr("Parametrs", "stepM"))
+            )
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Убрать шум на гармонике",
+            command = lambda: self.processing.AntiNoise(
+                function=self.model.getSumHarmNoise,
+                stepM=int(self.parametrs.GetParametr("Parametrs", "stepM"))
+            )
+        ).pack(anchor=N, fill=X, pady=[0, 20])
+    
     def printStatistic(self):
         result = self.analysis.statistics(
             self.model.getNoise(

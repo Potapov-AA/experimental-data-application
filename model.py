@@ -5,11 +5,14 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 import time
+from config import Config
+
 
 
 class Model:
     def __init__(self):
         self.e = np.e
+        self.parametrs = Config()
 
     def drawLinerTrend(self,  a=1, b=1, N=1000, N1=0, N2=999, type=0):
         '''
@@ -21,26 +24,33 @@ class Model:
         if type == 0:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYlinear(a, b, N)
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Линейный восходящий тренд")
             plt.show()
         elif type == 1:
             dataX = [i for i in range(N)]
             dataY = -self.__calculateYlinear(a, b, N)
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Линейный низходящий тренд")
             plt.show()
         else:
+            plt.figure(figsize=(10, 10))
             plt.subplot(1, 2, 1)
             dataX1 = [i for i in range(N)]
             dataY1 = self.__calculateYlinear(a, b, N)
             plt.plot(dataX1[N1:N2], dataY1[N1:N2])
+            plt.grid(True)
             plt.title("Линейный восходящий тренд")
 
             plt.subplot(1, 2, 2)
             dataX2 = [i for i in range(N)]
             dataY2 = -self.__calculateYlinear(a, b, N)
             plt.plot(dataX2[N1:N2], dataY2[N1:N2])
+            plt.grid(True)
             plt.title("Линейный низходящий тренд")
 
             plt.show()
@@ -69,25 +79,33 @@ class Model:
         if type == 0:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYexponenta(alpha, beta, N)[1]
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Экспонентный восходящий тренд")
             plt.show()
         elif type == 1:
             dataX = [i for i in range(N)]
             dataY = self.__calculateYexponenta(alpha, beta, N)[0]
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
             plt.plot(dataX[N1:N2], dataY[N1:N2])
             plt.title("Экспонентный низходящий тренд")
             plt.show()
         else:
+            plt.figure(figsize=(10, 10))
+            
             plt.subplot(1, 2, 1)
             dataX1 = [i for i in range(N)]
             dataY1 = self.__calculateYexponenta(alpha, beta, N)[1]
+            plt.grid(True)
             plt.plot(dataX1[N1:N2], dataY1[N1:N2])
             plt.title("Экспонентный восходящий тренд")
 
             plt.subplot(1, 2, 2)
             dataX2 = [i for i in range(N)]
             dataY2 = self.__calculateYexponenta(alpha, beta, N)[0]
+            plt.grid(True)
             plt.plot(dataX2[N1:N2], dataY2[N1:N2])
             plt.title("Экспонентный низходящий тренд")
 
@@ -112,25 +130,31 @@ class Model:
         Выводит график всех трендов
         '''
         dataX = [i for i in range(N)]
-
+        plt.figure(figsize=(10, 10))
+            
+        
         plt.subplot(2, 2, 1)
         dataY1 = self.__calculateYexponenta(alpha, beta, N)[1]
         plt.plot(dataX, dataY1)
+        plt.grid(True)
         plt.title("Экспонентный восходящий тренд")
 
         plt.subplot(2, 2, 2)
         dataY2 = self.__calculateYexponenta(alpha, beta, N)[0]
         plt.plot(dataX, dataY2)
+        plt.grid(True)
         plt.title("Экспонентный низходящий тренд")
 
         plt.subplot(2, 2, 3)
         dataY3 = self.__calculateYlinear(a, b, N)
         plt.plot(dataX, dataY3)
+        plt.grid(True)
         plt.title("Линейный восходящий тренд")
 
         plt.subplot(2, 2, 4)
         dataY4 = -self.__calculateYlinear(a, b, N)
         plt.plot(dataX, dataY4)
+        plt.grid(True)
         plt.title("Линейный низходящий тренд")
 
         plt.show()
@@ -142,6 +166,8 @@ class Model:
         dataX = [i for i in range(N)]
         dataY = self.__calculateRandomNoise(Range, N)
 
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.plot(dataX, dataY)
         plt.title("Шум на основе встроенного ПСЧ")
 
@@ -154,6 +180,8 @@ class Model:
         dataX = [i for i in range(N)]
         dataY = self.__calculateMyRandomNoise(time.time(), Range, N)
 
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.plot(dataX, dataY)
         plt.title("Шум на основе встроенного линейного конгруэнтного ПСЧ")
 
@@ -167,11 +195,14 @@ class Model:
         dataY1 = self.__calculateRandomNoise(Range, N)
         dataY2 = self.__calculateMyRandomNoise(time.time(), Range, N)
 
+        plt.figure(figsize=(10, 10))
         plt.subplot(1, 2, 1)
+        plt.grid(True)
         plt.plot(dataX, dataY1)
         plt.title("Шум на основе встроенного ПСЧ")
 
         plt.subplot(1, 2, 2)
+        plt.grid(True)
         plt.plot(dataX, dataY2)
         plt.title("Шум на основе встроенного линейного конгруэнтного ПСЧ")
 
@@ -191,6 +222,12 @@ class Model:
         else:
             return [self.__calculateRandomNoise(Range, N), self.__calculateMyRandomNoise(time.time(), Range, N)]
 
+    def getDefaultNoise(self):
+        return self.__calculateRandomNoise(
+            int(self.parametrs.GetParametr("Parametrs", "R")),
+            int(self.parametrs.GetParametr("Parametrs", "N"))
+        )
+    
     def drawShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
         '''
         Отрисовывает смещеные переданные данные на указанном диапозоне
@@ -210,11 +247,14 @@ class Model:
         if N2 != len(data) - 1:
             shiftData += [i for i in data[N2:]]
 
+        plt.figure(figsize=(10, 10))
         plt.subplot(1, 2, 1)
+        plt.grid(True)
         plt.plot([i for i in range(len(data))], data)
         plt.title("Начальные данные")
 
         plt.subplot(1, 2, 2)
+        plt.grid(True)
         plt.plot([i for i in range(len(shiftData))], shiftData)
         plt.title("Смещенные данные")
         plt.show()
@@ -266,6 +306,8 @@ class Model:
             else:
                 dataY.append(data[i])
 
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.plot(dataX, dataY)
         plt.title("Импульсы")
         plt.show()
@@ -299,6 +341,8 @@ class Model:
         dataX = [i * dt for i in range(N)]
         dataY = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
 
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.plot(dataX, dataY)
         plt.title("Гармонического процесс")
         plt.show()
@@ -318,6 +362,7 @@ class Model:
         
         
         _, (axs) = plt.subplots(2, 2)
+        plt.grid(True)
         axs[0, 0].plot(datasX[0], datasY[0])
         axs[0, 1].plot(datasX[1], datasY[1])
         axs[1, 0].plot(datasX[2], datasY[2])
@@ -340,6 +385,8 @@ class Model:
             for k in range(N)
         ]
 
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
         plt.plot([i * dt for i in range(N)], harm)
         plt.title("harm")
         plt.show()
@@ -351,6 +398,17 @@ class Model:
         dataY = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
 
         return dataY
+    
+    def getDefaultHarm(self):
+        N = int(self.parametrs.GetParametr("Parametrs", "N"))
+        A0=float(self.parametrs.GetParametr("Parametrs", "A0"))
+        f0=float(self.parametrs.GetParametr("Parametrs", "f0"))
+        dt=float(self.parametrs.GetParametr("Parametrs", "dt"))
+        thetta=float(self.parametrs.GetParametr("Parametrs", "thetta"))
+        
+        data = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
+        
+        return data
     
     def getPolyHarm(self, N = 1000, A0 = 100, A1 = 50, A2 = 25, f0 = 4, f1 = 1, f2 = 20, dt = 0.001):
         '''
@@ -380,6 +438,10 @@ class Model:
         N = len(data1)
         return [data1[i] + data2[i] for i in range(N)]
     
+    def getSumHarmNoise(self):
+        data = self.getDefaultNoise() + self.getDefaultHarm()
+        return data
+        
     def Fourier(self, data = [0 for i in range(1000)], N = 1000, L = 0):
         if L != 0:
             data = [i for i in data[0:N-L]]
