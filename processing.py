@@ -115,60 +115,44 @@ class Processing():
 
         return moveARGs
 
-    def AntiNoise(self, data=[0 for i in range(1000)], stepM=10):
+    def AntiNoise(self, function, stepM=10):
         plt.figure(figsize=(15, 15))
         
-
-        M = 1
+        M = 2
         step = 0
         while step < 6:
-            data = self.model.getNoise(
-                Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-                N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                type=0
-            )
+            data = function()
             for m in range(M-1):
-                data += self.model.getNoise(
-                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                    type=0
-                )
-
+                data += function()
+            
             dataY = []
             for i in data:
                 dataY.append(i/M)
-
-            dataX = [i for i in range(len(dataY))]
             dataY = np.asarray(dataY)
-
+            
+            dataX = [i for i in range(len(dataY))]
+            
             standardDeviation = round(np.std(dataY), 2)
-
+            
             plt.subplot(4, 3, (7, 9))
+            plt.grid(True)
             plt.plot(dataX, dataY)
             plt.title("Наложение всех шумов")
 
             plt.subplot(4, 3, step + 1)
+            plt.grid(True)
             plt.plot(dataX, dataY)
             plt.title(f"M = {M} стандартное отклонение = {standardDeviation}")
 
             M *= stepM
             step += 1
-
         
         dataX = []
         dataYstd = []
         for m in range(1, 1000, stepM):
-            data = self.model.getNoise(
-                Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-                N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                type=0
-            )
+            data = function()
             for i in range(m-1):
-                data += self.model.getNoise(
-                    Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-                    N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                    type=0
-                )
+                data += function()
             dataY = []
             for i in data:
                 dataY.append(i/m)
@@ -179,75 +163,4 @@ class Processing():
             plt.plot(dataX, dataYstd)
             plt.title("Изменение стандартного отклонения")
             
-            
         plt.show()
-
-        # plt.subplot(4, 3, (7, 9))
-        # plt.plot(dataX, dataY)
-        # plt.title("Наложение всех шумов")
-
-        # N = len(data)
-
-        # M = 10
-        # lM = []
-        # xt = []
-        # while M <= N:
-        #     lM.append(M)
-
-        #     sum = 0
-        #     for m in range(M):
-        #         sum += data[m]
-        #     sum = sum/M
-        #     if sum < 0:
-        #         sum *= -1
-        #     xt.append(sum)
-
-        #     M *= stepM
-
-        # for i in range(len(xt)):
-        #     dataNewY = []
-        #     for j in data:
-        #         if j > 0:
-        #             dataNewY.append(j - xt[i])
-        #         else:
-        #             dataNewY.append(j + xt[i])
-        #     plt.subplot(4, 3, i+1).patch.set_facecolor('black')
-        #     plt.plot(dataX, dataNewY)
-        #     plt.title(f"M = {lM[i]}")
-        #     standardDeviation = round(np.std(dataNewY), 2)
-        #     plt.text(10, -20, f"Стандартное отклонение {standardDeviation}", color = 'white',)
-        #     plt.subplot(4, 3, (7, 9))
-        #     plt.plot(dataX, dataNewY)
-
-        # dataYstd = []
-        # xtForStd = []
-
-        # M = 10
-        # while M <= N:
-        #     lM.append(M)
-
-        #     sum = 0
-        #     for m in range(M):
-        #         sum += data[m]
-        #     sum = sum/M
-        #     if sum < 0:
-        #         sum *= -1
-        #     xtForStd.append(sum)
-
-        #     M += stepM
-
-        # for i in range(len(xtForStd)):
-        #     dataNewY = []
-        #     for j in data:
-        #         if j > 0:
-        #             dataNewY.append(j - xtForStd[i])
-        #         else:
-        #             dataNewY.append(j + xtForStd[i])
-        #     standardDeviation = round(np.std(dataNewY), 2)
-        #     dataYstd.append(standardDeviation)
-
-        # plt.subplot(4, 3, (10, 12))
-        # plt.title(" зависимость изменения Стандартного отклонения")
-        # plt.plot([i for i in range(len(dataYstd))], dataYstd)
-
-        # plt.show()
