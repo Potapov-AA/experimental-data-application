@@ -125,6 +125,16 @@ class Model:
         else:
             return self.__calculateYexponenta(alpha, beta, N)
 
+    def getDefaultExponentaTrend(self):
+        alpha = float(self.parametrs.GetParametr("Parametrs", "alpha"))
+        beta = float(self.parametrs.GetParametr("Parametrs", "beta"))
+        N = int(self.parametrs.GetParametr("Parametrs", "N"))
+        dt = float(self.parametrs.GetParametr("Parametrs", "dt"))
+        
+        yExponenta = [beta * self.e ** (-alpha * i * dt) for i in range(N)]
+        
+        return yExponenta
+    
     def drawTrend(self, a=1, b=1, alpha=0.01, beta=1, N=1000):
         '''
         Выводит график всех трендов
@@ -441,7 +451,33 @@ class Model:
     def getSumHarmNoise(self):
         data = self.getDefaultNoise() + self.getDefaultHarm()
         return data
+    
+    def drawMultiModel(self, data1, data2):
+        N = len(data1)
+        data = [data1[i] * data2[i] for i in range(N)]
+        dataX = [i for i in range(N)]
         
+        plt.figure(figsize=(10,10))
+        plt.grid(True)
+        
+        plt.subplot(3, 1, 1)
+        plt.title("data1")
+        plt.plot(dataX, data1)
+        
+        plt.subplot(3, 1, 2)
+        plt.title("data2")
+        plt.plot(dataX, data2)
+        
+        plt.subplot(3, 1, 3)
+        plt.title("Multi data")
+        plt.plot(dataX, data)
+        
+        plt.show()
+    
+    def getMultModel(self, data1, data2):
+        N = len(data1)
+        return [data1[i] * data2[i] for i in range(N)]
+     
     def Fourier(self, data = [0 for i in range(1000)], N = 1000, L = 0):
         if L != 0:
             data = [i for i in data[0:N-L]]
@@ -463,8 +499,56 @@ class Model:
         dataY = np.asarray(dataY)
         
         return dataY
+    
+    def Cardiograma(self):
+        data = self.getMultModel(self.getDefaultExponentaTrend(), self.getDefaultHarm())
+        N = len(data)
+        M = 200
+        dataX = [i * 0.005 for i in range(N)]
         
-            
+        max = np.max(data)
+        data = [i / max * 120 for i in data]
+        
+        plt.figure(figsize=(15, 10))
+        
+        plt.subplot(3, 1, 1)
+        plt.title("Мульти экспонента-гармоника")
+        plt.grid(True)
+        plt.plot(dataX, data) 
+        
+        
+        impulse = 1
+        dataImpulse = []
+        for i in range(N):
+            if i % M == 0 and i != 0:
+                dataImpulse.append(impulse)
+            else:
+                dataImpulse.append(0)
+        
+        plt.subplot(3, 1, 2)
+        plt.title("Импульсы")
+        plt.grid(True)
+        plt.plot(dataX, dataImpulse)
+        
+        dataCardio = []
+        for k in range(N+M):
+            yk = 0
+            for m in range(M):
+                try:
+                    yk += dataImpulse[k-m] * data[m]
+                except:
+                    pass
+            dataCardio.append(yk)
+        
+        plt.subplot(3, 1, 3)
+        plt.title("Кардиограмма")
+        plt.grid(True)
+        plt.plot(dataX, dataCardio[0:N])
+        
+        plt.show()
+        
+        
+    
     @private
     def __calculateYlinear(self, a, b, N):
         '''
