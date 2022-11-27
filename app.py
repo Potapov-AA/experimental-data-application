@@ -1,11 +1,13 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import filedialog as fd 
 import numpy as np
 from settings import ParametrSettings
 from model import Model
 from analysis import Analysis
 from processing import Processing
 from config import Config
+from inout import InOut
 
 
 class App(Tk):
@@ -15,6 +17,9 @@ class App(Tk):
         self.analysis = Analysis()
         self.processing = Processing()
         self.parametrs = Config()
+        self.inout = InOut()
+        
+        self.currentData = []
         
         self.parametrs.DownloadSettings()
         self.title("МОЭД")
@@ -60,6 +65,7 @@ class App(Tk):
         frame8 = ttk.Frame(notebook)
         frame9 = ttk.Frame(notebook)
         frame10 = ttk.Frame(notebook)
+        frame11 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -71,17 +77,19 @@ class App(Tk):
         frame8.pack(fill=BOTH, expand=True)
         frame9.pack(fill=BOTH, expand=True)
         frame10.pack(fill=BOTH, expand=True)
+        frame11.pack(fill=BOTH, expand=True)
         
-        notebook.add(frame1, text="Лаб. 1")
-        notebook.add(frame2, text="Лаб. 2")
-        notebook.add(frame3, text="Лаб. 3")
-        notebook.add(frame4, text="Лаб. 4")
-        notebook.add(frame5, text="Лаб. 5")
-        notebook.add(frame6, text="Лаб. 6")
-        notebook.add(frame7, text="Лаб. 7")
-        notebook.add(frame8, text="Лаб. 8")
-        notebook.add(frame9, text="Лаб. 9")
-        notebook.add(frame10, text="Лаб. 10")
+        notebook.add(frame1, text="Л. 1")
+        notebook.add(frame2, text="Л. 2")
+        notebook.add(frame3, text="Л. 3")
+        notebook.add(frame4, text="Л. 4")
+        notebook.add(frame5, text="Л. 5")
+        notebook.add(frame6, text="Л. 6")
+        notebook.add(frame7, text="Л. 7")
+        notebook.add(frame8, text="Л. 8")
+        notebook.add(frame9, text="Л. 9")
+        notebook.add(frame10, text="Л. 10")
+        notebook.add(frame11, text="Л. 11")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
@@ -93,6 +101,7 @@ class App(Tk):
         self.lab8UI(frame8)
         self.lab9UI(frame9)
         self.lab10UI(frame10)
+        self.lab11UI(frame11)
         
     
     def lab1UI(self, parent):
@@ -566,7 +575,77 @@ class App(Tk):
                 stepM=int(self.parametrs.GetParametr("Parametrs", "stepM"))
             )
         ).pack(anchor=N, fill=X, pady=[0, 20])
-    
+        
+        text = "Убирает шум, также убирает шум на гармонике\n\n"
+        text += "Редактируемые параметры:\n"
+        text += "1) Шум\n"
+        text += "2) Гармоника"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
+
+    def lab11UI(self, parent):
+        Label(
+            parent,
+            text="Отобразить данные из файла"
+        ).pack(anchor=N, fill=X, pady=20)
+        
+        
+        Button(
+            parent,
+            text='Открыть файл', 
+            command=self.openfile
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text='Отрисовать данные',
+            command=lambda: self.analysis.drawFileData(self.currentData)
+        ).pack(anchor=N, fill=X)
+        
+        Label(parent, text="Сохранение текущих данных").pack(anchor=N, fill=X, pady=20)
+        
+        Label(parent, text="Название файла").pack(anchor=N, fill=X)
+        
+        self.entryName = Entry(parent, width=20, justify=CENTER)
+        self.entryName.pack(anchor=N)
+        
+        Button(
+            parent,
+            text="Задать тестовые данные",
+            command=self.testCurrentdata
+        ).pack(anchor=N, fill=X, pady= [20, 0])
+        
+        Button(
+            parent,
+            text="Сохранить",
+            command=self.savefile
+        ).pack(anchor=N, fill=X, pady= [0, 30])
+        
+        Button(
+            parent,
+            text = "Мульти тренд-гармоника",
+            command= lambda: self.model.drawMultiModel(
+                data1 = self.model.getDefaultExponentaTrend(),
+                data2= self.model.getDefaultHarm()
+            )
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text = "Кардиограмма",
+            command=lambda: self.model.Cardiograma()
+        ).pack(anchor=N, fill=X)
+        
+        text = "Считывает файл и сохраняет его в переменую текущих данных\n"
+        text += "После этого можно отобразить данные\n"
+        text += "Также сохраняет текущие данные в указанный файл\n"
+        text += "Считывание происходит по 4 байта, сразу в формат float\n"
+        text += "Также происходит сохзранение\n\n"
+        
+        text += "Реализована функция умножения данных, \nа также отображение кардиограммы"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X, pady=20)
+
     def printStatistic(self):
         result = self.analysis.statistics(
             self.model.getNoise(
@@ -885,3 +964,17 @@ class App(Tk):
                     type=1
                 )
             )
+    
+    def openfile(self):
+        name = fd.askopenfilename() 
+        self.currentData = self.inout.readFile(name)
+        
+    def savefile(self):
+        self.inout.saveFile(
+            name = self.entryName.get(),
+            data = self.currentData
+        )
+        
+    # TEST FUNCTION
+    def testCurrentdata(self):
+        self.currentData = self.model.getSumHarmNoise()

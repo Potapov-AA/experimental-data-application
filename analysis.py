@@ -162,5 +162,32 @@ class Analysis:
             plt.title(f"L={L[i]}")
         
         plt.show()
+    
+    def drawFileData(self, data):
+        dataX = [i for i in range(len(data))]
+        dataY = data
         
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
+        
+        plt.subplot(2,1,1)
+        plt.title("Данные из файла")
+        plt.plot(dataX, dataY)
+        
+        N = len(data)
+        FN = int(N/2)
+        deltaf = FN / (N/2)
+        
+        dataX = []
+        for n in range(FN):
+            dataX.append(n * deltaf)
+        dataX = np.asarray(dataX)
+        
+        dataY = self.model.Fourier(data, N)
+        
+        plt.subplot(2,1,2)
+        plt.plot(dataX, dataY[0:FN])
+        plt.title("Амплитудный спектр Фурье")
+        
+        plt.show()
             
