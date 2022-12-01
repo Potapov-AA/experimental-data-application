@@ -344,4 +344,29 @@ class Processing():
         plt.plot(dataX, dataY)
         
         plt.show()
+    
+    def useFilter(self, data, filter = 0):
+        lpw = self.lpf()[0]
+        hpw = self.hpf()[0]
+        bpw = self.bpf()
+        bsw = self.bsf()
         
+        filters = [lpw, hpw, bpw, bsw]
+        
+        currentFilter = filters[filter]
+        
+        filterData = []
+        M = 200
+        N = len(data)
+        for k in range(N+M):
+            yk = 0
+            for m in range(M):
+                try:
+                    yk += data[k-m] * currentFilter[m]
+                except:
+                    pass
+            filterData.append(yk)
+        
+        filterData = np.asarray(filterData)
+        
+        self.analysis.drawFileData(filterData)
