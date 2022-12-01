@@ -1,5 +1,5 @@
-from model import Model
 import numpy as np
+import wave
 from struct import *
 
 
@@ -26,3 +26,26 @@ class InOut():
             for number in data:
                 tempValue = pack("<f", number)
                 f.write(tempValue) 
+    
+    def readSoundFile(self, path):
+        result = dict()
+        data = object
+        with wave.open(path, 'rb') as f:
+            params = f.getparams()  
+            nchannels, sampwidth, framerate, nframes, comptype, compname = params[:6]
+            result["nchannels"] = nchannels
+            result["framerate"] = framerate
+            result["nframes"] = nframes
+            result["compname"] = compname
+            
+            str_data  = f.readframes(nframes)
+            data = np.fromstring(str_data,dtype = np.short)
+        
+        data.shape = -1,2
+        data = data.T
+        
+        result["data"] = data
+        
+        return result
+            
+            

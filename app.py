@@ -20,6 +20,7 @@ class App(Tk):
         self.inout = InOut()
         
         self.currentData = []
+        self.currentSoundData = []
         
         self.parametrs.DownloadSettings()
         self.title("МОЭД")
@@ -67,6 +68,7 @@ class App(Tk):
         frame10 = ttk.Frame(notebook)
         frame11 = ttk.Frame(notebook)
         frame12 = ttk.Frame(notebook)
+        frame13 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -80,6 +82,7 @@ class App(Tk):
         frame10.pack(fill=BOTH, expand=True)
         frame11.pack(fill=BOTH, expand=True)
         frame12.pack(fill=BOTH, expand=True)
+        frame13.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Л. 1")
         notebook.add(frame2, text="Л. 2")
@@ -93,6 +96,7 @@ class App(Tk):
         notebook.add(frame10, text="Л. 10")
         notebook.add(frame11, text="Л. 11")
         notebook.add(frame12, text="Л. 12")
+        notebook.add(frame13, text="Л. 13")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
@@ -106,6 +110,7 @@ class App(Tk):
         self.lab10UI(frame10)
         self.lab11UI(frame11)
         self.lab12UI(frame12)
+        self.lab13UI(frame13)
         
     
     def lab1UI(self, parent):
@@ -690,7 +695,51 @@ class App(Tk):
         text += "fc, fc1, fc2, dt, m"
         
         Label(parent, text=text).pack(anchor=N, fill=X)
+    
+    def lab13UI(self, parent):
+        Label(parent, text="Применение фильтров к текущим данным").pack(anchor=N ,fill=X, pady=20)
         
+        Button(
+            parent,
+            text="Применить ФВЧ",
+            command=lambda: self.processing.useFilter(self.currentData)
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Применить ФНЧ",
+            command=lambda: self.processing.useFilter(self.currentData, 1)
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Применить ПФ",
+            command=lambda: self.processing.useFilter(self.currentData, 2)
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Применить РФ",
+            command=lambda: self.processing.useFilter(self.currentData, 3)
+        ).pack(anchor=N, fill=X)
+        
+        
+        Button(
+            parent,
+            text="Чтение файла формата .wav",
+            command= self.openSoundFile
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Отобразить данные из текущего звукового файла",
+            command=lambda: self.analysis.drawSoundData(self.currentSoundData)
+        ).pack(anchor=N, fill=X, pady=[0, 20])
+        
+        text = "Применяет ранее написанные фильтра для считаных данных\n"
+        text += "Также реализована функция чтения из файла формата .wav"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
     
     def printStatistic(self):
         result = self.analysis.statistics(
@@ -1024,3 +1073,7 @@ class App(Tk):
     # TEST FUNCTION
     def testCurrentdata(self):
         self.currentData = self.model.getSumHarmNoise()
+        
+    def openSoundFile(self):
+        name = fd.askopenfilename() 
+        self.currentSoundData = self.inout.readSoundFile(name)
