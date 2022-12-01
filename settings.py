@@ -78,6 +78,13 @@ class ParametrSettings(Toplevel):
               
               self.drawParameter("M step =", "stepM", parent)
               
+              Label(parent, text="Импульсная реакция").pack(anchor=N, fill=X, pady=[15, 10])
+              
+              self.drawParameter("fc =", "fc", parent)
+              self.drawParameter("fc1 =", "fc1", parent)
+              self.drawParameter("fc2 =", "fc2", parent)
+              self.drawParameter("m =", "m for lpf", parent)
+              
        def centerWindow(self):
               w = 300
               h = 780
