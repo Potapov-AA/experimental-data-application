@@ -210,3 +210,25 @@ class Analysis:
         
         plt.show()
             
+    def drawSoundData(self, data):
+        dataY = data["data"]
+        dataX = np.arange(0,data["nframes"])/data["framerate"]
+        
+        time = round(data["nframes"]/data["framerate"], 2)
+        compname = data["compname"]
+        framerate = data["framerate"]
+        nchannels = data["nchannels"]
+        
+        print(dataX)
+        print(len(dataX))
+        print(dataY)
+        print(len(dataY))
+        
+        plt.figure(figsize=(10,10)) 
+        plt.subplot(2,1,1) 
+        plt.plot(dataX, dataY[0])
+        plt.title(f"Название: {compname}. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}")
+        plt.subplot(2,1,2) 
+        plt.plot(dataX, dataY[1], c='r')        
+        plt.xlabel("time")
+        plt.show()
