@@ -41,7 +41,10 @@ class Config():
         self.config.set("Parametrs", "L2", "124")
         self.config.set("Parametrs", "L3", "224")
         self.config.set("Parametrs", "stepM", "10")
-        
+        self.config.set("Parametrs", "fc", "50")
+        self.config.set("Parametrs", "fc1", "35")
+        self.config.set("Parametrs", "fc2", "75")
+        self.config.set("Parametrs", "m for lpf", "64")
         
         with open(self.path, "w") as configFiles:
             self.config .write(configFiles)
