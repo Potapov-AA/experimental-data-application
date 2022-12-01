@@ -3,10 +3,12 @@ import numpy as np
 from scipy.stats import norm
 from matplotlib import pyplot as plt
 from model import Model
+from config import Config
 
 class Analysis:
     def __init__(self):
         self.model = Model()
+        self.parametrs = Config()
 
     def statistics(self, data):
         '''
@@ -162,6 +164,23 @@ class Analysis:
             plt.title(f"L={L[i]}")
         
         plt.show()
+    
+    def getSpectrFourier(self, data):
+        N = len(data)
+        
+        
+        FN = int(N/2)
+        deltaf = FN / (N/2)
+        dataX = []
+        for n in range(FN):
+            dataX.append(n * deltaf)
+        dataX = np.asarray(dataX)
+        
+        dataY = self.model.Fourier(data, N)
+        dataY = dataY[0:FN]
+        dataY = np.asarray(dataY)
+        
+        return dataY
     
     def drawFileData(self, data):
         dataX = [i for i in range(len(data))]
