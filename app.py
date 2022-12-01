@@ -66,6 +66,7 @@ class App(Tk):
         frame9 = ttk.Frame(notebook)
         frame10 = ttk.Frame(notebook)
         frame11 = ttk.Frame(notebook)
+        frame12 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -78,6 +79,7 @@ class App(Tk):
         frame9.pack(fill=BOTH, expand=True)
         frame10.pack(fill=BOTH, expand=True)
         frame11.pack(fill=BOTH, expand=True)
+        frame12.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Л. 1")
         notebook.add(frame2, text="Л. 2")
@@ -90,6 +92,7 @@ class App(Tk):
         notebook.add(frame9, text="Л. 9")
         notebook.add(frame10, text="Л. 10")
         notebook.add(frame11, text="Л. 11")
+        notebook.add(frame12, text="Л. 12")
         
         self.lab1UI(frame1)
         self.lab2UI(frame2)
@@ -102,6 +105,7 @@ class App(Tk):
         self.lab9UI(frame9)
         self.lab10UI(frame10)
         self.lab11UI(frame11)
+        self.lab12UI(frame12)
         
     
     def lab1UI(self, parent):
@@ -646,6 +650,48 @@ class App(Tk):
         
         Label(parent, text=text).pack(anchor=N, fill=X, pady=20)
 
+    def lab12UI(self, parent):
+        Label(parent, text="Расчет импульсной реакции").pack(anchor=N, fill=X, pady=20)
+        
+        Button(
+            parent,
+            text="Рассчитать для ФНЧ",
+            command= lambda: self.processing.lpf(True)
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Рассчитать для ФВЧ",
+            command= lambda: self.processing.hpf(True)
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Рассчитать для ПФ",
+            command= lambda: self.processing.bpf(True)
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Рассчитать для РФ",
+            command= lambda: self.processing.bsf(True)
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Расчет частотной характеристики фильтров",
+            command= lambda: self.processing.FilterFourier()
+        ).pack(anchor=N, fill=X, pady=20)
+        
+        text = "Расчет имульсной реакции для различных фильтров\n"
+        text += "ФНЧ, ФВЧ, ПФ, РФ\n\n"
+        text += "И расчет частотной характеристики фильтров\n\n"
+        text += "Редактируемые параметры:\n"
+        text += "fc, fc1, fc2, dt, m"
+        
+        Label(parent, text=text).pack(anchor=N, fill=X)
+        
+    
     def printStatistic(self):
         result = self.analysis.statistics(
             self.model.getNoise(
