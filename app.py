@@ -90,7 +90,7 @@ class App(Tk):
         frame12.pack(fill=BOTH, expand=True)
         frame13.pack(fill=BOTH, expand=True)
         
-        notebook.add(frame1, text="Л. 1")
+        notebook.add(frame1, text="Стандартные графики")
         notebook.add(frame2, text="Л. 2")
         notebook.add(frame3, text="Л. 3")
         notebook.add(frame4, text="Л. 4")
@@ -104,7 +104,7 @@ class App(Tk):
         notebook.add(frame12, text="Л. 12")
         notebook.add(frame13, text="Л. 13")
         
-        self.lab1UI(frame1)
+        self.standartFunctionUI(frame1)
         # self.lab2UI(frame2)
         # self.lab3UI(frame3)
         # self.lab4UI(frame4)
@@ -119,77 +119,41 @@ class App(Tk):
         # self.lab13UI(frame13)
         
     def openBinaryFile(self):
-            name = fd.askopenfilename() 
-            self.currentData = self.inout.readFile(name)
+        name = fd.askopenfilename() 
+        self.currentData = self.inout.readBinaryFile(name)
     
     def openSoundFile(self):
         name = fd.askopenfilename() 
         self.currentSoundData = self.inout.readSoundFile(name)
     
     def saveBinaryFile(self):
-        self.inout.saveFile(
-            name = self.entryName.get(),
+        self.inout.saveBinaryFile(
+            name = "saveData/data.bin",
             data = self.currentData
         )
     
-    def lab1UI(self, parent):
-        Label(parent,
-              text="Стандартные графики",
-              font=self.font,
-              ).pack(anchor=N, fill=X, pady=20)
-
-        typeGraph = ["Восходящий", "Низходящий", "Восходящий и низходящий"]
-
-        self.choseGraph1 = StringVar(value=0)
-                
-        for index in range(len(typeGraph)):
-            radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseGraph1)
-            radiobtn_graph.pack(anchor=N)
-        
-        del typeGraph
-
+    def linerGraph(self):
+        self.currentData = self.model.linerGraph(draw=True)
+    
+    def exponentaGraph(self):
+        self.currentData = self.model.exponentaGraph(draw=True)
+    
+    def standartFunctionUI(self, parent):
         Button(
             parent,
-            text="Построить линейный тренд",
-            command=lambda: self.model.drawLinerTrend(
-                a=float(self.parametrs.GetParametr("Parametrs", "a")),
-                b=float(self.parametrs.GetParametr("Parametrs", "b")),
-                N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                type=int(self.choseGraph1.get())
-            )
+            text="Построить линейный график",
+            command=self.linerGraph,
+            font=self.font
         ).pack(anchor=N, fill=X, pady=[20, 0])
 
         Button(
             parent,
-            text="Построить экспонентный тренд",
-            command=lambda: self.model.drawExponentaTrend(
-                alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
-                beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
-                N=int(self.parametrs.GetParametr("Parametrs", "N")),
-                type=int(self.choseGraph1.get())
-            )
+            text="Построить график экспоненты",
+            command=self.exponentaGraph,
+            font=self.font
         ).pack(anchor=N, fill=X)
 
-        Button(
-            parent,
-            text="Вывести график всех трендов",
-            command=lambda: self.model.drawTrend(
-                a=float(self.parametrs.GetParametr("Parametrs", "a")),
-                b=float(self.parametrs.GetParametr("Parametrs", "b")),
-                alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
-                beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
-                N=int(self.parametrs.GetParametr("Parametrs", "N"))
-            )
-        ).pack(anchor=N, fill=X, pady=[0, 20])
         
-        text = "Выводит график выбранного тренда.\n"
-        text += "Изменяемые параметры в настройках:\n"
-        text += "Для линейного тренда y = ax + b\n"
-        text += "Для экспонетного тренда y = beta * e ^ (-alpha * x)"
-        
-        Label(parent,
-              text=text).pack(anchor=N, fill=X)
-    
     # def lab2UI(self, parent):
     #     Label(parent,
     #           text="ШУМЫ"
