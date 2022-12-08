@@ -1,4 +1,3 @@
-
 from random import randint
 from accessify import private
 from matplotlib import pyplot as plt
@@ -14,160 +13,63 @@ class Model:
         self.e = np.e
         self.parametrs = Config()
 
-    def drawLinerTrend(self,  a=1, b=1, N=1000, N1=0, N2=999, type=0):
+    def linerGraph(self, type=0, draw=False):
         '''
-        Выводит график линейных трендов
-        Если type = 0, выводит массив данные по Y восходящего тренда
-        Если type = 1, выводит массив данные по Y низходящего тренда
-        Если type = 2, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
+        Линейный график
         '''
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+        
+        a=float(self.parametrs.GetParametr("Parametrs", "a"))
+        b=float(self.parametrs.GetParametr("Parametrs", "b"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        
+        dataX = np.asarray([i for i in range(N)], dtype=float)
+        
         if type == 0:
-            dataX = [i for i in range(N)]
-            dataY = self.__calculateYlinear(a, b, N)
-            plt.figure(figsize=(10, 10))
-            plt.grid(True)
-            plt.plot(dataX[N1:N2], dataY[N1:N2])
-            plt.title("Линейный восходящий тренд")
-            plt.show()
+            dataY = np.asarray([i*a+b for i in range(N)], dtype=float)
+            if draw:
+                plt.plot(dataX, dataY)
+                plt.title("Линейный восходящий график")
         elif type == 1:
-            dataX = [i for i in range(N)]
-            dataY = -self.__calculateYlinear(a, b, N)
-            plt.figure(figsize=(10, 10))
-            plt.grid(True)
-            plt.plot(dataX[N1:N2], dataY[N1:N2])
-            plt.title("Линейный низходящий тренд")
+            dataY = -np.asarray([i*a+b for i in range(N)], dtype=float)
+            if draw:
+                plt.plot(dataX, dataY)
+                plt.title("Линейный низходящий график")
+        
+        if draw:
             plt.show()
-        else:
-            plt.figure(figsize=(10, 10))
-            plt.subplot(1, 2, 1)
-            dataX1 = [i for i in range(N)]
-            dataY1 = self.__calculateYlinear(a, b, N)
-            plt.plot(dataX1[N1:N2], dataY1[N1:N2])
-            plt.grid(True)
-            plt.title("Линейный восходящий тренд")
-
-            plt.subplot(1, 2, 2)
-            dataX2 = [i for i in range(N)]
-            dataY2 = -self.__calculateYlinear(a, b, N)
-            plt.plot(dataX2[N1:N2], dataY2[N1:N2])
-            plt.grid(True)
-            plt.title("Линейный низходящий тренд")
-
-            plt.show()
-
-    def getLinerTrend(self, a=1, b=1, N=1000, type=1):
-        '''
-        Получить массив данных линейных трендов
-        Если type = 0, возвращает массив данные по Y восходящего тренда
-        Если type = 1, возвращает массив данные по Y низходящего тренда
-        Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
-        '''
-        if type == 0:
-            return self.__calculateYlinear(a, b, N)
-        elif type == 1:
-            return -self.__calculateYlinear(a, b, N)
-        else:
-            return [self.__calculateYlinear(a, b, N), -self.__calculateYlinear(a, b, N)]
-
-    def drawExponentaTrend(self, alpha=0.01, beta=1, N=1000, N1=0, N2=999, type=0):
-        '''
-        Выводит график экспонентных трендов
-        Если type = 0, выводит массив данные по Y восходящего тренда
-        Если type = 1, выводит массив данные по Y низходящего тренда
-        Если type = 2, выводит массив массивов данных по Y восходящего тренда и низходящего тренда
-        '''
-        if type == 0:
-            dataX = [i for i in range(N)]
-            dataY = self.__calculateYexponenta(alpha, beta, N)[1]
-            plt.figure(figsize=(10, 10))
-            plt.grid(True)
-            plt.plot(dataX[N1:N2], dataY[N1:N2])
-            plt.title("Экспонентный восходящий тренд")
-            plt.show()
-        elif type == 1:
-            dataX = [i for i in range(N)]
-            dataY = self.__calculateYexponenta(alpha, beta, N)[0]
-            plt.figure(figsize=(10, 10))
-            plt.grid(True)
-            plt.plot(dataX[N1:N2], dataY[N1:N2])
-            plt.title("Экспонентный низходящий тренд")
-            plt.show()
-        else:
-            plt.figure(figsize=(10, 10))
             
-            plt.subplot(1, 2, 1)
-            dataX1 = [i for i in range(N)]
-            dataY1 = self.__calculateYexponenta(alpha, beta, N)[1]
-            plt.grid(True)
-            plt.plot(dataX1[N1:N2], dataY1[N1:N2])
-            plt.title("Экспонентный восходящий тренд")
+        return dataY
 
-            plt.subplot(1, 2, 2)
-            dataX2 = [i for i in range(N)]
-            dataY2 = self.__calculateYexponenta(alpha, beta, N)[0]
-            plt.grid(True)
-            plt.plot(dataX2[N1:N2], dataY2[N1:N2])
-            plt.title("Экспонентный низходящий тренд")
-
-            plt.show()
-
-    def getExponentaTrend(self, alpha=0.01, beta=1, N=1000, type=0):
+    def exponentaGraph(self, type=0, draw=False):
         '''
-        Получить массив данных экспонентных трендов
-        Если type = 0, возвращает массив данные по Y восходящего тренда
-        Если type = 1, возвращает массив данные по Y низходящего тренда
-        Если type = 2, возвращает массив массивов данных по Y восходящего тренда и низходящего тренда
+        График экспоненты
         '''
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+        
+        alpha=float(self.parametrs.GetParametr("Parametrs", "alpha"))
+        beta=float(self.parametrs.GetParametr("Parametrs", "beta"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        
+        dataX = np.asarray([i for i in range(N)], dtype=float)
+        
         if type == 0:
-            return self.__calculateYexponenta(alpha, beta, N)[1]
+            dataY = np.asarray([beta * self.e ** (-alpha * i) for i in range(N)])
+            plt.plot(dataX, dataY)
+            plt.title("Экспонентный восходящий график")
         elif type == 1:
-            return self.__calculateYexponenta(alpha, beta, N)[0]
-        else:
-            return self.__calculateYexponenta(alpha, beta, N)
-
-    def getDefaultExponentaTrend(self):
-        alpha = float(self.parametrs.GetParametr("Parametrs", "alpha"))
-        beta = float(self.parametrs.GetParametr("Parametrs", "beta"))
-        N = int(self.parametrs.GetParametr("Parametrs", "N"))
-        dt = float(self.parametrs.GetParametr("Parametrs", "dt"))
+            dataY = np.asarray([beta * self.e ** (alpha * i) for i in range(N)])
+            plt.plot(dataX, dataY)
+            plt.title("Экспонентный низходящий график")
         
-        yExponenta = [beta * self.e ** (-alpha * i * dt) for i in range(N)]
-        
-        return yExponenta
-    
-    def drawTrend(self, a=1, b=1, alpha=0.01, beta=1, N=1000):
-        '''
-        Выводит график всех трендов
-        '''
-        dataX = [i for i in range(N)]
-        plt.figure(figsize=(10, 10))
+        if draw:
+            plt.show()
             
-        
-        plt.subplot(2, 2, 1)
-        dataY1 = self.__calculateYexponenta(alpha, beta, N)[1]
-        plt.plot(dataX, dataY1)
-        plt.grid(True)
-        plt.title("Экспонентный восходящий тренд")
-
-        plt.subplot(2, 2, 2)
-        dataY2 = self.__calculateYexponenta(alpha, beta, N)[0]
-        plt.plot(dataX, dataY2)
-        plt.grid(True)
-        plt.title("Экспонентный низходящий тренд")
-
-        plt.subplot(2, 2, 3)
-        dataY3 = self.__calculateYlinear(a, b, N)
-        plt.plot(dataX, dataY3)
-        plt.grid(True)
-        plt.title("Линейный восходящий тренд")
-
-        plt.subplot(2, 2, 4)
-        dataY4 = -self.__calculateYlinear(a, b, N)
-        plt.plot(dataX, dataY4)
-        plt.grid(True)
-        plt.title("Линейный низходящий тренд")
-
-        plt.show()
+        return dataY
 
     def drawRandomNoise(self, Range=1000, N=1000):
         '''
@@ -546,30 +448,7 @@ class Model:
         plt.plot(dataX, dataCardio[0:N])
         
         plt.show()
-        
-        
-    
-    @private
-    def __calculateYlinear(self, a, b, N):
-        '''
-        Расчитывает значения по оси Y для линейного графика
-        '''
-        return np.asarray([i*a+b for i in range(N)], dtype=float)
-
-    @private
-    def __calculateYexponenta(self, alpha, beta, N):
-        '''
-        Расчитывает значения по оси Y для экспоненты
-        '''
-        yExponenta = []
-        yExponenta_1 = [beta * self.e **
-                        (-alpha * i) for i in range(N)]
-        yExponenta_2 = [beta * self.e **
-                        (alpha * i) for i in range(N)]
-        yExponenta.append(yExponenta_1)
-        yExponenta.append(yExponenta_2)
-        return np.asarray(yExponenta)
-
+     
     @private
     def __calculateRandomNoise(self, Range, N):
         '''
