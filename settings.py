@@ -29,11 +29,11 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Общие параметры").pack(anchor=N, fill=X, pady=[20, 10])
               self.drawParameter("N =", "N", parent)
               
-              Label(parent, text="Линейный тренд").pack(anchor=N, fill=X, pady=[15, 10])
+              Label(parent, text="Линейный график").pack(anchor=N, fill=X, pady=[15, 10])
               self.drawParameter("a =", "a", parent)
               self.drawParameter("b =", "b", parent)
               
-              Label(parent, text="Экспонентный тренд").pack(anchor=N, fill=X, pady=[15, 10])
+              Label(parent, text="График экспоненты").pack(anchor=N, fill=X, pady=[15, 10])
               self.drawParameter("alpha =", "alpha", parent)
               self.drawParameter("beta =", "beta", parent)
               
