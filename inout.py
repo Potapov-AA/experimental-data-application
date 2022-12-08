@@ -6,7 +6,7 @@ from struct import *
 class InOut():
     def __init__(self): pass
     
-    def readFile(self, path):
+    def readBinaryFile(self, path):
         data = []
         with open(path, 'rb') as f:
             number = f.read(4)
@@ -21,7 +21,7 @@ class InOut():
         data = np.asarray(data)
         return data
     
-    def saveFile(self, name, data):
+    def saveBinaryFile(self, name, data):
         with open(name, 'wb') as f:
             for number in data:
                 tempValue = pack("<f", number)
@@ -48,4 +48,6 @@ class InOut():
         
         return result
             
-            
+    def statisticSave(self, name, statistic):
+        with open(name, 'w') as f:
+            f.write(statistic)    
