@@ -37,17 +37,7 @@ class ParametrSettings(Toplevel):
               self.drawParameter("alpha =", "alpha", parent)
               self.drawParameter("beta =", "beta", parent)
               
-              Label(parent, text="Шумы").pack(anchor=N, fill=X, pady=[15, 10])
-              self.drawParameter("R =", "R", parent)
-              
-              Label(parent, text="Смещение и импульсы").pack(anchor=N, fill=X, pady=[15, 10])
-              self.drawParameter("Shift =", "Shift", parent)
-              self.drawParameter("From =", "ShiftFrom", parent)
-              self.drawParameter("To =", "ShiftTo", parent)
-              self.drawParameter("R1 =", "R1", parent)
-              self.drawParameter("R2 =", "R2", parent)
-              
-              Label(parent, text="Гармоники").pack(anchor=N, fill=X, pady=[15, 10])
+              Label(parent, text="Гармоники (синусойда)").pack(anchor=N, fill=X, pady=[15, 10])
               
               self.drawParameter("A0 =", "A0", parent)
               self.drawParameter("A1 =", "A1", parent)
@@ -58,6 +48,19 @@ class ParametrSettings(Toplevel):
               self.drawParameter("dt =", "dt", parent)
               self.drawParameter("step =", "step", parent)
               self.drawParameter("thetta =", "thetta", parent)
+              
+              
+              Label(parent, text="Шумы").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("R =", "R", parent)
+              
+              Label(parent, text="Смещение и импульсы").pack(anchor=N, fill=X, pady=[15, 10])
+              self.drawParameter("Shift =", "Shift", parent)
+              self.drawParameter("From =", "ShiftFrom", parent)
+              self.drawParameter("To =", "ShiftTo", parent)
+              self.drawParameter("R1 =", "R1", parent)
+              self.drawParameter("R2 =", "R2", parent)
+              
+              
               
        
        def page2UI(self, parent):
