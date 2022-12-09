@@ -13,6 +13,43 @@ class Model:
         self.e = np.e
         self.parametrs = Config()
 
+
+    def drawCurrentData(self, data):
+        '''
+        Отображает текущие данные
+        '''
+        dataX = [i for i in range(len(data))]
+        dataY = data
+        
+        plt.figure(figsize=(10, 10))
+        plt.grid(True)
+        
+        plt.title("Текущие данные")
+        plt.plot(dataX, dataY)
+        
+        plt.show()
+    
+    def drawCurrentSoundData(self, data):
+        '''
+        Отображает текущие звуковые данные
+        '''
+        dataY = data["data"]
+        dataX = np.arange(0,data["nframes"])/data["framerate"]
+        
+        time = round(data["nframes"]/data["framerate"], 2)
+        framerate = data["framerate"]
+        nchannels = data["nchannels"]
+        
+        plt.figure(figsize=(10,10)) 
+        plt.subplot(2,1,1) 
+        plt.plot(dataX, dataY[0])
+        plt.title(f"Текущий звуковой файл. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}")
+        plt.subplot(2,1,2) 
+        plt.plot(dataX, dataY[1], c='r')        
+        plt.xlabel("time")
+        plt.show()
+    
+    
     def linerGraph(self, type=0, draw=False):
         '''
         Линейный график
@@ -71,74 +108,92 @@ class Model:
             
         return dataY
 
-    def drawRandomNoise(self, Range=1000, N=1000):
+    def sinGraph(self, draw=False):
         '''
-        Выводит график шума основанного на встроенном ПСЧ
+        График синусойды
         '''
-        dataX = [i for i in range(N)]
-        dataY = self.__calculateRandomNoise(Range, N)
+        A0=float(self.parametrs.GetParametr("Parametrs", "A0"))
+        f0=float(self.parametrs.GetParametr("Parametrs", "f0"))
+        dt=float(self.parametrs.GetParametr("Parametrs", "dt"))
+        thetta=float(self.parametrs.GetParametr("Parametrs", "thetta"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        
+        dataX = np.asarray([i * dt for i in range(N)])
+        dataY = np.asarray([A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)])
 
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        plt.plot(dataX, dataY)
-        plt.title("Шум на основе встроенного ПСЧ")
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+            plt.plot(dataX, dataY)
+            plt.title("Синусойда")
+            plt.show()
 
-        plt.show()
+        return dataY
+      
 
-    def drawMyRandomNoise(self, Range=1000, N=1000):
+    def defaultNoise(self, draw=False):
         '''
-         Выводит график шума основанного на линейном конгруэнтном ПСЧ
+        Шум на основе встроенного ПСЧ
         '''
-        dataX = [i for i in range(N)]
-        dataY = self.__calculateMyRandomNoise(time.time(), Range, N)
+        Range=float(self.parametrs.GetParametr("Parametrs", "R"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        
+        dataX = np.asarray([i for i in range(N)])
+        dataY = np.asarray(np.random.randint(-Range, Range, N))
 
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        plt.plot(dataX, dataY)
-        plt.title("Шум на основе встроенного линейного конгруэнтного ПСЧ")
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+            plt.plot(dataX, dataY)
+            plt.title("Шум на основе встроенного ПСЧ")
+            plt.show()
+        
+        return dataY
 
-        plt.show()
-
-    def drawNoise(self, Range=1000, N=1000):
+    def lineKonNoise(self, draw=False):
         '''
-        Выводит график шума
+        Шум на основе встроенного линейного конгруэнтного ПСЧ
         '''
-        dataX = [i for i in range(N)]
-        dataY1 = self.__calculateRandomNoise(Range, N)
-        dataY2 = self.__calculateMyRandomNoise(time.time(), Range, N)
+        Range=float(self.parametrs.GetParametr("Parametrs", "R"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        
+        seed = time.time()
+        m = 32768
+        a = 29
+        c = 47
+        r = [0 for i in range(N)]
 
-        plt.figure(figsize=(10, 10))
-        plt.subplot(1, 2, 1)
-        plt.grid(True)
-        plt.plot(dataX, dataY1)
-        plt.title("Шум на основе встроенного ПСЧ")
+        r[0] = math.ceil(seed)
+        for i in range(1, N):
+            r[i] = math.ceil(math.fmod((a*r[i-1]+c), m))
 
-        plt.subplot(1, 2, 2)
-        plt.grid(True)
-        plt.plot(dataX, dataY2)
-        plt.title("Шум на основе встроенного линейного конгруэнтного ПСЧ")
+        dataY = []
 
-        plt.show()
+        for i in r:
+            j = 0
+            while i > Range:
+                i /= 3
+                j += 1
 
-    def getNoise(self, Range=1000, N=1000, type=0):
-        '''
-        Получить массив данных экспонентных трендов
-        Если type = 0, возвращает массив данные по Y встроенного рандомайзера
-        Если type = 1, возвращает массив данные по Y написанного рандомайзера
-        Если type = 2, возвращает массив массивов данных по Y встроенного рандомайзера и написанного рандомайзера
-        '''
-        if type == 0:
-            return self.__calculateRandomNoise(Range, N)
-        elif type == 1:
-            return self.__calculateMyRandomNoise(time.time(), Range, N)
-        else:
-            return [self.__calculateRandomNoise(Range, N), self.__calculateMyRandomNoise(time.time(), Range, N)]
+            i = round(i)
 
-    def getDefaultNoise(self):
-        return self.__calculateRandomNoise(
-            int(self.parametrs.GetParametr("Parametrs", "R")),
-            int(self.parametrs.GetParametr("Parametrs", "N"))
-        )
+            if j % 2 == 1:
+                i *= -1
+
+            dataY.append(i)
+
+        dataX = np.asarray([i for i in range(N)])
+        dataY = np.asarray(dataY)
+
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+            plt.plot(dataX, dataY)
+            plt.title("Шум на основе встроенного линейного конгруэнтного ПСЧ")
+            plt.show()
+        
+        return dataY
+        
     
     def drawShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
         '''
@@ -156,7 +211,7 @@ class Model:
 
         shiftData += [i + shift for i in data[N1: N2]]
 
-        if N2 != len(data) - 1:
+        if N2 != len(data):
             shiftData += [i for i in data[N2:]]
 
         plt.figure(figsize=(10, 10))
@@ -246,18 +301,7 @@ class Model:
 
         return np.asarray(dataY)
 
-    def drawHarm(self, N = 1000, A0 = 10, f0 = 10, dt = 0.01, thetta = 0):
-        '''
-        Выводит график гармонического процесса
-        '''
-        dataX = [i * dt for i in range(N)]
-        dataY = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
-
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        plt.plot(dataX, dataY)
-        plt.title("Гармонического процесс")
-        plt.show()
+    
 
     def drawHarms(self, N = 200, A0 = 5, f0 = 10, dt = 0.001, step = 250):
         '''
@@ -448,41 +492,11 @@ class Model:
         plt.plot(dataX, dataCardio[0:N])
         
         plt.show()
-     
-    @private
-    def __calculateRandomNoise(self, Range, N):
-        '''
-        Расчитывает значения по оси Y встроенным рандомом
-        '''
-        return np.asarray(np.random.randint(-Range, Range, N))
+
 
     @private
     def __calculateMyRandomNoise(self, seed, Range, N):
         '''
         Расчитывает значения по оси Y по функции с помощью линейного конгруэнтный генератора псевдослучайных чисел
         '''
-        m = 32768
-        a = 29
-        c = 47
-        r = [0 for i in range(N)]
-
-        r[0] = math.ceil(seed)
-        for i in range(1, N):
-            r[i] = math.ceil(math.fmod((a*r[i-1]+c), m))
-
-        dataY = []
-
-        for i in r:
-            j = 0
-            while i > Range:
-                i /= 3
-                j += 1
-
-            i = round(i)
-
-            if j % 2 == 1:
-                i *= -1
-
-            dataY.append(i)
-
-        return np.asarray(dataY)
+        
