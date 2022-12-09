@@ -10,7 +10,6 @@ class InOut():
         data = []
         with open(path, 'rb') as f:
             number = f.read(4)
-            print(number)
             
             while number:
                 tempTuple = unpack("<f", number)
@@ -50,4 +49,4 @@ class InOut():
             
     def statisticSave(self, name, statistic):
         with open(name, 'w') as f:
-            f.write(statistic)    
+            f.write(statistic.encode('utf-16').decode('utf-16'))    
