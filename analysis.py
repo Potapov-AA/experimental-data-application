@@ -27,22 +27,25 @@ class Analysis:
         meanSquare = sum(i ** 2 for i in data) / len(data)
         meanSquareError = np.sqrt(meanSquare)
         
-        result = f'Количество значенией: {len(data)}\n'
-        result += f'Минимальное значение: {min}\n'
-        result += f'Максимальное значение: {max}\n'
-        result += f'Среднее значение: {meanValue}\n'
-        result += f'Дисперсия: {variance}\n'
-        result += f'Стандартное отклонение: {standardDeviation}\n'
-        result += f'Ассиметрия: {assymetry}\n'
-        result += f'Коэффицент ассиметрии: {assymetryCoef}\n'
-        result += f'Эксцесс: {excess}\n'
-        result += f'куртозис: {kurtosis}\n'
-        result += f'Средний квадрат: {meanSquare}\n'
-        result += f'Ср. квад. ошибка: {meanSquareError}'
+        result = f'Number of values: {len(data)}\n'
+        result += f'Min value: {min}\n'
+        result += f'Max value: {max}\n'
+        result += f'Middle value: {meanValue}\n'
+        result += f'Dispersion: {variance}\n'
+        result += f'Standard deviation: {standardDeviation}\n'
+        result += f'Asymmetry: {assymetry}\n'
+        result += f'Asymmetry coefficient: {assymetryCoef}\n'
+        result += f'Excess: {excess}\n'
+        result += f'Kurtosis: {kurtosis}\n'
+        result += f'Medium square: {meanSquare}\n'
+        result += f'RMS error: {meanSquareError}'
         
         return result
 
     def stationarity(self, data, M=10):
+        '''
+        Возвращает стационарность данных
+        '''
         sub_arrays = np.split(data, M)
 
         means = []
@@ -57,8 +60,9 @@ class Analysis:
                     abs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1] > 0.1)):
                     #print (f'\ti = {i}\n\tmeans[i] = {means[i]}\n\tmeans[i+1] = {means[i+1]}\n\tabs((means[i] - means[i+1]) / means[i+1]) = {abs((means[i] - means[i+1]) / means[i+1])}')
                     #print (f'\ti = {i}\n\tstd_deviations[i] = {std_deviations[i]}\n\tstd_deviations[i+1] = {std_deviations[i+1]}\n\tabs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1]) = {abs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1])}')
-                    return 'Процесс нестационарный'
-        return 'Процесс стационарный'
+                    return 'The process is non-stationary'
+        return 'Stationary process'
+        
         
     def histograma(self, data=[i for i in range(10000)], M=100):
         
@@ -182,53 +186,6 @@ class Analysis:
         
         return dataY
     
-    def drawFileData(self, data):
-        dataX = [i for i in range(len(data))]
-        dataY = data
-        
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        
-        plt.subplot(2,1,1)
-        plt.title("Данные из файла")
-        plt.plot(dataX, dataY)
-        
-        N = len(data)
-        FN = int(N/2)
-        deltaf = FN / (N/2)
-        
-        dataX = []
-        for n in range(FN):
-            dataX.append(n * deltaf)
-        dataX = np.asarray(dataX)
-        
-        dataY = self.model.Fourier(data, N)
-        
-        plt.subplot(2,1,2)
-        plt.plot(dataX, dataY[0:FN])
-        plt.title("Амплитудный спектр Фурье")
-        
-        plt.show()
+    
             
-    def drawSoundData(self, data):
-        dataY = data["data"]
-        dataX = np.arange(0,data["nframes"])/data["framerate"]
-        
-        time = round(data["nframes"]/data["framerate"], 2)
-        compname = data["compname"]
-        framerate = data["framerate"]
-        nchannels = data["nchannels"]
-        
-        print(dataX)
-        print(len(dataX))
-        print(dataY)
-        print(len(dataY))
-        
-        plt.figure(figsize=(10,10)) 
-        plt.subplot(2,1,1) 
-        plt.plot(dataX, dataY[0])
-        plt.title(f"Название: {compname}. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}")
-        plt.subplot(2,1,2) 
-        plt.plot(dataX, dataY[1], c='r')        
-        plt.xlabel("time")
-        plt.show()
+    
