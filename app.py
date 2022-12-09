@@ -2,7 +2,9 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as fd 
 from tkinter import font
+
 import numpy as np
+
 from settings import ParametrSettings
 from model import Model
 from analysis import Analysis
@@ -21,9 +23,11 @@ class App(Tk):
         self.inout = InOut()
         
         self.currentData = []
+        self.upgradeData = []
+        
         self.currentSoundData = []
         
-        self.font = font.Font(family= "Verdana", size=12, weight="normal", slant="roman")
+        self.mainFont = font.Font(family="Verdana", size=12, weight="normal", slant="roman")
         
         self.parametrs.DownloadSettings()
         self.title("Обработчик данных")
@@ -50,14 +54,23 @@ class App(Tk):
 
         filemenu = Menu(mainmenu, tearoff=0)
         filemenu.add_command(label="Открыть файл с данными", command=self.openBinaryFile)
+        filemenu.add_command(label="Отобразить текущие данные", command=lambda : self.model.drawCurrentData(self.currentData))
         filemenu.add_command(label="Сохранить текущий файл с данными", command=self.saveBinaryFile)
         filemenu.add_command(label="Открыть звуковой файл", command=self.openSoundFile)
+        filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawCurrentSoundData(self.currentSoundData))
         filemenu.add_command(label="Выход", command=self.destroy)
         mainmenu.add_cascade(label="Файл", menu=filemenu)
+        
 
         settings = Menu(mainmenu, tearoff=0)
         settings.add_command(label="Настройки параметров", command=self.openParametrSettings)
         mainmenu.add_cascade(label="Настройки", menu=settings)
+        
+        
+        analysis = Menu(mainmenu, tearoff=0)
+        analysis.add_command(label="Сохранить статистику текущих данных", command=self.statisticCurrentFile)
+        mainmenu.add_cascade(label="Анализ", menu=analysis)
+        
 
         notebook = ttk.Notebook()
         notebook.pack(expand=True, fill=BOTH)       
@@ -91,7 +104,7 @@ class App(Tk):
         frame13.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Стандартные графики")
-        notebook.add(frame2, text="Л. 2")
+        notebook.add(frame2, text="Генератор шумов")
         notebook.add(frame3, text="Л. 3")
         notebook.add(frame4, text="Л. 4")
         notebook.add(frame5, text="Л. 5")
@@ -105,7 +118,7 @@ class App(Tk):
         notebook.add(frame13, text="Л. 13")
         
         self.standartFunctionUI(frame1)
-        # self.lab2UI(frame2)
+        self.noiseGeneratorUI(frame2)
         # self.lab3UI(frame3)
         # self.lab4UI(frame4)
         # self.lab5UI(frame5)
@@ -132,109 +145,60 @@ class App(Tk):
             data = self.currentData
         )
     
-    def linerGraph(self):
-        self.currentData = self.model.linerGraph(draw=True)
     
-    def exponentaGraph(self):
-        self.currentData = self.model.exponentaGraph(draw=True)
+    def statisticCurrentFile(self):
+        statisticText = self.analysis.statistics(self.currentData)
+        statisticText += '\n'
+        statisticText += self.analysis.stationarity(self.currentData)
+        
+        self.inout.statisticSave("saveData/statistic.txt", statisticText)
+    
+    
+    def writeCurrentData(self, function):
+        self.currentData = function
+    
+    def writeUpgradeData(self, function):
+        pass
+    
     
     def standartFunctionUI(self, parent):
         Button(
             parent,
             text="Построить линейный график",
-            command=self.linerGraph,
-            font=self.font
+            command=lambda : self.writeCurrentData(self.model.linerGraph(draw=True)),
+            font=self.mainFont
         ).pack(anchor=N, fill=X, pady=[20, 0])
 
         Button(
             parent,
             text="Построить график экспоненты",
-            command=self.exponentaGraph,
-            font=self.font
+            command=lambda : self.writeCurrentData(self.model.exponentaGraph(draw=True)),
+            font=self.mainFont
         ).pack(anchor=N, fill=X)
-
+    
+        Button(
+            parent,
+            text="Построить синусойду",
+            command=lambda : self.writeCurrentData(self.model.sinGraph(draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+    
+    
+    def noiseGeneratorUI(self, parent):
+        Button(
+            parent,
+            text="Построить график шума на встроенном ПСЧ",
+            command= lambda : self.writeCurrentData(self.model.defaultNoise(draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20,0])
         
-    # def lab2UI(self, parent):
-    #     Label(parent,
-    #           text="ШУМЫ"
-    #           ).pack(anchor=N, fill=X, pady=20)
-
-    #     Button(
-    #         parent,
-    #         text="Построить график шума на основе линейного конгруэнтного ПСЧ",
-    #         command=lambda: self.model.drawMyRandomNoise(
-    #             Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N"))
-    #         )
-    #     ).pack(anchor=N, fill=X)
-        
-    #     Button(
-    #         parent,
-    #         text="Построить график шума основанного на встроенном ПСЧ",
-    #         command=lambda: self.model.drawRandomNoise(
-    #             Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N"))
-    #         )
-    #     ).pack(anchor=N, fill=X)
-
-    #     Button(
-    #         parent,
-    #         text="Построить график всех шумов",
-    #         command=lambda: self.model.drawNoise(
-    #             Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N"))
-    #         )
-    #     ).pack(anchor=N, fill=X, pady=[0, 20])    
-        
-    #     text = "Генерирует два вида шума:\n"
-    #     text += "1) На основе встроенного рандомайзера\n"
-    #     text += "2) На основе написаного рандомайзера на \nоснове линейного конгруэнтного ПСЧ\n\n"
-    #     text += "Редактируемый параметр R - максимальное значение,\nкоторое может быть сгенирировано" 
-        
-    #     Label(parent, text=text).pack(anchor=N, fill=X)
-          
-    # def lab3UI(self, parent):
-    #     Label(parent,
-    #           text="СТАТИСТИКА"
-    #           ).pack(anchor=N, fill=X, pady=20)
-        
-        
-    #     typeGraph = ['Шум на основе встроенного генератора', 'Шум на основе написанного генератора']
-
-    #     self.choseNoise = StringVar(value=0)
-
-    #     for index in range(len(typeGraph)):
-    #         radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseNoise)
-    #         radiobtn_graph.pack(anchor=N)
-       
-    #     del typeGraph
-        
-    #     Button(
-    #         parent,
-    #         text='Расчитать статистику',
-    #         command=self.printStatistic
-    #     ).pack(anchor=N, fill=X, pady=20)
-
-    #     result = f'Количество значенией:\n'
-    #     result += f'Минимальное значение:\n'
-    #     result += f'Максимальное значение:\n'
-    #     result += f'Среднее значение:\n'
-    #     result += f'Дисперсия:\n'
-    #     result += f'Стандартное отклонение:\n'
-    #     result += f'Ассиметрия:\n'
-    #     result += f'Коэффицент ассиметрии:\n'
-    #     result += f'Эксцесс:\n'
-    #     result += f'Куртозис:\n'
-    #     result += f'Средний квадрат:\n'
-    #     result += f'Ср. квад. ошибка:\n\n'
-        
-    #     self.label_statistic = Label(parent, text=result)
-    #     self.label_statistic.pack(anchor=N, fill=X, pady=[0, 20])
-        
-    #     text = "Рассчитывает статистику для шума\n\n"
-    #     text += "Редактируемый параметр R - максимальное значение,\nкоторое может быть сгенирировано" 
-        
-    #     Label(parent, text=text).pack(anchor=N, fill=X)
+        Button(
+            parent,
+            text="Построить график шума основанного на встроенном ПСЧ",
+            command=lambda : self.writeCurrentData(self.model.lineKonNoise(draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+    
     
     # def lab4UI(self, parent):
     #     Label(parent,
@@ -282,17 +246,6 @@ class App(Tk):
     #           text="ГАРМОНИКИ"
     #           ).pack(anchor=N, fill=X, pady=20)
     
-    #     Button(
-    #         parent,
-    #         text='Вывести гармонический процесс',
-    #         command=lambda: self.model.drawHarm(
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #             A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
-    #             f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
-    #             dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
-    #             thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
-    #         )
-    #     ).pack(anchor=N, fill=X)
         
     #     Button(
     #         parent,
