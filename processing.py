@@ -212,7 +212,7 @@ class Processing():
             
             
             reverseLPW = lpw[::-1]
-            simetricLPW = reverseLPW + lpw
+            simetricLPW = reverseLPW + lpw[1::]
             result.append(simetricLPW)
             
             if draw:
@@ -225,6 +225,7 @@ class Processing():
             
         if draw:
             plt.show()
+        
         
         return result   
     
@@ -241,7 +242,7 @@ class Processing():
         result = []
         for lpw in llpw:
             hpw = []
-            for k in range(loper+1):
+            for k in range(loper):
                 if k == m:
                     hpw.append(1 - lpw[k])
                 else:
@@ -265,7 +266,7 @@ class Processing():
         loper = 2*m+1
         bpw = []
         
-        for k in range(loper+1):
+        for k in range(loper):
             bpw.append(lpw2[k]-lpw1[k])
         if draw:
             plt.figure(figsize=(10,10))
@@ -283,7 +284,7 @@ class Processing():
         loper = 2*m+1
         bsw = []
         
-        for k in range(loper+1):
+        for k in range(loper):
             if k == m:
                 bsw.append(1 + lpw1[k] - lpw2[k])
             else:
