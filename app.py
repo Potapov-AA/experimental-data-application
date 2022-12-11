@@ -27,7 +27,7 @@ class App(Tk):
         
         self.currentSoundData = []
         
-        self.mainFont = font.Font(family="Verdana", size=12, weight="normal", slant="roman")
+        self.mainFont = font.Font(family="Time New Roman", size=12, weight="normal", slant="roman")
         
         self.parametrs.DownloadSettings()
         self.title("Обработчик данных")
@@ -54,8 +54,10 @@ class App(Tk):
 
         filemenu = Menu(mainmenu, tearoff=0)
         filemenu.add_command(label="Открыть файл с данными", command=self.openBinaryFile)
-        filemenu.add_command(label="Отобразить текущие данные", command=lambda : self.model.drawCurrentData(self.currentData))
-        filemenu.add_command(label="Сохранить текущий файл с данными", command=self.saveBinaryFile)
+        
+        filemenu.add_command(label="Отобразить текущие данные", command=lambda : self.model.drawData(self.currentData))
+        filemenu.add_command(label="Сохранить текущий файл с данными", command=lambda : self.saveBinaryFile("saveData/data.bin"))
+        
         filemenu.add_command(label="Открыть звуковой файл", command=self.openSoundFile)
         filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawCurrentSoundData(self.currentSoundData))
         filemenu.add_command(label="Выход", command=self.destroy)
@@ -93,33 +95,33 @@ class App(Tk):
         frame2.pack(fill=BOTH, expand=True)
         frame3.pack(fill=BOTH, expand=True)
         frame4.pack(fill=BOTH, expand=True)
-        frame5.pack(fill=BOTH, expand=True)
-        frame6.pack(fill=BOTH, expand=True)
-        frame7.pack(fill=BOTH, expand=True)
-        frame8.pack(fill=BOTH, expand=True)
-        frame9.pack(fill=BOTH, expand=True)
-        frame10.pack(fill=BOTH, expand=True)
-        frame11.pack(fill=BOTH, expand=True)
-        frame12.pack(fill=BOTH, expand=True)
-        frame13.pack(fill=BOTH, expand=True)
+        # frame5.pack(fill=BOTH, expand=True)
+        # frame6.pack(fill=BOTH, expand=True)
+        # frame7.pack(fill=BOTH, expand=True)
+        # frame8.pack(fill=BOTH, expand=True)
+        # frame9.pack(fill=BOTH, expand=True)
+        # frame10.pack(fill=BOTH, expand=True)
+        # frame11.pack(fill=BOTH, expand=True)
+        # frame12.pack(fill=BOTH, expand=True)
+        # frame13.pack(fill=BOTH, expand=True)
         
-        notebook.add(frame1, text="Стандартные графики")
+        notebook.add(frame1, text="Станд. графики")
         notebook.add(frame2, text="Генератор шумов")
-        notebook.add(frame3, text="Л. 3")
-        notebook.add(frame4, text="Л. 4")
-        notebook.add(frame5, text="Л. 5")
-        notebook.add(frame6, text="Л. 6")
-        notebook.add(frame7, text="Л. 7")
-        notebook.add(frame8, text="Л. 8")
-        notebook.add(frame9, text="Л. 9")
-        notebook.add(frame10, text="Л. 10")
-        notebook.add(frame11, text="Л. 11")
-        notebook.add(frame12, text="Л. 12")
-        notebook.add(frame13, text="Л. 13")
+        notebook.add(frame3, text="Изменить тек. данные")
+        notebook.add(frame4, text="Примеры применения")
+        # notebook.add(frame5, text="Л. 5")
+        # notebook.add(frame6, text="Л. 6")
+        # notebook.add(frame7, text="Л. 7")
+        # notebook.add(frame8, text="Л. 8")
+        # notebook.add(frame9, text="Л. 9")
+        # notebook.add(frame10, text="Л. 10")
+        # notebook.add(frame11, text="Л. 11")
+        # notebook.add(frame12, text="Л. 12")
+        # notebook.add(frame13, text="Л. 13")
         
         self.standartFunctionUI(frame1)
         self.noiseGeneratorUI(frame2)
-        # self.lab3UI(frame3)
+        self.changeCurrentDataUI(frame3)
         # self.lab4UI(frame4)
         # self.lab5UI(frame5)
         # self.lab6UI(frame6)
@@ -139,9 +141,9 @@ class App(Tk):
         name = fd.askopenfilename() 
         self.currentSoundData = self.inout.readSoundFile(name)
     
-    def saveBinaryFile(self):
+    def saveBinaryFile(self, name):
         self.inout.saveBinaryFile(
-            name = "saveData/data.bin",
+            name = name,
             data = self.currentData
         )
     
@@ -156,9 +158,6 @@ class App(Tk):
     
     def writeCurrentData(self, function):
         self.currentData = function
-    
-    def writeUpgradeData(self, function):
-        pass
     
     
     def standartFunctionUI(self, parent):
@@ -182,7 +181,21 @@ class App(Tk):
             command=lambda : self.writeCurrentData(self.model.sinGraph(draw=True)),
             font=self.mainFont
         ).pack(anchor=N, fill=X)
-    
+
+        Button(
+            parent,
+            text='Построить сумму трех синусойд',
+            command=lambda : self.writeCurrentData(self.model.sinSumGraph(draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+
+        Button(
+            parent,
+            text='Вывести гармонический процесс с повышением f0 с шагом',
+            command=self.model.drawSinWithStep,
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[0, 20])
+        
     
     def noiseGeneratorUI(self, parent):
         Button(
@@ -200,90 +213,21 @@ class App(Tk):
         ).pack(anchor=N, fill=X)
     
     
-    # def lab4UI(self, parent):
-    #     Label(parent,
-    #           text="СМЕЩЕНИЕ И ИМПУЛЬСЫ"
-    #           ).pack(anchor=N, fill=X, pady=20)
+    def changeCurrentDataUI(self, parent):
+        Button(
+            parent,
+            text='Сделать смещение на данных',
+            command=lambda : self.writeCurrentData(self.model.shiftData(self.currentData, draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20,0])
         
-    #     typeGraph = ['Линейный восходящий', 'Линейный низходящий', 'Экспонента восходящая', 'Экспонента низходящая']
-    #     self.choseGraph2 = StringVar(value=0)
-
-    #     for index in range(len(typeGraph)):
-    #         radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseGraph2)
-    #         radiobtn_graph.pack(anchor=N)
-       
-    #     del typeGraph
+        Button(
+            parent,
+            text="Сделать импульсы на данных",
+            command=lambda : self.writeCurrentData(self.model.impulseData(self.currentData, draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
     
-    #     Button(
-    #         parent,
-    #         text='Построить смещение на графике',
-    #         command=self.drawShift
-    #     ).pack(anchor=N, fill=X, pady=[20,0])
-        
-    #     Button(
-    #         parent,
-    #         text="Построить импульсы",
-    #         command=lambda: self.model.drawImpulseNoise(
-    #             R=int(self.parametrs.GetParametr("Parametrs", "R2")),
-    #             Rs=int(self.parametrs.GetParametr("Parametrs", "R1"))
-    #         )
-    #     ).pack(anchor=N, fill=X, pady=[0, 20])
-        
-    #     text = "Отрисовывает смещеные переданные данные на указанном диапозоне\n"
-    #     text += "Если диапазон не передан, то смещение идет по всем данным\n"
-    #     text += "И выводит импульс на переданных данных\n\n"
-    #     text += "Редактируемы параметры:\n"
-    #     text += "shift - величина смещения\n"
-    #     text += "from - индекс начала смещения\n"
-    #     text += "to - индекс конца смещения\n"
-    #     text += "R1 = минимальное значение импульса\n"
-    #     text += "R2 = максимальное значение импульса"
-        
-    #     Label(parent, text=text).pack(anchor=N, fill=X)
-    
-    # def lab5UI(self, parent):
-    #     Label(parent,
-    #           text="ГАРМОНИКИ"
-    #           ).pack(anchor=N, fill=X, pady=20)
-    
-        
-    #     Button(
-    #         parent,
-    #         text='Вывести гармонический процесс с суммой трех гармоник',
-    #         command=lambda: self.model.draw3In1Harm(
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #             A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
-    #             A1=float(self.parametrs.GetParametr("Parametrs", "A1")),
-    #             A2=float(self.parametrs.GetParametr("Parametrs", "A2")),
-    #             f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
-    #             f1=float(self.parametrs.GetParametr("Parametrs", "f1")),
-    #             f2=float(self.parametrs.GetParametr("Parametrs", "f2")),
-    #             dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
-    #         )
-    #     ).pack(anchor=N, fill=X)
-
-    #     Button(
-    #         parent,
-    #         text='Вывести гармонический процесс с повышением f0 с указанным шагом',
-    #         command=lambda: self.model.drawHarms(
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #             A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
-    #             f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
-    #             dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
-    #             step=float(self.parametrs.GetParametr("Parametrs", "step"))
-    #         )
-    #     ).pack(anchor=N, fill=X, pady=[0, 20])
-        
-    #     text = "Выводит различные графики гармоник\n\n"
-    #     text += "Редактируемые параметры:\n"
-    #     text += "y = A * sin(2 * pi * f * dt * x + thetta\n"
-    #     text += "A0, A1, A2\n"
-    #     text += "f0, f1, f2\n"
-    #     text += "thetta\n"
-    #     text += "dt\n"
-    #     text += "step - для повышения f0\n"
-        
-    #     Label(parent, text=text).pack(anchor=N, fill=X)
 
     # def lab6UI(self, parent):
     #     Label(parent,
@@ -697,55 +641,7 @@ class App(Tk):
         
     #     self.label_statistic.configure(text=result)
 
-    # def drawShift(self):
-    #     if int(self.choseGraph2.get()) == 0:
-    #         self.model.drawShiftData(
-    #             data=self.model.getLinerTrend(
-    #                 a=float(self.parametrs.GetParametr("Parametrs", "a")),
-    #                 b=float(self.parametrs.GetParametr("Parametrs", "b")),
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 type=0
-    #                 ),
-    #             shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
-    #             N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
-    #             N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
-    #         )
-    #     elif int(self.choseGraph2.get()) == 1:
-    #         self.model.drawShiftData(
-    #             data=self.model.getLinerTrend(
-    #                 a=float(self.parametrs.GetParametr("Parametrs", "a")),
-    #                 b=float(self.parametrs.GetParametr("Parametrs", "b")),
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 type=1
-    #                 ),
-    #             shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
-    #             N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
-    #             N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
-    #         )
-    #     elif int(self.choseGraph2.get()) == 2:
-    #         self.model.drawShiftData(
-    #             data=self.model.getExponentaTrend(
-    #                 alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
-    #                 beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 type=0
-    #                 ),
-    #             shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
-    #             N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
-    #             N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
-    #         )
-    #     elif int(self.choseGraph2.get()) == 3:
-    #         self.model.drawShiftData(
-    #             data=self.model.getExponentaTrend(
-    #                 alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
-    #                 beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 type=1
-    #                 ),
-    #             shift=float(self.parametrs.GetParametr("Parametrs", "Shift")),
-    #             N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom")),
-    #             N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
-    #         )
+    
     
     # def drawHistogram(self):
     #     if int(self.choseHis.get()) == 0:
