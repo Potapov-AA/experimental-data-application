@@ -14,9 +14,9 @@ class Model:
         self.parametrs = Config()
 
 
-    def drawCurrentData(self, data):
+    def drawData(self, data):
         '''
-        Отображает текущие данные
+        Отображает переданные данные
         '''
         dataX = [i for i in range(len(data))]
         dataY = data
@@ -129,7 +129,62 @@ class Model:
             plt.show()
 
         return dataY
-      
+    
+    def drawSinWithStep(self):
+        '''
+        Графики синусойды с повышением f0 с указанным шагом
+        '''
+        A0=float(self.parametrs.GetParametr("Parametrs", "A0"))
+        f0=float(self.parametrs.GetParametr("Parametrs", "f0"))
+        dt=float(self.parametrs.GetParametr("Parametrs", "dt"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        step = int(self.parametrs.GetParametr("Parametrs", "step"))
+        
+        plt.figure(figsize=(10, 10))
+        
+        dataX = np.asarray([i * dt for i in range(N)])
+        
+        for i in range(4):
+            plt.subplot(2, 2, i+1)
+            plt.grid(True)
+            
+            dataY = np.asarray([A0 * math.sin(2 * math.pi * f0 * dt * k) for k in range(N)])
+            f0 += step
+
+            plt.plot(dataX, dataY)
+        
+        plt.show()
+    
+          
+    def sinSumGraph(self, draw=False):
+        '''
+        Сумма трех синусойд на одном графике
+        '''
+        A0=float(self.parametrs.GetParametr("Parametrs", "A0"))
+        A1=float(self.parametrs.GetParametr("Parametrs", "A1"))
+        A2=float(self.parametrs.GetParametr("Parametrs", "A2"))
+        f0=float(self.parametrs.GetParametr("Parametrs", "f0"))
+        f1=float(self.parametrs.GetParametr("Parametrs", "f1"))
+        f2=float(self.parametrs.GetParametr("Parametrs", "f2"))
+        dt=float(self.parametrs.GetParametr("Parametrs", "dt"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        
+        dataX = [i * dt for i in range(N)]
+        dataY = [
+            A0 * math.sin(2 * math.pi * f0 * dt * k)
+            + A1 * math.sin(2 * math.pi * f1 * dt * k)
+            + A2 * math.sin(2 * math.pi * f2 * dt * k)
+            for k in range(N)
+        ]
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+            plt.plot(dataX, dataY)
+            plt.title("Сумма трех синусойд")
+            plt.show()
+
+        return dataY
+          
 
     def defaultNoise(self, draw=False):
         '''
@@ -195,189 +250,109 @@ class Model:
         return dataY
         
     
-    def drawShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
+    def shiftData(self, data, draw=False):
         '''
-        Отрисовывает смещеные переданные данные на указанном диапозоне
-        Если диапазон не передан, то смещение идет по всем данным
-        По умолчанию не отрисовывает графики
-        data - смещаемые данные 
-        shift - величина смещения
-        N1 - индекс начала смещения
-        N2 - индекс конца смещения
+        Создает смещение на переданных данных в указанном диапозоне
         '''
-        shiftData = []
-        if N1 != 0:
-            shiftData += [i for i in data[0: N1]]
+        try:
+            shift=float(self.parametrs.GetParametr("Parametrs", "Shift"))
+            N1=int(self.parametrs.GetParametr("Parametrs", "ShiftFrom"))
+            N2=int(self.parametrs.GetParametr("Parametrs", "ShiftTo"))
+            
+            
+            dataShiftY = []
+            if N1 != 0:
+                for i in range(N1):
+                    dataShiftY.append(data[i])
 
-        shiftData += [i + shift for i in data[N1: N2]]
+            for i in range(N1, N2):
+                dataShiftY.append(data[i]+shift)
 
-        if N2 != len(data):
-            shiftData += [i for i in data[N2:]]
+            if N2 != len(data):
+                for i in range(N2, len(data)):
+                    dataShiftY.append(data[i])
 
-        plt.figure(figsize=(10, 10))
-        plt.subplot(1, 2, 1)
-        plt.grid(True)
-        plt.plot([i for i in range(len(data))], data)
-        plt.title("Начальные данные")
+            dataX = [i for i in range(len(data))]
+            dataDefultY = data
+            
+            if draw:
+                plt.figure(figsize=(10, 10))
+                plt.subplot(1, 2, 1)
+                plt.grid(True)
+                plt.plot(dataX, dataDefultY)
+                plt.title("Начальные данные")
 
-        plt.subplot(1, 2, 2)
-        plt.grid(True)
-        plt.plot([i for i in range(len(shiftData))], shiftData)
-        plt.title("Смещенные данные")
-        plt.show()
+                plt.subplot(1, 2, 2)
+                plt.grid(True)
+                plt.plot(dataX, dataShiftY)
+                plt.title("Смещенные данные")
+                plt.show()
 
-    def getShiftData(self, data=[i for i in range(1000)], shift=500, N1=0, N2=500):
+            dataShiftY = np.asarray(dataShiftY)
+            
+            return dataShiftY
+        except:
+            print("Передан пустой массив данных")
+        
+    def impulseData(self, data, draw=False):
         '''
-        Возвращает смещеные переданные данные на указанном диапозоне
-        Если диапазон не передан, то смещение идет по всем данным
-        По умолчанию не отрисовывает графики
-        data - смещаемые данные 
-        shift - величина смещения
-        N1 - индекс начала смещения
-        N2 - индекс конца смещения
+        Создает импульсы на переданных данных
         '''
-        shiftData = []
-        if N1 != 0:
-            shiftData += [i for i in data[0: N1]]
+        try:
+            maxR=int(self.parametrs.GetParametr("Parametrs", "R2"))
+            minR=int(self.parametrs.GetParametr("Parametrs", "R1"))
+                    
+            dataX = [i for i in range(len(data))]
 
-        shiftData += [i + shift for i in data[N1: N2]]
+            M = randint(len(data) * 0.005, len(data)*0.01+1)
 
-        if N2 != len(data) - 1:
-            shiftData += [i for i in data[N2:]]
+            impulseList = []
 
-        return shiftData
+            for i in range(M):
+                number = randint(0, len(data) + 1)
+                impulseList.append(number)
 
-    def drawImpulseNoise(self, data=[0 for i in range(1000)], R=1000, Rs=900):
-        '''
-        Выводит импульс на переданных данных
-        data = передаваемые данные
-        R = максимальное значение импульса
-        Rs = минимальное значение импульса
-        '''
-        dataX = [i for i in range(len(data))]
+            dataDefultY = data
+            dataImpulseY = []
+            for i in dataX:
+                if i in impulseList:
+                    sign = math.pow(-1, randint(1, 3))
+                    y = randint(maxR-minR, maxR+minR+1) * sign
+                    dataImpulseY.append(y)
+                else:
+                    dataImpulseY.append(data[i])
 
-        M = randint(len(data) * 0.005, len(data)*0.01+1)
-
-        impulseList = []
-
-        for i in range(M):
-            number = randint(0, len(data) + 1)
-            impulseList.append(number)
-
-        dataY = []
-        for i in dataX:
-            if i in impulseList:
-                sign = math.pow(-1, randint(1, 3))
-                y = randint(R-Rs, R+Rs+1) * sign
-                dataY.append(y)
-            else:
-                dataY.append(data[i])
-
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        plt.plot(dataX, dataY)
-        plt.title("Импульсы")
-        plt.show()
-
-    def getImpulseNoise(self, data=[0 for i in range(1000)], R=1000, Rs=900):
-        dataX = [i for i in range(len(data))]
-
-        M = randint(len(data) * 0.005, len(data)*0.01+1)
-
-        impulseList = []
-
-        for i in range(M):
-            number = randint(0, len(data) + 1)
-            impulseList.append(number)
-
-        dataY = []
-        for i in dataX:
-            if i in impulseList:
-                sign = math.pow(-1, randint(1, 3))
-                y = randint(R-Rs, R+Rs+1) * sign
-                dataY.append(y)
-            else:
-                dataY.append(data[i])
-
-        return np.asarray(dataY)
+            if draw:
+                plt.figure(figsize=(10, 10))
+                
+                plt.subplot(1, 2, 1)
+                plt.grid(True)
+                plt.plot(dataX, dataDefultY)
+                plt.title("Начальные данные")
+                
+                plt.subplot(1, 2, 2)
+                plt.grid(True)
+                plt.plot(dataX, dataImpulseY)
+                plt.title("Данные с импульсами")
+                
+                plt.show()    
+            
+            dataImpulseY = np.asarray(dataImpulseY)
+            
+            return dataImpulseY
+        except:
+            print("Передан пустой массив данных")
+        
+    
 
     
 
-    def drawHarms(self, N = 200, A0 = 5, f0 = 10, dt = 0.001, step = 250):
-        '''
-        Множество графиков гармонического процесса с повышением f0 по 50
-        '''
-        datasX = [0] * 4
-        datasY = [0] * 4
-        
-        
-        for i in range(4):            
-            datasX[i] = [i * dt for i in range(N)]
-            datasY[i] = [A0 * math.sin(2 * math.pi * f0 * dt * k) for k in range(N)]
-            f0 += step
-        
-        
-        _, (axs) = plt.subplots(2, 2)
-        plt.grid(True)
-        axs[0, 0].plot(datasX[0], datasY[0])
-        axs[0, 1].plot(datasX[1], datasY[1])
-        axs[1, 0].plot(datasX[2], datasY[2])
-        axs[1, 1].plot(datasX[3], datasY[3])
-        
-        for flat in axs.flat:
-            flat.set(xlabel="X", ylabel="Y")
-            flat.label_outer()
+    
 
-        plt.show()
+    
+
+    
    
-    def draw3In1Harm(self, N = 1000, A0 = 100, A1 = 50, A2 = 25, f0 = 4, f1 = 1, f2 = 20, dt = 0.001):
-        '''
-        Сумма нескольких гармоник на одном графике
-        '''
-        harm = [
-            A0 * math.sin(2 * math.pi * f0 * dt * k)
-            + A1 * math.sin(2 * math.pi * f1 * dt * k)
-            + A2 * math.sin(2 * math.pi * f2 * dt * k)
-            for k in range(N)
-        ]
-
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        plt.plot([i * dt for i in range(N)], harm)
-        plt.title("harm")
-        plt.show()
-    
-    def getHarm(self, N = 1000, A0 = 10, f0 = 10, dt = 0.01, thetta = 0):
-        '''
-        Возвращает данные гармонического процесса
-        '''
-        dataY = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
-
-        return dataY
-    
-    def getDefaultHarm(self):
-        N = int(self.parametrs.GetParametr("Parametrs", "N"))
-        A0=float(self.parametrs.GetParametr("Parametrs", "A0"))
-        f0=float(self.parametrs.GetParametr("Parametrs", "f0"))
-        dt=float(self.parametrs.GetParametr("Parametrs", "dt"))
-        thetta=float(self.parametrs.GetParametr("Parametrs", "thetta"))
-        
-        data = [A0 * math.sin(2 * math.pi * f0 * dt * k + thetta) for k in range(N)]
-        
-        return data
-    
-    def getPolyHarm(self, N = 1000, A0 = 100, A1 = 50, A2 = 25, f0 = 4, f1 = 1, f2 = 20, dt = 0.001):
-        '''
-        Возвращает данные полигармонического процесса
-        '''
-        dataY = [
-            A0 * math.sin(2 * math.pi * f0 * dt * k)
-            + A1 * math.sin(2 * math.pi * f1 * dt * k)
-            + A2 * math.sin(2 * math.pi * f2 * dt * k)
-            for k in range(N)
-        ]
-        
-        return dataY
     
     def addModel(self, data1 = [i for i in range(1000)], data2 = [-i for i in range(1000)]):
         N = len(data1)
@@ -492,11 +467,3 @@ class Model:
         plt.plot(dataX, dataCardio[0:N])
         
         plt.show()
-
-
-    @private
-    def __calculateMyRandomNoise(self, seed, Range, N):
-        '''
-        Расчитывает значения по оси Y по функции с помощью линейного конгруэнтный генератора псевдослучайных чисел
-        '''
-        
