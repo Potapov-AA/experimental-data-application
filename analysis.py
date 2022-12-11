@@ -62,37 +62,47 @@ class Analysis:
                     #print (f'\ti = {i}\n\tstd_deviations[i] = {std_deviations[i]}\n\tstd_deviations[i+1] = {std_deviations[i+1]}\n\tabs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1]) = {abs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1])}')
                     return 'The process is non-stationary'
         return 'Stationary process'
-        
-        
-    def histograma(self, data=[i for i in range(10000)], M=100):
-        
+       
+    def histograma(self, data):
+        '''
+        Создает гистограмму для переданных данных
+        '''
+        try:
+            M = int(self.parametrs.GetParametr("Parametrs", "M"))
+            
+            sortData = sorted(data)
+            coutData = len(data)
+            
+            step = int(coutData/M)
+            currentIndex = 0
+            
+            lstep = []
+            for i in range(currentIndex, coutData, step):
+                lstep.append([sortData[i], sortData[i+step-1]])
+            
+            
+            dataForBarX = []
+            dataForBarY = []
+            for i in lstep:
+                c = 0
+                for j in data:
+                    if j >= i[0] and j < i[1]:
+                        c += 1
+                dataForBarY.append(c) 
+                dataForBarX.append(f'{i}')
+                    
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+            plt.bar(dataForBarX, dataForBarY)
+            plt.plot(dataForBarX, dataForBarY, color="red")
+            plt.show()
+        except:
+            print("Текущие данные - пусты")
 
-        min = int(round(np.min(data), 2))
-        max = int(round(np.max(data), 2))
-        
-        step = int(round((max-min)/M))
-        
-        lstep = []
-        for i in range(min, max, step):
-            if i+step<=max:
-                lstep.append([i, i+step])
-        
-        
-        dataForBarX = []
-        dataForBarY = []
-        for i in lstep:
-            c = 0
-            for j in data:
-                if j >= i[0] and j < i[1]:
-                    c += 1
-            dataForBarY.append(c) 
-            dataForBarX.append(f'{i}')
-                 
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        plt.bar(dataForBarX, dataForBarY)
-        plt.plot(dataForBarX, dataForBarY, color="red")
-        plt.show()
+
+
+
+
     
     def acf(self, data=[i for i in range(1000)]):
         L = [i for i in range(0, len(data)-1)]
