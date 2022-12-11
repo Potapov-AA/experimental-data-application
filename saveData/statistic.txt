@@ -1,13 +1,13 @@
 Number of values: 1000
 Min value: 1.0
-Max value: 29971.0
-Middle value: 14986.0
-Dispersion: 74999925.0
-Standard deviation: 8660.25
+Max value: 100.9
+Middle value: 50.95
+Dispersion: 833.33
+Standard deviation: 28.87
 Asymmetry: 0
 Asymmetry coefficient: 0.0
-Excess: 1.012496625002363e+16
+Excess: 1249995.83
 Kurtosis: -1.2
-Medium square: 299580121.0
-RMS error: 17308.38296895467
+Medium square: 3429.2350000000006
+RMS error: 58.55967042256984
 The process is non-stationary
