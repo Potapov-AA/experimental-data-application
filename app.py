@@ -23,7 +23,7 @@ class App(Tk):
         self.inout = InOut()
         
         self.currentData = []
-        self.upgradeData = []
+        self.tempData = []
         
         self.currentSoundData = []
         
@@ -58,21 +58,27 @@ class App(Tk):
         filemenu.add_command(label="Отобразить текущие данные", command=lambda : self.model.drawData(self.currentData))
         filemenu.add_command(label="Сохранить текущий файл с данными", command=lambda : self.saveBinaryFile("saveData/data.bin"))
         
+        filemenu.add_command(label="Записать текущие данные во временную переменную", command=self.writeCurrentDataInTemp)
+        
         filemenu.add_command(label="Открыть звуковой файл", command=self.openSoundFile)
         filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawCurrentSoundData(self.currentSoundData))
+        
         filemenu.add_command(label="Выход", command=self.destroy)
-        mainmenu.add_cascade(label="Файл", menu=filemenu)
         
 
         settings = Menu(mainmenu, tearoff=0)
         settings.add_command(label="Настройки параметров", command=self.openParametrSettings)
-        mainmenu.add_cascade(label="Настройки", menu=settings)
         
         
         analysis = Menu(mainmenu, tearoff=0)
         analysis.add_command(label="Сохранить статистику текущих данных", command=self.statisticCurrentFile)
-        mainmenu.add_cascade(label="Анализ", menu=analysis)
+        analysis.add_command(label="Гистограмма текущих данных", command=lambda : self.analysis.histograma(self.currentData))
         
+        
+        mainmenu.add_cascade(label="Файл", menu=filemenu)
+        mainmenu.add_cascade(label="Анализ", menu=analysis)
+        mainmenu.add_cascade(label="Настройки", menu=settings)
+
 
         notebook = ttk.Notebook()
         notebook.pack(expand=True, fill=BOTH)       
@@ -95,7 +101,7 @@ class App(Tk):
         frame2.pack(fill=BOTH, expand=True)
         frame3.pack(fill=BOTH, expand=True)
         frame4.pack(fill=BOTH, expand=True)
-        # frame5.pack(fill=BOTH, expand=True)
+        frame5.pack(fill=BOTH, expand=True)
         # frame6.pack(fill=BOTH, expand=True)
         # frame7.pack(fill=BOTH, expand=True)
         # frame8.pack(fill=BOTH, expand=True)
@@ -107,9 +113,9 @@ class App(Tk):
         
         notebook.add(frame1, text="Станд. графики")
         notebook.add(frame2, text="Генератор шумов")
-        notebook.add(frame3, text="Изменить тек. данные")
-        notebook.add(frame4, text="Примеры применения")
-        # notebook.add(frame5, text="Л. 5")
+        notebook.add(frame3, text="Изменить данные")
+        notebook.add(frame4, text="ы")
+        notebook.add(frame5, text="Примеры")
         # notebook.add(frame6, text="Л. 6")
         # notebook.add(frame7, text="Л. 7")
         # notebook.add(frame8, text="Л. 8")
@@ -158,6 +164,12 @@ class App(Tk):
     
     def writeCurrentData(self, function):
         self.currentData = function
+    
+    def writeCurrentDataInTemp(self):
+        try:
+            self.tempData = self.currentData
+        except:
+            print("Текущих данных не существует")
     
     
     def standartFunctionUI(self, parent):
@@ -229,32 +241,6 @@ class App(Tk):
         ).pack(anchor=N, fill=X)
     
 
-    # def lab6UI(self, parent):
-    #     Label(parent,
-    #           text="ГИСТАГРАМА"
-    #     ).pack(anchor=N, fill=X, pady=20)
-    
-    #     typeGraph = ['Линейный тренд', 'Экспонентный тренд', 'Шум', 'Гармоника']
-
-    #     self.choseHis = StringVar(value=0)
-
-    #     for index in range(len(typeGraph)):
-    #         radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseHis)
-    #         radiobtn_graph.pack(anchor=N)
-       
-    #     del typeGraph
-        
-    #     Button(
-    #         parent,
-    #         text="Построить гистаграмму",
-    #         command=self.drawHistogram
-    #     ).pack(anchor=N, fill=X, pady=20)
-        
-    #     text = "Выводит гистаграму переданных данных\n\n"
-    #     text += "Редактируемые параметры:\n"
-    #     text += "M - количество разбиений"
-        
-    #     Label(parent, text=text).pack(anchor=N, fill=X)
     
     # def lab7UI(self, parent):
     #     Label(
@@ -474,36 +460,6 @@ class App(Tk):
     #     Label(parent, text=text).pack(anchor=N, fill=X)
 
     # def lab11UI(self, parent):
-    #     Label(
-    #         parent,
-    #         text="Отобразить данные из файла"
-    #     ).pack(anchor=N, fill=X, pady=20)
-        
-        
-    #     Button(
-    #         parent,
-    #         text='Открыть файл', 
-    #         command=self.openfile
-    #     ).pack(anchor=N, fill=X)
-        
-    #     Button(
-    #         parent,
-    #         text='Отрисовать данные',
-    #         command=lambda: self.analysis.drawFileData(self.currentData)
-    #     ).pack(anchor=N, fill=X)
-        
-    #     Label(parent, text="Сохранение текущих данных").pack(anchor=N, fill=X, pady=20)
-        
-    #     Label(parent, text="Название файла").pack(anchor=N, fill=X)
-        
-    #     self.entryName = Entry(parent, width=20, justify=CENTER)
-    #     self.entryName.pack(anchor=N)
-        
-    #     Button(
-    #         parent,
-    #         text="Задать тестовые данные",
-    #         command=self.testCurrentdata
-    #     ).pack(anchor=N, fill=X, pady= [20, 0])
         
     #     Button(
     #         parent,
@@ -622,68 +578,7 @@ class App(Tk):
         
     #     Label(parent, text=text).pack(anchor=N, fill=X)
     
-    # def printStatistic(self):
-    #     result = self.analysis.statistics(
-    #         self.model.getNoise(
-    #             Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #             type=int(self.choseNoise.get())
-    #         )
-    #     )
-    #     result += '\n\n'
-    #     result += self.analysis.stationarity(
-    #         self.model.getNoise(
-    #             Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #             N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #             type=int(self.choseNoise.get())
-    #         )
-    #     )
-        
-    #     self.label_statistic.configure(text=result)
-
     
-    
-    # def drawHistogram(self):
-    #     if int(self.choseHis.get()) == 0:
-    #         self.analysis.histograma(
-    #             self.model.getLinerTrend(
-    #                 a=float(self.parametrs.GetParametr("Parametrs", "a")),
-    #                 b=float(self.parametrs.GetParametr("Parametrs", "b")),
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 type=0
-    #             ),
-    #             M= int(self.parametrs.GetParametr("Parametrs", "M"))
-    #         )
-    #     elif int(self.choseHis.get()) == 1:
-    #         self.analysis.histograma(
-    #             self.model.getExponentaTrend(
-    #                 alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
-    #                 beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 type=0
-    #             ),
-    #             M= int(self.parametrs.GetParametr("Parametrs", "M"))
-    #         )
-    #     elif int(self.choseHis.get()) == 2:
-    #         self.analysis.histograma(
-    #             self.model.getNoise(
-    #                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 type=0
-    #             ),
-    #             M= int(self.parametrs.GetParametr("Parametrs", "M"))
-    #         )
-    #     elif int(self.choseHis.get()) == 3:
-    #         self.analysis.histograma(
-    #             self.model.getHarm(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
-    #                 f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
-    #                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
-    #                 thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
-    #             ),
-    #             M= int(self.parametrs.GetParametr("Parametrs", "M"))
-    #         )
     
     # def drawAutoKor(self):
     #     if int(self.choseAuto.get()) == 0:
