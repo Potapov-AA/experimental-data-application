@@ -63,7 +63,7 @@ class Analysis:
                     return 'The process is non-stationary'
         return 'Stationary process'
        
-    def histograma(self, data):
+    def histograma(self, data, draw=False):
         '''
         Создает гистограмму для переданных данных
         '''
@@ -90,21 +90,21 @@ class Analysis:
                         c += 1
                 dataForBarY.append(c) 
                 dataForBarX.append(f'{i}')
-                    
-            plt.figure(figsize=(10, 10))
-            plt.grid(True)
-            plt.bar(dataForBarX, dataForBarY)
-            plt.plot(dataForBarX, dataForBarY, color="red")
-            plt.show()
+            if draw:        
+                plt.figure(figsize=(10, 10))
+                plt.grid(True)
+                plt.bar(dataForBarX, dataForBarY)
+                plt.plot(dataForBarX, dataForBarY, color="red")
+                plt.show()
+            
+            return [dataForBarX, dataForBarY]
         except:
             print("Текущие данные - пусты")
 
-
-
-
-
-    
-    def acf(self, data=[i for i in range(1000)]):
+    def acf(self, data):
+        '''
+        График корреляции переданных данных
+        '''
         L = [i for i in range(0, len(data)-1)]
         middleValue = round(np.mean(data), 2)
         Rxx = []
@@ -129,8 +129,11 @@ class Analysis:
         plt.plot([i for i in range(len(Rl))], Rl)
         
         plt.show()
-    
+
     def ccf(self, *args):
+        '''
+        Взаимокорреляция переданных данных
+        '''
         L = [i for i in range(0, len(args[0])-1)]
         
         middleValue = []
@@ -148,10 +151,16 @@ class Analysis:
         
         plt.figure(figsize=(10, 10))
         plt.grid(True)
-        plt.title("График взаимной корреляции")
+        plt.title("График взаимокорреляции")
         plt.plot([i for i in range(len(Rxx))], Rxx)
         
         plt.show()
+
+
+    
+    
+    
+    
     
     def spectrFourier(self, data = [i for i in range(1000)], N = 1000, L=[24, 124, 224]):
         FN = int(N/2)
