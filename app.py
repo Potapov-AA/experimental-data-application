@@ -72,7 +72,9 @@ class App(Tk):
         
         analysis = Menu(mainmenu, tearoff=0)
         analysis.add_command(label="Сохранить статистику текущих данных", command=self.statisticCurrentFile)
-        analysis.add_command(label="Гистограмма текущих данных", command=lambda : self.analysis.histograma(self.currentData))
+        analysis.add_command(label="Гистограмма текущих данных", command=lambda : self.analysis.histograma(self.currentData, draw=True))
+        analysis.add_command(label="Корреляция текущих данных", command=lambda : self.analysis.acf(self.currentData))
+        analysis.add_command(label="Взаимокорреляция текущих и временных данных", command=lambda : self.analysis.ccf(self.currentData, self.tempData))
         
         
         mainmenu.add_cascade(label="Файл", menu=filemenu)
@@ -114,7 +116,7 @@ class App(Tk):
         notebook.add(frame1, text="Станд. графики")
         notebook.add(frame2, text="Генератор шумов")
         notebook.add(frame3, text="Изменить данные")
-        notebook.add(frame4, text="ы")
+        notebook.add(frame4, text="Фильтры")
         notebook.add(frame5, text="Примеры")
         # notebook.add(frame6, text="Л. 6")
         # notebook.add(frame7, text="Л. 7")
@@ -240,35 +242,25 @@ class App(Tk):
             font=self.mainFont
         ).pack(anchor=N, fill=X)
     
-
+    
+        Button(
+            parent,
+            text="Удалить смещение по всем данным",
+            command=lambda : self.writeCurrentData(self.processing.antiShift(self.currentData, draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Удалить неправдоподобных значений в данных",
+            command=lambda : self.writeCurrentData(self.processing.antiSpike(self.currentData, draw=True)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        
     
     # def lab7UI(self, parent):
-    #     Label(
-    #         parent,
-    #         text="АВТОКОРЯЛЛЯЦИЯ И ВЗАИМНОКОРРЕЛЯЦИОННАЯ ФУНКЦИИ"
-    #     ).pack(anchor=N, fill=X, pady=20)
-        
-    #     typeGraph = ['Шум встроенный', 'Шум написанный', 'Гармоника', 'Линейный тренд', 'Экспонентный тренд']
-
-    #     self.choseAuto = StringVar(value=0)
-
-    #     for index in range(len(typeGraph)):
-    #         radiobtn_graph = ttk.Radiobutton(parent, text=typeGraph[index], value=index, variable=self.choseAuto)
-    #         radiobtn_graph.pack(anchor=N)
-       
-    #     del typeGraph
-
-    #     Button(
-    #         parent,
-    #         text="Построить график автокорялляции",
-    #         command=self.drawAutoKor
-    #     ).pack(anchor=N, fill=X, pady=[20, 0])
-
-    #     Button(
-    #         parent,
-    #         text="Построить взаимокорреляционную функцию",
-    #         command=self.drawTwoAutoKor
-    #     ).pack(anchor=N, fill=X)
+    #     
         
     #     Button(
     #         parent,
@@ -292,21 +284,6 @@ class App(Tk):
     #         command=self.antiSpike
     #     ).pack(anchor=N, fill=X, pady=20)
         
-    #     text = "Рассчитываем и отрисовываект график\n"
-    #     text += "автокорреляцию и вазимнокорреляцию переданной функции\n\n"
-        
-    #     text += "Следующая функция, это удаление смещения в данных\n"
-    #     text += "А также удаление импульсов на данных\n\n"
-        
-    #     text += "Редактируемые параметры:\n"
-    #     text += "R - максимальное значение, которое может быть сгенирировано (шум)\n"
-    #     text += "y = A * sin(2 * pi * f * dt * x + thetta\n"
-    #     text += "A0\n"
-    #     text += "f0\n"
-    #     text += "thetta\n"
-    #     text += "dt\n"
-    #     text += "R1 = минимальное значение импульса\n"
-    #     text += "R2 = максимальное значение импульса"
 
         
     #     Label(parent, text=text).pack(anchor=N, fill=X)
@@ -580,96 +557,7 @@ class App(Tk):
     
     
     
-    # def drawAutoKor(self):
-    #     if int(self.choseAuto.get()) == 0:
-    #         self.analysis.acf(
-    #             self.model.getNoise(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #                 type=0
-    #             )
-    #         )
-    #     elif int(self.choseAuto.get()) == 1:
-    #         self.analysis.acf(
-    #             self.model.getNoise(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #                 type=1
-    #             )
-    #         )
-    #     elif int(self.choseAuto.get()) == 2:
-    #         self.analysis.acf(
-    #             self.model.getHarm(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
-    #                 f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
-    #                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
-    #                 thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
-    #             )
-    #         )
-    #     elif int(self.choseAuto.get()) == 3:
-    #         self.analysis.acf(
-    #             self.model.getLinerTrend(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 a=float(self.parametrs.GetParametr("Parametrs", "a")),
-    #                 b=float(self.parametrs.GetParametr("Parametrs", "b")),
-    #                 type=0
-    #             )
-    #         )
-    #     elif int(self.choseAuto.get()) == 4:
-    #         self.analysis.acf(
-    #             self.model.getExponentaTrend(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 alpha=float(self.parametrs.GetParametr("Parametrs", "alpha")),
-    #                 beta=float(self.parametrs.GetParametr("Parametrs", "beta")),
-    #                 type=1
-    #             )
-    #         )
-    
-    # def drawTwoAutoKor(self):
-    #     if int(self.choseAuto.get()) == 0:
-    #         self.analysis.ccf(
-    #             self.model.getNoise(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #                 type=0
-    #             ),
-    #             self.model.getNoise(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #                 type=0
-    #             ),
-    #         )
-    #     elif int(self.choseAuto.get()) == 1:
-    #         self.analysis.ccf(
-    #             self.model.getNoise(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #                 type=1
-    #             ),
-    #             self.model.getNoise(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 Range=int(self.parametrs.GetParametr("Parametrs", "R")),
-    #                 type=1
-    #             )
-    #         )
-    #     elif int(self.choseAuto.get()) == 2:
-    #         self.analysis.ccf(
-    #             self.model.getHarm(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 A0=float(self.parametrs.GetParametr("Parametrs", "A0")),
-    #                 f0=float(self.parametrs.GetParametr("Parametrs", "f0")),
-    #                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
-    #                 thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
-    #             ),
-    #             self.model.getHarm(
-    #                 N=int(self.parametrs.GetParametr("Parametrs", "N")),
-    #                 A0=float(self.parametrs.GetParametr("Parametrs", "A1")),
-    #                 f0=float(self.parametrs.GetParametr("Parametrs", "f1")),
-    #                 dt=float(self.parametrs.GetParametr("Parametrs", "dt")),
-    #                 thetta=float(self.parametrs.GetParametr("Parametrs", "thetta")),
-    #             )
-    #         )
+   
     
     # def antiShift(self):
     #     if int(self.choseAuto.get()) == 0:
