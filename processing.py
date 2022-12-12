@@ -1,8 +1,8 @@
-from accessify import private
 from matplotlib import pyplot as plt
 from sympy import *
 import numpy as np
 import math
+
 from model import Model
 from config import Config
 from analysis import Analysis
@@ -14,46 +14,117 @@ class Processing():
         self.parametrs = Config()
         self.analysis = Analysis()
 
-    def antiShift(self, data=[i for i in range(1000)]):
-
-        fig, ax = plt.subplots(4, figsize=(10, 6))
-
-        ax[0].scatter(x=[i for i in range(len(data))], y=data)
-
-        ax[1].plot([i for i in range(len(data))], data)
-        dataAntiShoft = [i - np.mean(data) for i in data]
-        ax[2].plot([i for i in range(len(dataAntiShoft))],
-                   dataAntiShoft, color="red")
-
-        ax[3].plot([i for i in range(len(data))], data)
-        ax[3].plot([i for i in range(len(dataAntiShoft))],
-                   dataAntiShoft, color="red")
-
-        plt.show()
-
-    def antiSpike(self, min, max, data=[i for i in range(1000)]):
-
-        fig, ax = plt.subplots(3, figsize=(10, 6))
-
-        ax[0].plot([i for i in range(len(data))], data)
-
-        dataAntiSpike = []
-        dataAntiSpike.append(data[0])
+    
+    def antiShift(self, data, draw=False):
+        '''
+        Убирает смещение по всей длине данных, вычислением среднего
+        '''
+        dataX = [i for i in range(len(data))]
+        
+        meanValue = np.mean(data)
+        
+        dataDefaultY = data
+        dataAntiShiftY = [i - meanValue for i in data]
+        
+        if draw:
+            plt.figure(figsize=(10,10))
+            
+            plt.subplot(2, 2, 1)
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            
+            plt.subplot(2, 2, 2)
+            plt.grid(True)
+            plt.plot(dataX, dataAntiShiftY, c="red")
+            
+            plt.subplot(2, 2, (3, 4))
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            plt.plot(dataX, dataAntiShiftY, c="red")
+            
+            plt.show()
+        
+        return dataAntiShiftY
+    
+    def antiSpike(self, data, draw=False):
+        '''
+        Убирает импульсы на данных, поиском истинного максимума и минимума
+        '''
+        dataX = [i for i in range(len(data))]
+        dataDefaultY = data
+        
+        sortData = sorted(data)
+        
+        meanIndex = int(len(data)/2)
+        
+        maxValue = 0
+        for i in range(meanIndex, len(sortData)):
+            if i + 1 != len(sortData):
+                if sortData[i] >=0:
+                    tempValue = sortData[i + 1] - sortData[i]
+                elif sortData[i] < 0:
+                    if sortData[i+1] >= 0:
+                        tempValue = sortData[i + 1] + sortData[i]
+                    elif sortData[i + 1] < 0:
+                        tempValue = sortData[i + 1] - sortData[i]    
+                        
+                if tempValue > 50:
+                    maxValue = sortData[i]
+                    break
+        
+        minValue = 0
+        for i in range(meanIndex, -1, -1):
+            if i - 1 != -1:
+                if sortData[i] < 0:
+                    tempValue = sortData[i] - sortData[i - 1]
+                elif sortData[i] >= 0:
+                    if sortData[i - 1] >=0:
+                        tempValue = sortData[i] - sortData[i - 1]
+                    elif sortData[i - 1] < 0:
+                        tempValue = sortData[i] + sortData[i - 1]  
+                if tempValue > 50 or tempValue < -50:
+                    minValue = sortData[i]
+                    break
+           
+        dataAntiSpikeY = []
+        dataAntiSpikeY.append(data[0])
+        
         for i in range(1, len(data)-1):
-            if data[i] > max or data[i] < min:
-                dataAntiSpike.append((data[i-1]+data[i+1])/2)
+            if data[i] > maxValue or data[i] < minValue:
+                dataAntiSpikeY.append((data[i-1]+data[i+1])/2)
             else:
-                dataAntiSpike.append((data[i]))
-        dataAntiSpike.append(data[-1])
+                dataAntiSpikeY.append((data[i]))
+        dataAntiSpikeY.append(data[-1])
 
-        ax[1].plot([i for i in range(len(dataAntiSpike))],
-                   dataAntiSpike, color="red")
+        
+        if draw:
+            plt.figure(figsize=(10,10))
+            
+            plt.subplot(2, 2, 1)
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            
+            plt.subplot(2, 2, 2)
+            plt.grid(True)
+            plt.plot(dataX, dataAntiSpikeY, c="red")
+            
+            plt.subplot(2, 2, (3, 4))
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            plt.plot(dataX, dataAntiSpikeY, c="red")
+            
+            plt.show()
+        
+        return dataAntiSpikeY
+    
+    
+    
+    
+    
 
-        ax[2].plot([i for i in range(len(data))], data)
-        ax[2].plot([i for i in range(len(dataAntiSpike))],
-                   dataAntiSpike, color="red")
-
-        plt.show()
+    
+    
+    
 
     def antiTrendLinear(self, a, b, A0, f0, dt, thetta, N):
         x = Symbol('x')
