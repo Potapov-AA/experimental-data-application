@@ -157,54 +157,61 @@ class Analysis:
         plt.show()
 
 
-    
-    
-    
-    
-    
-    def spectrFourier(self, data = [i for i in range(1000)], N = 1000, L=[24, 124, 224]):
-        FN = int(N/2)
-        deltaf = FN / (N/2)
-        dataX = []
-        for n in range(FN):
-            dataX.append(n * deltaf)
-        dataX = np.asarray(dataX)
+    def fourier(self, data, N, L=0):
+        if L != 0:
+            data = [i for i in data[0:N-L]]
+            data += [0 for i in range(L)]
         
-        dataY = self.model.Fourier(data, N)
+        dataY = []
+        for n in range(N):
+            Re = 0
+            for k in range(N):
+                Re += data[k]*np.cos((2 * np.pi * n * k)/N)
+            Re /= N
+            
+            Lm = 0
+            for k in range(N):
+                Lm += data[k]*np.sin((2 * np.pi * n * k)/N)
+            Lm /= N
+            dataY.append(np.sqrt(np.square(Re) + np.square(Lm)))
         
-        plt.figure(figsize=(10, 10))
-        plt.subplot(4,1,1)
-        plt.grid(True)
-        plt.plot(dataX, dataY[0:FN])
-        plt.title("Амплитудный спектр Фурье")
-        
-        for i in range(len(L)):
-            window = self.model.Fourier(data, N, L=L[i])
-            window = np.asarray(window)
-            plt.subplot(4,1,i+2)
-            plt.grid(True)
-            plt.plot(dataX, window[0:FN])
-            plt.title(f"L={L[i]}")
-        
-        plt.show()
-    
-    def getSpectrFourier(self, data):
-        N = len(data)
-        
-        
-        FN = int(N/2)
-        deltaf = FN / (N/2)
-        dataX = []
-        for n in range(FN):
-            dataX.append(n * deltaf)
-        dataX = np.asarray(dataX)
-        
-        dataY = self.model.Fourier(data, N)
-        dataY = dataY[0:FN]
         dataY = np.asarray(dataY)
         
         return dataY
     
-    
+    def spectrFourier(self, data, draw=False):
+        N=len(data)
+        L=[
+            int(self.parametrs.GetParametr("Parametrs", "L1")),
+            int(self.parametrs.GetParametr("Parametrs", "L2")),
+            int(self.parametrs.GetParametr("Parametrs", "L3"))
+        ]
+        
+        FN = int(N/2)
+        deltaf = FN / (N/2)
+        
+        dataX = []
+        for n in range(FN):
+            dataX.append(n * deltaf)
+        dataX = np.asarray(dataX)
+        
+        dataY = self.fourier(data, N, L=0)
+        
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.subplot(4,1,1)
+            plt.grid(True)
+            plt.plot(dataX, dataY[0:FN])
+            plt.title("Амплитудный спектр Фурье")
             
-    
+            for i in range(len(L)):
+                window = self.fourier(data, N, L=L[i])
+                window = np.asarray(window)
+                plt.subplot(4,1,i+2)
+                plt.grid(True)
+                plt.plot(dataX, window[0:FN])
+                plt.title(f"L={L[i]}")
+            
+            plt.show()
+        
+        return dataY

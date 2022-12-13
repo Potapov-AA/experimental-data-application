@@ -96,12 +96,14 @@ class Model:
         
         if type == 0:
             dataY = np.asarray([beta * self.e ** (-alpha * i) for i in range(N)])
-            plt.plot(dataX, dataY)
-            plt.title("Экспонентный восходящий график")
+            if draw:
+                plt.plot(dataX, dataY)
+                plt.title("Экспонентный восходящий график")
         elif type == 1:
             dataY = np.asarray([beta * self.e ** (alpha * i) for i in range(N)])
-            plt.plot(dataX, dataY)
-            plt.title("Экспонентный низходящий график")
+            if draw:
+                plt.plot(dataX, dataY)
+                plt.title("Экспонентный низходящий график")
         
         if draw:
             plt.show()
@@ -344,85 +346,61 @@ class Model:
             print("Передан пустой массив данных")
         
     
-
-    
-
-    
-
-    
-
-    
-   
-    
-    def addModel(self, data1 = [i for i in range(1000)], data2 = [-i for i in range(1000)]):
-        N = len(data1)
-        dataSum = [data1[i] + data2[i] for i in range(N)]
+    def sumGraph(self, data1, data2, draw=False):
+        '''
+        Сложение двух данных
+        '''
+        dataX = [i for i in range(len(data1))]
+        dataY = [data1[i] + data2[i] for i in range(len(data1))]
         
-        fig, ax = plt.subplots(3, figsize = (10, 8))
-        ax[0].plot([i for i in range(N)], data1)
-        ax[1].plot([i for i in range(N)], data2)
-        ax[2].plot([i for i in range(N)], dataSum)
-        
-        plt.show()
-    
-    def getSumModel(self, data1 = [i for i in range(1000)], data2 = [-i for i in range(1000)]):
-        N = len(data1)
-        return [data1[i] + data2[i] for i in range(N)]
-    
-    def getSumHarmNoise(self):
-        data = self.getDefaultNoise() + self.getDefaultHarm()
-        return data
-    
-    def drawMultiModel(self, data1, data2):
-        N = len(data1)
-        data = [data1[i] * data2[i] for i in range(N)]
-        dataX = [i for i in range(N)]
-        
-        plt.figure(figsize=(10,10))
-        plt.grid(True)
-        
-        plt.subplot(3, 1, 1)
-        plt.title("data1")
-        plt.plot(dataX, data1)
-        
-        plt.subplot(3, 1, 2)
-        plt.title("data2")
-        plt.plot(dataX, data2)
-        
-        plt.subplot(3, 1, 3)
-        plt.title("Multi data")
-        plt.plot(dataX, data)
-        
-        plt.show()
-    
-    def getMultModel(self, data1, data2):
-        N = len(data1)
-        return [data1[i] * data2[i] for i in range(N)]
-     
-    def Fourier(self, data = [0 for i in range(1000)], N = 1000, L = 0):
-        if L != 0:
-            data = [i for i in data[0:N-L]]
-            data += [0 for i in range(L)]
-        
-        dataY = []
-        for n in range(N):
-            Re = 0
-            for k in range(N):
-                Re += data[k]*np.cos((2 * np.pi * n * k)/N)
-            Re /= N
+        if draw:
+            plt.figure(figsize=(10,10))
             
-            Lm = 0
-            for k in range(N):
-                Lm += data[k]*np.sin((2 * np.pi * n * k)/N)
-            Lm /= N
-            dataY.append(np.sqrt(np.square(Re) + np.square(Lm)))
+            plt.subplot(2, 2, 1)
+            plt.grid(True)
+            plt.plot(dataX, data1)
+            
+            plt.subplot(2, 2, 2)
+            plt.grid(True)
+            plt.plot(dataX, data2)
+            
+            plt.subplot(2, 2, (3, 4))
+            plt.grid(True)
+            plt.plot(dataX, dataY)
+            
+            plt.show()
         
-        dataY = np.asarray(dataY)
+        return dataY
+
+    def multiGraph(self, data1, data2, draw=False):
+        '''
+        Перемножение двух данных
+        '''
+        dataX = [i for i in range(len(data1))]
+        dataY = [data1[i] * data2[i] for i in range(len(data1))]
+        
+        if draw:
+            plt.figure(figsize=(10,10))
+            
+            plt.subplot(2, 2, 1)
+            plt.grid(True)
+            plt.plot(dataX, data1)
+            
+            plt.subplot(2, 2, 2)
+            plt.grid(True)
+            plt.plot(dataX, data2)
+            
+            plt.subplot(2, 2, (3, 4))
+            plt.grid(True)
+            plt.plot(dataX, dataY)
+            
+            plt.show()
         
         return dataY
     
-    def Cardiograma(self):
-        data = self.getMultModel(self.getDefaultExponentaTrend(), self.getDefaultHarm())
+    
+    def cardiograma(self, draw=False):
+        data = self.multiGraph(self.exponentaGraph(), self.sinGraph())
         N = len(data)
         M = 200
         dataX = [i * 0.005 for i in range(N)]
@@ -430,12 +408,6 @@ class Model:
         max = np.max(data)
         data = [i / max * 120 for i in data]
         
-        plt.figure(figsize=(15, 10))
-        
-        plt.subplot(3, 1, 1)
-        plt.title("Мульти экспонента-гармоника")
-        plt.grid(True)
-        plt.plot(dataX, data) 
         
         
         impulse = 1
@@ -446,10 +418,6 @@ class Model:
             else:
                 dataImpulse.append(0)
         
-        plt.subplot(3, 1, 2)
-        plt.title("Импульсы")
-        plt.grid(True)
-        plt.plot(dataX, dataImpulse)
         
         dataCardio = []
         for k in range(N+M):
@@ -461,9 +429,12 @@ class Model:
                     pass
             dataCardio.append(yk)
         
-        plt.subplot(3, 1, 3)
-        plt.title("Кардиограмма")
-        plt.grid(True)
-        plt.plot(dataX, dataCardio[0:N])
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.title("Кардиограмма")
+            plt.grid(True)
+            plt.plot(dataX, dataCardio[0:N])
+            
+            plt.show()
         
-        plt.show()
+        return dataCardio
