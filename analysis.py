@@ -27,22 +27,25 @@ class Analysis:
         meanSquare = sum(i ** 2 for i in data) / len(data)
         meanSquareError = np.sqrt(meanSquare)
         
-        result = f'Количество значенией: {len(data)}\n'
-        result += f'Минимальное значение: {min}\n'
-        result += f'Максимальное значение: {max}\n'
-        result += f'Среднее значение: {meanValue}\n'
-        result += f'Дисперсия: {variance}\n'
-        result += f'Стандартное отклонение: {standardDeviation}\n'
-        result += f'Ассиметрия: {assymetry}\n'
-        result += f'Коэффицент ассиметрии: {assymetryCoef}\n'
-        result += f'Эксцесс: {excess}\n'
-        result += f'куртозис: {kurtosis}\n'
-        result += f'Средний квадрат: {meanSquare}\n'
-        result += f'Ср. квад. ошибка: {meanSquareError}'
+        result = f'Number of values: {len(data)}\n'
+        result += f'Min value: {min}\n'
+        result += f'Max value: {max}\n'
+        result += f'Middle value: {meanValue}\n'
+        result += f'Dispersion: {variance}\n'
+        result += f'Standard deviation: {standardDeviation}\n'
+        result += f'Asymmetry: {assymetry}\n'
+        result += f'Asymmetry coefficient: {assymetryCoef}\n'
+        result += f'Excess: {excess}\n'
+        result += f'Kurtosis: {kurtosis}\n'
+        result += f'Medium square: {meanSquare}\n'
+        result += f'RMS error: {meanSquareError}'
         
         return result
 
     def stationarity(self, data, M=10):
+        '''
+        Возвращает стационарность данных
+        '''
         sub_arrays = np.split(data, M)
 
         means = []
@@ -57,40 +60,51 @@ class Analysis:
                     abs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1] > 0.1)):
                     #print (f'\ti = {i}\n\tmeans[i] = {means[i]}\n\tmeans[i+1] = {means[i+1]}\n\tabs((means[i] - means[i+1]) / means[i+1]) = {abs((means[i] - means[i+1]) / means[i+1])}')
                     #print (f'\ti = {i}\n\tstd_deviations[i] = {std_deviations[i]}\n\tstd_deviations[i+1] = {std_deviations[i+1]}\n\tabs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1]) = {abs((std_deviations[i] - std_deviations[i+1]) / std_deviations[i+1])}')
-                    return 'Процесс нестационарный'
-        return 'Процесс стационарный'
-        
-    def histograma(self, data=[i for i in range(10000)], M=100):
-        
+                    return 'The process is non-stationary'
+        return 'Stationary process'
+       
+    def histograma(self, data, draw=False):
+        '''
+        Создает гистограмму для переданных данных
+        '''
+        try:
+            M = int(self.parametrs.GetParametr("Parametrs", "M"))
+            
+            sortData = sorted(data)
+            coutData = len(data)
+            
+            step = int(coutData/M)
+            currentIndex = 0
+            
+            lstep = []
+            for i in range(currentIndex, coutData, step):
+                lstep.append([sortData[i], sortData[i+step-1]])
+            
+            
+            dataForBarX = []
+            dataForBarY = []
+            for i in lstep:
+                c = 0
+                for j in data:
+                    if j >= i[0] and j < i[1]:
+                        c += 1
+                dataForBarY.append(c) 
+                dataForBarX.append(f'{i}')
+            if draw:        
+                plt.figure(figsize=(10, 10))
+                plt.grid(True)
+                plt.bar(dataForBarX, dataForBarY)
+                plt.plot(dataForBarX, dataForBarY, color="red")
+                plt.show()
+            
+            return [dataForBarX, dataForBarY]
+        except:
+            print("Текущие данные - пусты")
 
-        min = int(round(np.min(data), 2))
-        max = int(round(np.max(data), 2))
-        
-        step = int(round((max-min)/M))
-        
-        lstep = []
-        for i in range(min, max, step):
-            if i+step<=max:
-                lstep.append([i, i+step])
-        
-        
-        dataForBarX = []
-        dataForBarY = []
-        for i in lstep:
-            c = 0
-            for j in data:
-                if j >= i[0] and j < i[1]:
-                    c += 1
-            dataForBarY.append(c) 
-            dataForBarX.append(f'{i}')
-                 
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        plt.bar(dataForBarX, dataForBarY)
-        plt.plot(dataForBarX, dataForBarY, color="red")
-        plt.show()
-    
-    def acf(self, data=[i for i in range(1000)]):
+    def acf(self, data):
+        '''
+        График корреляции переданных данных
+        '''
         L = [i for i in range(0, len(data)-1)]
         middleValue = round(np.mean(data), 2)
         Rxx = []
@@ -115,8 +129,11 @@ class Analysis:
         plt.plot([i for i in range(len(Rl))], Rl)
         
         plt.show()
-    
+
     def ccf(self, *args):
+        '''
+        Взаимокорреляция переданных данных
+        '''
         L = [i for i in range(0, len(args[0])-1)]
         
         middleValue = []
@@ -134,66 +151,42 @@ class Analysis:
         
         plt.figure(figsize=(10, 10))
         plt.grid(True)
-        plt.title("График взаимной корреляции")
+        plt.title("График взаимокорреляции")
         plt.plot([i for i in range(len(Rxx))], Rxx)
         
         plt.show()
-    
-    def spectrFourier(self, data = [i for i in range(1000)], N = 1000, L=[24, 124, 224]):
-        FN = int(N/2)
-        deltaf = FN / (N/2)
-        dataX = []
-        for n in range(FN):
-            dataX.append(n * deltaf)
-        dataX = np.asarray(dataX)
+
+
+    def fourier(self, data, N, L=0):
+        if L != 0:
+            data = [i for i in data[0:N-L]]
+            data += [0 for i in range(L)]
         
-        dataY = self.model.Fourier(data, N)
+        dataY = []
+        for n in range(N):
+            Re = 0
+            for k in range(N):
+                Re += data[k]*np.cos((2 * np.pi * n * k)/N)
+            Re /= N
+            
+            Lm = 0
+            for k in range(N):
+                Lm += data[k]*np.sin((2 * np.pi * n * k)/N)
+            Lm /= N
+            dataY.append(np.sqrt(np.square(Re) + np.square(Lm)))
         
-        plt.figure(figsize=(10, 10))
-        plt.subplot(4,1,1)
-        plt.grid(True)
-        plt.plot(dataX, dataY[0:FN])
-        plt.title("Амплитудный спектр Фурье")
-        
-        for i in range(len(L)):
-            window = self.model.Fourier(data, N, L=L[i])
-            window = np.asarray(window)
-            plt.subplot(4,1,i+2)
-            plt.grid(True)
-            plt.plot(dataX, window[0:FN])
-            plt.title(f"L={L[i]}")
-        
-        plt.show()
-    
-    def getSpectrFourier(self, data):
-        N = len(data)
-        
-        
-        FN = int(N/2)
-        deltaf = FN / (N/2)
-        dataX = []
-        for n in range(FN):
-            dataX.append(n * deltaf)
-        dataX = np.asarray(dataX)
-        
-        dataY = self.model.Fourier(data, N)
-        dataY = dataY[0:FN]
         dataY = np.asarray(dataY)
         
         return dataY
     
-    def drawFileData(self, data):
-        dataX = [i for i in range(len(data))]
-        dataY = data
+    def spectrFourier(self, data, draw=False):
+        N=len(data)
+        L=[
+            int(self.parametrs.GetParametr("Parametrs", "L1")),
+            int(self.parametrs.GetParametr("Parametrs", "L2")),
+            int(self.parametrs.GetParametr("Parametrs", "L3"))
+        ]
         
-        plt.figure(figsize=(10, 10))
-        plt.grid(True)
-        
-        plt.subplot(2,1,1)
-        plt.title("Данные из файла")
-        plt.plot(dataX, dataY)
-        
-        N = len(data)
         FN = int(N/2)
         deltaf = FN / (N/2)
         
@@ -202,33 +195,23 @@ class Analysis:
             dataX.append(n * deltaf)
         dataX = np.asarray(dataX)
         
-        dataY = self.model.Fourier(data, N)
+        dataY = self.fourier(data, N, L=0)
         
-        plt.subplot(2,1,2)
-        plt.plot(dataX, dataY[0:FN])
-        plt.title("Амплитудный спектр Фурье")
-        
-        plt.show()
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.subplot(4,1,1)
+            plt.grid(True)
+            plt.plot(dataX, dataY[0:FN])
+            plt.title("Амплитудный спектр Фурье")
             
-    def drawSoundData(self, data):
-        dataY = data["data"]
-        dataX = np.arange(0,data["nframes"])/data["framerate"]
+            for i in range(len(L)):
+                window = self.fourier(data, N, L=L[i])
+                window = np.asarray(window)
+                plt.subplot(4,1,i+2)
+                plt.grid(True)
+                plt.plot(dataX, window[0:FN])
+                plt.title(f"L={L[i]}")
+            
+            plt.show()
         
-        time = round(data["nframes"]/data["framerate"], 2)
-        compname = data["compname"]
-        framerate = data["framerate"]
-        nchannels = data["nchannels"]
-        
-        print(dataX)
-        print(len(dataX))
-        print(dataY)
-        print(len(dataY))
-        
-        plt.figure(figsize=(10,10)) 
-        plt.subplot(2,1,1) 
-        plt.plot(dataX, dataY[0])
-        plt.title(f"Название: {compname}. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}")
-        plt.subplot(2,1,2) 
-        plt.plot(dataX, dataY[1], c='r')        
-        plt.xlabel("time")
-        plt.show()
+        return dataY

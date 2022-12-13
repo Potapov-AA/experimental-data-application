@@ -1,8 +1,8 @@
-from accessify import private
 from matplotlib import pyplot as plt
 from sympy import *
 import numpy as np
 import math
+
 from model import Model
 from config import Config
 from analysis import Analysis
@@ -14,115 +14,196 @@ class Processing():
         self.parametrs = Config()
         self.analysis = Analysis()
 
-    def antiShift(self, data=[i for i in range(1000)]):
-
-        fig, ax = plt.subplots(4, figsize=(10, 6))
-
-        ax[0].scatter(x=[i for i in range(len(data))], y=data)
-
-        ax[1].plot([i for i in range(len(data))], data)
-        dataAntiShoft = [i - np.mean(data) for i in data]
-        ax[2].plot([i for i in range(len(dataAntiShoft))],
-                   dataAntiShoft, color="red")
-
-        ax[3].plot([i for i in range(len(data))], data)
-        ax[3].plot([i for i in range(len(dataAntiShoft))],
-                   dataAntiShoft, color="red")
-
-        plt.show()
-
-    def antiSpike(self, min, max, data=[i for i in range(1000)]):
-
-        fig, ax = plt.subplots(3, figsize=(10, 6))
-
-        ax[0].plot([i for i in range(len(data))], data)
-
-        dataAntiSpike = []
-        dataAntiSpike.append(data[0])
-        for i in range(1, len(data)-1):
-            if data[i] > max or data[i] < min:
-                dataAntiSpike.append((data[i-1]+data[i+1])/2)
-            else:
-                dataAntiSpike.append((data[i]))
-        dataAntiSpike.append(data[-1])
-
-        ax[1].plot([i for i in range(len(dataAntiSpike))],
-                   dataAntiSpike, color="red")
-
-        ax[2].plot([i for i in range(len(data))], data)
-        ax[2].plot([i for i in range(len(dataAntiSpike))],
-                   dataAntiSpike, color="red")
-
-        plt.show()
-
-    def antiTrendLinear(self, a, b, A0, f0, dt, thetta, N):
-        x = Symbol('x')
-        y = (x*a+b) + A0 * sin(2 * math.pi * f0 * dt * x + thetta)
-        y = y.diff(x)
-
-        dataAntiTrendLiner = []
-        for i in range(N):
-            dataAntiTrendLiner.append(y.subs(x, i))
-
-        fig, ax = plt.subplots(figsize=(10, 8))
-        ax.plot([i for i in range(N)], dataAntiTrendLiner)
-
-        plt.show()
-
-    def getAntiTrendLinear(self, a, b, A0, f0, dt, thetta, N):
-        x = Symbol('x')
-        y = (x*a+b) + A0 * sin(2 * math.pi * f0 * dt * x + thetta)
-        y = y.diff(x)
-
-        dataAntiTrendLiner = []
-        for i in range(N):
-            dataAntiTrendLiner.append(y.subs(x, i))
-
-        return dataAntiTrendLiner
-
-    def antiTrendNonLinear(self, data, W):
-        moveARGs = []
-
-        for w in W:
-            moveARG = []
-            i = 0
-            while i < len(data) - w + 1:
-                window = data[i: i + w]
-                moveARG.append(round(sum(window) / w, 2))
-                i += 1
-            moveARGs.append(moveARG)
-
-        fig, ax = plt.subplots(3, figsize=(10, 8))
-
-        for i in range(3):
-            dataAntiTrendNonLinear = []
-            for j in range(len(moveARGs[i])):
-                dataAntiTrendNonLinear.append(data[j] - moveARGs[i][j])
-            ax[i].plot([i for i in range(len(dataAntiTrendNonLinear))],
-                       dataAntiTrendNonLinear)
-
-        plt.show()
-
-    def getAntiTrendNonLinear(self, data, W):
-        moveARGs = []
-
-        for w in W:
-            moveARG = []
-            i = 0
-            while i < len(data) - w + 1:
-                window = data[i: i + w]
-                moveARG.append(round(sum(window) / w, 2))
-                i += 1
-            moveARGs.append(moveARG)
-
-        return moveARGs
-
-    def AntiNoise(self, function, stepM=10):
-        plt.figure(figsize=(15, 15))
+    
+    def antiShift(self, data, draw=False):
+        '''
+        Убирает смещение по всей длине данных, вычислением среднего
+        '''
+        dataX = [i for i in range(len(data))]
         
-        M = 2
+        meanValue = np.mean(data)
+        
+        dataDefaultY = data
+        dataAntiShiftY = [i - meanValue for i in data]
+        
+        if draw:
+            plt.figure(figsize=(10,10))
+            
+            plt.subplot(2, 2, 1)
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            
+            plt.subplot(2, 2, 2)
+            plt.grid(True)
+            plt.plot(dataX, dataAntiShiftY, c="red")
+            
+            plt.subplot(2, 2, (3, 4))
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            plt.plot(dataX, dataAntiShiftY, c="red")
+            
+            plt.show()
+        
+        return dataAntiShiftY
+    
+    def antiSpike(self, data, draw=False):
+        '''
+        Убирает импульсы на данных, поиском истинного максимума и минимума
+        '''
+        dataX = [i for i in range(len(data))]
+        dataDefaultY = data
+        
+        sortData = sorted(data)
+        
+        meanIndex = int(len(data)/2)
+        
+        maxValue = 0
+        for i in range(meanIndex, len(sortData)):
+            if i + 1 != len(sortData):
+                if sortData[i] >=0:
+                    tempValue = sortData[i + 1] - sortData[i]
+                elif sortData[i] < 0:
+                    if sortData[i+1] >= 0:
+                        tempValue = sortData[i + 1] + sortData[i]
+                    elif sortData[i + 1] < 0:
+                        tempValue = sortData[i + 1] - sortData[i]    
+                        
+                if tempValue > 50:
+                    maxValue = sortData[i]
+                    break
+        
+        minValue = 0
+        for i in range(meanIndex, -1, -1):
+            if i - 1 != -1:
+                if sortData[i] < 0:
+                    tempValue = sortData[i] - sortData[i - 1]
+                elif sortData[i] >= 0:
+                    if sortData[i - 1] >=0:
+                        tempValue = sortData[i] - sortData[i - 1]
+                    elif sortData[i - 1] < 0:
+                        tempValue = sortData[i] + sortData[i - 1]  
+                if tempValue > 50 or tempValue < -50:
+                    minValue = sortData[i]
+                    break
+           
+        dataAntiSpikeY = []
+        dataAntiSpikeY.append(data[0])
+        
+        for i in range(1, len(data)-1):
+            if data[i] > maxValue or data[i] < minValue:
+                dataAntiSpikeY.append((data[i-1]+data[i+1])/2)
+            else:
+                dataAntiSpikeY.append((data[i]))
+        dataAntiSpikeY.append(data[-1])
+
+        
+        if draw:
+            plt.figure(figsize=(10,10))
+            
+            plt.subplot(2, 2, 1)
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            
+            plt.subplot(2, 2, 2)
+            plt.grid(True)
+            plt.plot(dataX, dataAntiSpikeY, c="red")
+            
+            plt.subplot(2, 2, (3, 4))
+            plt.grid(True)
+            plt.plot(dataX, dataDefaultY)
+            plt.plot(dataX, dataAntiSpikeY, c="red")
+            
+            plt.show()
+        
+        return dataAntiSpikeY
+    
+    
+    def antiTrendLinear(self, draw=False):
+        '''
+        Убирает линейный тренд на синусойде
+        '''
+        a=float(self.parametrs.GetParametr("Parametrs", "a"))
+        b=float(self.parametrs.GetParametr("Parametrs", "b"))
+        A0=float(self.parametrs.GetParametr("Parametrs", "A0"))
+        f0=float(self.parametrs.GetParametr("Parametrs", "f0"))
+        dt=float(self.parametrs.GetParametr("Parametrs", "dt"))
+        thetta=float(self.parametrs.GetParametr("Parametrs", "thetta"))
+        N=int(self.parametrs.GetParametr("Parametrs", "N"))
+        
+        
+        x = Symbol('x')
+        y = (x*a+b) + A0 * sin(2 * math.pi * f0 * dt * x + thetta)
+        y = y.diff(x)
+
+        dataX = [i for i in range(N)]
+        dataY = [(i*a+b) + A0 * sin(2 * math.pi * f0 * dt * i + thetta) for i in range(N)]
+        
+        dataAntiTrendLinerY = []
+        for i in range(N):
+            dataAntiTrendLinerY.append(y.subs(x, i))
+
+        if draw:
+            plt.figure(figsize=(10, 10))
+            
+            plt.subplot(2, 1, 1)
+            plt.grid(True)
+            plt.plot(dataX, dataY)
+            
+            plt.subplot(2, 1 , 2)
+            plt.grid(True)
+            plt.plot(dataX, dataAntiTrendLinerY)
+            
+            plt.show()
+        
+        return dataAntiTrendLinerY
+        
+    def antiTrendNonLinear(self, data, draw=False):
+        '''
+        убирает нелинейный тренд на разных окнах
+        '''
+        W=[
+            int(self.parametrs.GetParametr("Parametrs", "W1")),
+            int(self.parametrs.GetParametr("Parametrs", "W2")),
+            int(self.parametrs.GetParametr("Parametrs", "W3"))
+        ]    
+        
+        moveARGs = []
+
+        for w in W:
+            moveARG = []
+            i = 0
+            while i < len(data) - w + 1:
+                window = data[i: i + w]
+                moveARG.append(round(sum(window) / w, 2))
+                i += 1
+            moveARGs.append(moveARG)
+
+        
+        if draw:
+            fig, ax = plt.subplots(3, figsize=(10, 8))
+
+            for i in range(3):
+                dataAntiTrendNonLinear = []
+                for j in range(len(moveARGs[i])):
+                    dataAntiTrendNonLinear.append(data[j] - moveARGs[i][j])
+                ax[i].plot([i for i in range(len(dataAntiTrendNonLinear))],
+                        dataAntiTrendNonLinear)
+
+            plt.show()
+    
+    
+    def antiNoise(self, function):
+        stepM=int(self.parametrs.GetParametr("Parametrs", "stepM"))
+        
+        plt.figure(figsize=(15,15))
+        
+        
+        M = 1
         step = 0
-        while step < 6:
+        
+        dataStdY = []
+        
+        while step < 5:
             data = function()
             for m in range(M-1):
                 data += function()
@@ -135,39 +216,40 @@ class Processing():
             dataX = [i for i in range(len(dataY))]
             
             standardDeviation = round(np.std(dataY), 2)
+            dataStdY.append(standardDeviation)
             
-            plt.subplot(4, 3, (7, 9))
+            plt.subplot(5, 2, (7, 8))
             plt.grid(True)
             plt.plot(dataX, dataY)
             plt.title("Наложение всех шумов")
 
-            plt.subplot(4, 3, step + 1)
-            plt.grid(True)
-            plt.plot(dataX, dataY)
-            plt.title(f"M = {M} стандартное отклонение = {standardDeviation}")
+            if step + 1 != 5:    
+                plt.subplot(5, 2, step + 1)
+                plt.grid(True)
+                plt.plot(dataX, dataY)
+                plt.title(f"M = {M} стандартное отклонение = {standardDeviation}")
+            else:
+                plt.subplot(5, 2, (5, 6))
+                plt.grid(True)
+                plt.plot(dataX, dataY, c="green")
+                plt.title(f"M = {M} стандартное отклонение = {standardDeviation}")
 
             M *= stepM
             step += 1
         
-        dataX = []
-        dataYstd = []
-        for m in range(1, 1000, stepM):
-            data = function()
-            for i in range(m-1):
-                data += function()
-            dataY = []
-            for i in data:
-                dataY.append(i/m)
-            standardDeviation = round(np.std(dataY), 4)
-            dataX.append(m)
-            dataYstd.append(standardDeviation)
-            plt.subplot(4, 3, (10, 12))
-            plt.plot(dataX, dataYstd)
-            plt.title("Изменение стандартного отклонения")
+        dataStdX = [i for i in range(len(dataStdY))]
+        
+        plt.subplot(5, 2, (9, 10))
+        plt.grid(True)
+        plt.plot(dataStdX, dataStdY)
             
         plt.show()
     
+    
     def lpf(self, draw = False):
+        '''
+        ФНЧ
+        '''
         fc1=float(self.parametrs.GetParametr("Parametrs", "fc"))
         fc2=float(self.parametrs.GetParametr("Parametrs", "fc1"))
         fc3=float(self.parametrs.GetParametr("Parametrs", "fc2"))
@@ -212,7 +294,7 @@ class Processing():
             
             
             reverseLPW = lpw[::-1]
-            simetricLPW = reverseLPW + lpw
+            simetricLPW = reverseLPW + lpw[1::]
             result.append(simetricLPW)
             
             if draw:
@@ -226,8 +308,8 @@ class Processing():
         if draw:
             plt.show()
         
-        return result   
-    
+        
+        return result
     
     def hpf(self, draw=False):
         m = int(self.parametrs.GetParametr("Parametrs", "m for lpf"))
@@ -241,7 +323,7 @@ class Processing():
         result = []
         for lpw in llpw:
             hpw = []
-            for k in range(loper+1):
+            for k in range(loper):
                 if k == m:
                     hpw.append(1 - lpw[k])
                 else:
@@ -265,7 +347,7 @@ class Processing():
         loper = 2*m+1
         bpw = []
         
-        for k in range(loper+1):
+        for k in range(loper):
             bpw.append(lpw2[k]-lpw1[k])
         if draw:
             plt.figure(figsize=(10,10))
@@ -283,7 +365,7 @@ class Processing():
         loper = 2*m+1
         bsw = []
         
-        for k in range(loper+1):
+        for k in range(loper):
             if k == m:
                 bsw.append(1 + lpw1[k] - lpw2[k])
             else:
@@ -296,7 +378,7 @@ class Processing():
 
         return bsw
         
-    def FilterFourier(self):
+    def filterFourier(self):
         m = int(self.parametrs.GetParametr("Parametrs", "m for lpf"))
         
         lpw = self.lpf()[0]
@@ -308,43 +390,48 @@ class Processing():
         
         plt.figure(figsize=(10, 10))
         
-        lpwFourier = self.analysis.getSpectrFourier(lpw)
+        lpwFourier = self.analysis.spectrFourier(lpw)
         dataX = [i for i in range(len(lpwFourier))]
         dataY = [i * loper for i in lpwFourier]
+        N = len(lpwFourier)
         
         plt.subplot(2, 2, 1)
         plt.title("LPF")
-        plt.plot(dataX, dataY)
+        plt.plot(dataX[0:int(N/2)], dataY[0:int(N/2)])
         
         
-        hpwFourier = self.analysis.getSpectrFourier(hpw)
+        hpwFourier = self.analysis.spectrFourier(hpw)
         dataX = [i for i in range(len(hpwFourier))]
         dataY = [i * loper for i in hpwFourier]
+        N = len(hpwFourier)
         
         plt.subplot(2, 2, 2)
         plt.title("HPF")
-        plt.plot(dataX, dataY)
+        plt.plot(dataX[0:int(N/2)], dataY[0:int(N/2)])
         
         
-        bpwFourier = self.analysis.getSpectrFourier(bpw)
+        bpwFourier = self.analysis.spectrFourier(bpw)
         dataX = [i for i in range(len(bpwFourier))]
         dataY = [i * loper for i in bpwFourier]
+        N = len(bpwFourier)
         
         plt.subplot(2, 2, 3)
         plt.title("BPF")
-        plt.plot(dataX, dataY)
+        plt.plot(dataX[0:int(N/2)], dataY[0:int(N/2)])
         
         
-        bswFourier = self.analysis.getSpectrFourier(bsw)
+        bswFourier = self.analysis.spectrFourier(bsw)
         dataX = [i for i in range(len(bswFourier))]
         dataY = [i * loper for i in bswFourier]
+        N = len(bswFourier)
         
         plt.subplot(2, 2, 4)
         plt.title("BSF")
-        plt.plot(dataX, dataY)
+        plt.plot(dataX[0:int(N/2)], dataY[0:int(N/2)])
         
         plt.show()
     
+
     def useFilter(self, data, filter = 0):
         lpw = self.lpf()[0]
         hpw = self.hpf()[0]
@@ -369,4 +456,4 @@ class Processing():
         
         filterData = np.asarray(filterData)
         
-        self.analysis.drawFileData(filterData)
+        self.model.drawData(filterData)

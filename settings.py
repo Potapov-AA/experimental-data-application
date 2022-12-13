@@ -29,13 +29,26 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Общие параметры").pack(anchor=N, fill=X, pady=[20, 10])
               self.drawParameter("N =", "N", parent)
               
-              Label(parent, text="Линейный тренд").pack(anchor=N, fill=X, pady=[15, 10])
+              Label(parent, text="Линейный график").pack(anchor=N, fill=X, pady=[15, 10])
               self.drawParameter("a =", "a", parent)
               self.drawParameter("b =", "b", parent)
               
-              Label(parent, text="Экспонентный тренд").pack(anchor=N, fill=X, pady=[15, 10])
+              Label(parent, text="График экспоненты").pack(anchor=N, fill=X, pady=[15, 10])
               self.drawParameter("alpha =", "alpha", parent)
               self.drawParameter("beta =", "beta", parent)
+              
+              Label(parent, text="Гармоники (синусойда)").pack(anchor=N, fill=X, pady=[15, 10])
+              
+              self.drawParameter("A0 =", "A0", parent)
+              self.drawParameter("A1 =", "A1", parent)
+              self.drawParameter("A2 =", "A2", parent)
+              self.drawParameter("f0 =", "f0", parent)
+              self.drawParameter("f1 =", "f1", parent)
+              self.drawParameter("f2 =", "f2", parent)
+              self.drawParameter("dt =", "dt", parent)
+              self.drawParameter("step =", "step", parent)
+              self.drawParameter("thetta =", "thetta", parent)
+              
               
               Label(parent, text="Шумы").pack(anchor=N, fill=X, pady=[15, 10])
               self.drawParameter("R =", "R", parent)
@@ -47,17 +60,7 @@ class ParametrSettings(Toplevel):
               self.drawParameter("R1 =", "R1", parent)
               self.drawParameter("R2 =", "R2", parent)
               
-              Label(parent, text="Гармоники").pack(anchor=N, fill=X, pady=[15, 10])
               
-              self.drawParameter("A0 =", "A0", parent)
-              self.drawParameter("A1 =", "A1", parent)
-              self.drawParameter("A2 =", "A2", parent)
-              self.drawParameter("f0 =", "f0", parent)
-              self.drawParameter("f1 =", "f1", parent)
-              self.drawParameter("f2 =", "f2", parent)
-              self.drawParameter("dt =", "dt", parent)
-              self.drawParameter("step =", "step", parent)
-              self.drawParameter("thetta =", "thetta", parent)
               
        
        def page2UI(self, parent):
