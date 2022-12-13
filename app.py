@@ -241,8 +241,6 @@ class App(Tk):
         ).pack(anchor=N, fill=X)
 
         
-        
-        
     def filterUI(self, parent):
         Button(
             parent,
