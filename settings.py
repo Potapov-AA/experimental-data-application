@@ -15,15 +15,19 @@ class ParametrSettings(Toplevel):
               
               frame1 = ttk.Frame(notebook)
               frame2 = ttk.Frame(notebook)
+              frame3 = ttk.Frame(notebook)
               
               frame1.pack(fill=BOTH, expand=True)
               frame2.pack(fill=BOTH, expand=True)
+              frame3.pack(fill=BOTH, expand=True)
               
               notebook.add(frame1, text="Стр. 1")
               notebook.add(frame2, text="Стр. 2")
+              notebook.add(frame3, text="Стр. 3")
               
               self.page1UI(frame1)
               self.page2UI(frame2)
+              self.page3UI(frame3)
        
        def page1UI(self, parent):
               Label(parent, text="Общие параметры").pack(anchor=N, fill=X, pady=[20, 10])
@@ -88,6 +92,21 @@ class ParametrSettings(Toplevel):
               self.drawParameter("fc2 =", "fc2", parent)
               self.drawParameter("m =", "m for lpf", parent)
               
+              Label(parent, text="Ударный слог").pack(anchor=N, fill=X, pady=[15, 10])
+                                                                  
+              self.drawParameter("c1 = ", "c1", parent)
+              self.drawParameter("c1 = ", "c1", parent)
+              
+              self.drawParameter("n1 = ", "n1", parent)
+              self.drawParameter("n2 = ", "n2", parent)
+              self.drawParameter("n3 = ", "n3", parent)
+              self.drawParameter("n4 = ", "n4", parent)
+       
+       def page3UI(self, parent):
+              Label(parent, text="Фрагмент звукового файла").pack(anchor=N, fill=X, pady=[20, 10])
+              self.drawParameter("sN1 =", "sN1", parent)
+              self.drawParameter("sN2 =", "sN2", parent)
+            
        def centerWindow(self):
               w = 300
               h = 780
