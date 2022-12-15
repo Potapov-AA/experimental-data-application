@@ -26,6 +26,7 @@ class App(Tk):
         self.tempData = []
         
         self.currentSoundData = []
+        self.tempSoundData = []
         
         self.mainFont = font.Font(family="Time New Roman", size=12, weight="normal", slant="roman")
         
@@ -63,6 +64,9 @@ class App(Tk):
         filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawSoundData(self.currentSoundData))
         filemenu.add_command(label="Сохранить текущие звуковые данные", command=lambda : self.inout.saveSoundFile("saveData/data.wav", self.currentSoundData))
         
+        filemenu.add_command(label="Записать выбранный фрагмент звуковых данных во временную переменную", command=self.writeCurrentSoundDataInTemp)
+        filemenu.add_command(label="Отобразить выбранный фрагмент звуковых данных", command=lambda : self.model.drawData(self.tempSoundData))
+        
         filemenu.add_command(label="Выход", command=self.destroy)
         
 
@@ -76,7 +80,7 @@ class App(Tk):
         analysis.add_command(label="Корреляция текущих данных", command=lambda : self.analysis.acf(self.currentData))
         analysis.add_command(label="Взаимокорреляция текущих и временных данных", command=lambda : self.analysis.ccf(self.currentData, self.tempData))
         analysis.add_command(label="Амплитудный спектр Фурье", command=lambda : self.analysis.spectrFourier(self.currentData, draw=True))
-        
+        analysis.add_command(label="Амплитудный спектр Фурье для аудиофрагмента", command=lambda : self.analysis.spectrFourierForAudio(self.tempSoundData, draw=True))
         
         mainmenu.add_cascade(label="Файл", menu=filemenu)
         mainmenu.add_cascade(label="Анализ", menu=analysis)
@@ -136,6 +140,23 @@ class App(Tk):
         except:
             print("Текущих данных не существует")
     
+    def writeCurrentSoundData(self, function):
+        self.currentSoundData = function
+    
+    def writeCurrentSoundDataInTemp(self):
+        try:
+            sN1=int(float(self.parametrs.GetParametr("Parametrs", "sN1")) * self.currentSoundData["framerate"])
+            sN2=int(float(self.parametrs.GetParametr("Parametrs", "sN2")) * self.currentSoundData["framerate"])
+            if sN1!=0 and sN2!=0:
+                dataForAnalys = []
+                for i in range(sN1, sN2):
+                    dataForAnalys.append(self.currentSoundData["data"][i])
+                self.tempSoundData = dataForAnalys
+            else:
+                self.tempSoundData = self.currentSoundData["data"]
+        except:
+            print("Текущих данных не существует")
+            
     
     def standartFunctionUI(self, parent):
         Button(
@@ -233,6 +254,13 @@ class App(Tk):
             command=lambda : self.writeCurrentData(self.model.multiGraph(self.currentData, self.tempData, draw=True)),
             font=self.mainFont
         ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Поменять ударный слог",
+            command=lambda : self.writeCurrentSoundData(self.processing.newStressedSyllable(self.currentSoundData)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20,0])
 
         
     def filterUI(self, parent):
