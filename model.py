@@ -1,9 +1,9 @@
 from random import randint
-from accessify import private
 from matplotlib import pyplot as plt
 import numpy as np
 import math
 import time
+
 from config import Config
 
 
@@ -29,7 +29,7 @@ class Model:
         
         plt.show()
     
-    def drawCurrentSoundData(self, data):
+    def drawSoundData(self, data):
         '''
         Отображает текущие звуковые данные
         '''
@@ -39,14 +39,22 @@ class Model:
         time = round(data["nframes"]/data["framerate"], 2)
         framerate = data["framerate"]
         nchannels = data["nchannels"]
+        sampwidth = data["sampwidth"]
         
-        plt.figure(figsize=(10,10)) 
-        plt.subplot(2,1,1) 
-        plt.plot(dataX, dataY[0])
-        plt.title(f"Текущий звуковой файл. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}")
-        plt.subplot(2,1,2) 
-        plt.plot(dataX, dataY[1], c='r')        
-        plt.xlabel("time")
+        if nchannels == 2:
+            plt.figure(figsize=(10,10)) 
+            plt.subplot(2,1,1) 
+            plt.plot(dataX, dataY[0])
+            plt.title(f"Текущий звуковой файл. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}")
+            plt.subplot(2,1,2) 
+            plt.plot(dataX, dataY[1], c='r')        
+            plt.xlabel("time")
+        else:
+            plt.figure(figsize=(10,10)) 
+            plt.plot(dataX, dataY)
+            plt.title(f"Текущий звуковой файл. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}, {sampwidth}")   
+            plt.xlabel("time")
+        
         plt.show()
     
     
