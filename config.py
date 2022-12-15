@@ -45,6 +45,14 @@ class Config():
         self.config.set("Parametrs", "fc1", "35")
         self.config.set("Parametrs", "fc2", "75")
         self.config.set("Parametrs", "m for lpf", "64")
+        self.config.set("Parametrs", "c1", "1")
+        self.config.set("Parametrs", "c2", "1")
+        self.config.set("Parametrs", "n1", "1")
+        self.config.set("Parametrs", "n2", "2")
+        self.config.set("Parametrs", "n3", "3")
+        self.config.set("Parametrs", "n4", "4")
+        self.config.set("Parametrs", "sN1", "0")
+        self.config.set("Parametrs", "sN2", "0")
         
         with open(self.path, "w") as configFiles:
             self.config .write(configFiles)
