@@ -36,17 +36,32 @@ class InOut():
             result["framerate"] = framerate
             result["nframes"] = nframes
             result["compname"] = compname
+            result["sampwidth"] = sampwidth
             
             str_data  = f.readframes(nframes)
             data = np.fromstring(str_data,dtype = np.short)
         
-        data.shape = -1,2
-        data = data.T
+        if nchannels == 2:
+            data.shape = -1,2
+            data = data.T
         
         result["data"] = data
         
         return result
-            
+    
+    def saveSoundFile(self, name, data):
+        with wave.open(name, 'wb') as f:
+            f.setnchannels(data["nchannels"])
+            f.setsampwidth(data["sampwidth"])
+            f.setframerate(data["framerate"])
+            if data["nchannels"] == 1:                
+                f.writeframes(data["data"])
+            else:
+                data1 = data["data"][0]
+                data2 = data["data"][1]
+                dataY = np.hstack([data1 , data2])
+                f.writeframes(dataY)
+         
     def statisticSave(self, name, statistic):
         with open(name, 'w') as f:
             f.write(statistic.encode('utf-16').decode('utf-16'))    
