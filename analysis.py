@@ -1,6 +1,5 @@
-from turtle import color
 import numpy as np
-from scipy.stats import norm
+from scipy.fft import fft
 from matplotlib import pyplot as plt
 from model import Model
 from config import Config
@@ -215,3 +214,28 @@ class Analysis:
             plt.show()
         
         return dataY
+    
+    def spectrFourierForAudio(self, data, draw=False):
+        N=len(data)
+        
+        dataY = fft(data)
+        
+        
+        
+        FN = int(N/2)
+        deltaf = FN / (N/2)
+        
+        dataX = []
+        for n in range(FN):
+            dataX.append(n * deltaf)
+        dataX = np.asarray(dataX)
+        
+        # dataY = self.fourier(data, N, L=0)
+        
+        if draw:
+            plt.figure(figsize=(10, 10))
+            plt.grid(True)
+            plt.plot(dataX[0:FN], dataY[0:FN])
+            plt.title("Амплитудный спектр Фурье")
+            
+            plt.show()
