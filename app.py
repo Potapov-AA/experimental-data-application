@@ -54,14 +54,14 @@ class App(Tk):
 
         filemenu = Menu(mainmenu, tearoff=0)
         filemenu.add_command(label="Открыть файл с данными", command=self.openBinaryFile)
-        
         filemenu.add_command(label="Отобразить текущие данные", command=lambda : self.model.drawData(self.currentData))
-        filemenu.add_command(label="Сохранить текущий файл с данными", command=lambda : self.saveBinaryFile("saveData/data.bin"))
+        filemenu.add_command(label="Сохранить текущий файл с данными", command=lambda : self.inout.saveBinaryFile("saveData/data.bin", self.currentData))
         
         filemenu.add_command(label="Записать текущие данные во временную переменную", command=self.writeCurrentDataInTemp)
         
         filemenu.add_command(label="Открыть звуковой файл", command=self.openSoundFile)
-        filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawCurrentSoundData(self.currentSoundData))
+        filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawSoundData(self.currentSoundData))
+        filemenu.add_command(label="Сохранить текущие звуковые данные", command=lambda : self.inout.saveSoundFile("saveData/data.wav", self.currentSoundData))
         
         filemenu.add_command(label="Выход", command=self.destroy)
         
@@ -117,12 +117,6 @@ class App(Tk):
     def openSoundFile(self):
         name = fd.askopenfilename() 
         self.currentSoundData = self.inout.readSoundFile(name)
-    
-    def saveBinaryFile(self, name):
-        self.inout.saveBinaryFile(
-            name = name,
-            data = self.currentData
-        )
     
     
     def statisticCurrentFile(self):
