@@ -457,3 +457,47 @@ class Processing():
         filterData = np.asarray(filterData)
         
         self.model.drawData(filterData)
+    
+    
+    def newStressedSyllable(self, data):
+        c1=float(self.parametrs.GetParametr("Parametrs", "c1")) 
+        c2=float(self.parametrs.GetParametr("Parametrs", "c2"))
+        n1=int(float(self.parametrs.GetParametr("Parametrs", "n1")) * data["framerate"])
+        n2=int(float(self.parametrs.GetParametr("Parametrs", "n2")) * data["framerate"])
+        n3=int(float(self.parametrs.GetParametr("Parametrs", "n3")) * data["framerate"])
+        n4=int(float(self.parametrs.GetParametr("Parametrs", "n4")) * data["framerate"])
+        
+        
+        
+        N = data["nframes"]
+        oldData = data["data"]
+        
+        dataForMulti = [0 for i in range(0, n1)]
+        dataForMulti += [c1 for i in range(n1, n2+1)]
+        dataForMulti += [0 for i in range(n2+1, n3)]
+        dataForMulti += [c2 for i in range(n3, n4+1)]
+        dataForMulti += [0 for i in range(n4+1, N)]
+        
+        newData = self.model.multiGraph(oldData, dataForMulti)
+        
+        result = dict()
+        result["nchannels"] = data["nchannels"]
+        result["framerate"] = data["framerate"]
+        result["nframes"] = data["nframes"]
+        result["compname"] = data["compname"]
+        result["sampwidth"] = data["sampwidth"]
+        result["data"] = np.asarray(newData, dtype=np.short)
+        
+        
+        plt.figure(figsize=(10, 10))
+        plt.subplot(2, 1, 1)
+        plt.plot(oldData)
+        
+        plt.subplot(2, 1, 2)
+        plt.plot(newData)
+        
+        plt.show()
+        
+        return(result)
+        
+        
