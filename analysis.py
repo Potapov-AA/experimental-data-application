@@ -215,27 +215,26 @@ class Analysis:
         
         return dataY
     
-    def spectrFourierForAudio(self, data, draw=False):
+    def spectrFourierForAudio(self, data, rate, draw=False):
         N=len(data)
         
-        dataY = fft(data)
         
+        dt = 1 / rate
         
-        
-        FN = int(N/2)
-        deltaf = FN / (N/2)
+        FN = 1 / (2 * dt)
+        deltaf = round(2 * FN / N, 2)
         
         dataX = []
-        for n in range(FN):
+        for n in range(int(N/2)):
             dataX.append(n * deltaf)
         dataX = np.asarray(dataX)
         
-        # dataY = self.fourier(data, N, L=0)
+        dataY = self.fourier(data, N, L=0)
         
         if draw:
             plt.figure(figsize=(10, 10))
             plt.grid(True)
-            plt.plot(dataX[0:FN], dataY[0:FN])
+            plt.plot(dataX[0:500], dataY[0:500])
             plt.title("Амплитудный спектр Фурье")
             
             plt.show()
