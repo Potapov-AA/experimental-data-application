@@ -255,8 +255,8 @@ class Processing():
         fc3=float(self.parametrs.GetParametr("Parametrs", "fc2"))
         fc = [fc1, fc2, fc3]
         m = int(self.parametrs.GetParametr("Parametrs", "m for lpf"))
-        dt = float(self.parametrs.GetParametr("Parametrs", "dt"))
-        
+        #dt = float(self.parametrs.GetParametr("Parametrs", "dt"))
+        dt = 1/22100
         # rectangular part weights
         D = [0.35577019, 0.2436983, 0.07211497, 0.00630165]
         result = []
@@ -432,7 +432,7 @@ class Processing():
         plt.show()
     
 
-    def useFilter(self, data, filter = 0):
+    def useFilter(self, data, filter = 0, sound = False):
         lpw = self.lpf()[0]
         hpw = self.hpf()[0]
         bpw = self.bpf()
@@ -457,6 +457,9 @@ class Processing():
         filterData = np.asarray(filterData)
         
         self.model.drawData(filterData)
+        
+        if sound:
+            self.analysis.spectrFourierForAudio(filterData, rate=22100, draw=True)
     
     
     def newStressedSyllable(self, data):
