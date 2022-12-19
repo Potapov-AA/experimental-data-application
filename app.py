@@ -28,6 +28,9 @@ class App(Tk):
         self.currentSoundData = []
         self.tempSoundData = []
         
+        self.currentFilter = []
+        self.currentFilterSound = []
+        
         self.mainFont = font.Font(family="Time New Roman", size=12, weight="normal", slant="roman")
         
         self.parametrs.DownloadSettings()
@@ -80,7 +83,7 @@ class App(Tk):
         analysis.add_command(label="Корреляция текущих данных", command=lambda : self.analysis.acf(self.currentData))
         analysis.add_command(label="Взаимокорреляция текущих и временных данных", command=lambda : self.analysis.ccf(self.currentData, self.tempData))
         analysis.add_command(label="Амплитудный спектр Фурье", command=lambda : self.analysis.spectrFourier(self.currentData, draw=True))
-        analysis.add_command(label="Амплитудный спектр Фурье для аудиофрагмента", command=lambda : self.analysis.spectrFourierForAudio(self.tempSoundData, draw=True))
+        analysis.add_command(label="Амплитудный спектр Фурье для аудиофрагмента", command=lambda : self.analysis.spectrFourierForAudio(self.tempSoundData, rate=self.currentSoundData["framerate"], draw=True))
         
         mainmenu.add_cascade(label="Файл", menu=filemenu)
         mainmenu.add_cascade(label="Анализ", menu=analysis)
@@ -156,7 +159,7 @@ class App(Tk):
                 self.tempSoundData = self.currentSoundData["data"]
         except:
             print("Текущих данных не существует")
-            
+              
     
     def standartFunctionUI(self, parent):
         Button(
@@ -326,6 +329,35 @@ class App(Tk):
             command=lambda: self.processing.useFilter(self.currentData, 3),
             font=self.mainFont
         ).pack(anchor=N, fill=X)   
+        
+        
+        Button(
+            parent,
+            text="Применить ФВЧ к звуковым данным",
+            command=lambda: self.processing.useFilter(self.tempSoundData, sound=True),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Применить ФНЧ к звуковым данным",
+            command=lambda: self.processing.useFilter(self.tempSoundData, 1, sound=True),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Применить ПФ к звуковым данным",
+            command=lambda: self.processing.useFilter(self.tempSoundData, 2, sound=True),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Применить РФ к звуковым данным",
+            command=lambda: self.processing.useFilter(self.tempSoundData, 3, sound=True),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X) 
         
     
     def exampleUI(self, parent):    
