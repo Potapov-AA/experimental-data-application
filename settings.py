@@ -95,7 +95,7 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Ударный слог").pack(anchor=N, fill=X, pady=[15, 10])
                                                                   
               self.drawParameter("c1 = ", "c1", parent)
-              self.drawParameter("c1 = ", "c1", parent)
+              self.drawParameter("c2 = ", "c2", parent)
               
               self.drawParameter("n1 = ", "n1", parent)
               self.drawParameter("n2 = ", "n2", parent)
