@@ -106,6 +106,13 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Фрагмент звукового файла").pack(anchor=N, fill=X, pady=[20, 10])
               self.drawParameter("sN1 =", "sN1", parent)
               self.drawParameter("sN2 =", "sN2", parent)
+              
+              Label(parent, text="Смещение данных изображения").pack(anchor=N, fill=X, pady=[15, 10])             
+              self.drawParameter("shiftImage = ", "shiftImage", parent)
+              
+              Label(parent, text="Умножение данных изображения на константу").pack(anchor=N, fill=X, pady=[15, 10])             
+              self.drawParameter("multiImage = ", "multiImage", parent)
+              
             
        def centerWindow(self):
               w = 300

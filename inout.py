@@ -1,7 +1,8 @@
 import numpy as np
 import wave
+import imageio
 from struct import *
-
+from PIL import Image
 
 class InOut():
     def __init__(self): pass
@@ -64,4 +65,18 @@ class InOut():
          
     def statisticSave(self, name, statistic):
         with open(name, 'w') as f:
-            f.write(statistic.encode('utf-16').decode('utf-16'))    
+            f.write(statistic.encode('utf-16').decode('utf-16'))
+    
+    
+    def readImages(self, path):
+        try:
+            img = Image.open(path)
+            return img
+        except Exception:
+            print(Exception)
+            
+    def saveImage(self, name, image):
+        try:
+            image.save(name)
+        except Exception:
+            imageio.imwrite(name, image)

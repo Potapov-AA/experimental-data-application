@@ -30,6 +30,8 @@ class App(Tk):
         
         self.currentFilter = []
         self.currentFilterSound = []
+
+        self.currentImage = []
         
         self.mainFont = font.Font(family="Time New Roman", size=12, weight="normal", slant="roman")
         
@@ -67,6 +69,10 @@ class App(Tk):
         filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawSoundData(self.currentSoundData))
         filemenu.add_command(label="Сохранить текущие звуковые данные", command=lambda : self.inout.saveSoundFile("saveData/data.wav", self.currentSoundData))
         
+        filemenu.add_command(label="Открыть изображение", command=self.openImageFile)
+        filemenu.add_command(label="Отобразить текущее изображение", command=lambda : self.model.drawImageData(self.currentImage))
+        filemenu.add_command(label="Сохранить текущее изображение", command=lambda : self.inout.saveImage("saveData/img.jpg", self.currentImage))
+        
         filemenu.add_command(label="Записать выбранный фрагмент звуковых данных во временную переменную", command=self.writeCurrentSoundDataInTemp)
         filemenu.add_command(label="Отобразить выбранный фрагмент звуковых данных", command=lambda : self.model.drawData(self.tempSoundData))
         
@@ -98,24 +104,28 @@ class App(Tk):
         frame3 = ttk.Frame(notebook)
         frame4 = ttk.Frame(notebook)
         frame5 = ttk.Frame(notebook)
+        frame6 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
         frame3.pack(fill=BOTH, expand=True)
         frame4.pack(fill=BOTH, expand=True)
         frame5.pack(fill=BOTH, expand=True)
+        frame6.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Станд. графики")
         notebook.add(frame2, text="Генератор шумов")
         notebook.add(frame3, text="Изменить данные")
         notebook.add(frame4, text="Фильтры")
         notebook.add(frame5, text="Примеры")
+        notebook.add(frame6, text="Работа с изображениями")
         
         self.standartFunctionUI(frame1)
         self.noiseGeneratorUI(frame2)
         self.changeCurrentDataUI(frame3)
         self.filterUI(frame4)
         self.exampleUI(frame5)
+        self.imageUI(frame6)
         
     def openBinaryFile(self):
         name = fd.askopenfilename() 
@@ -124,6 +134,10 @@ class App(Tk):
     def openSoundFile(self):
         name = fd.askopenfilename() 
         self.currentSoundData = self.inout.readSoundFile(name)
+    
+    def openImageFile(self):
+        name = fd.askopenfilename() 
+        self.currentImage = self.inout.readImages(name)
     
     
     def statisticCurrentFile(self):
@@ -145,6 +159,9 @@ class App(Tk):
     
     def writeCurrentSoundData(self, function):
         self.currentSoundData = function
+    
+    def writeCurrentImageData(self, function):
+        self.currentImage = function
     
     def writeCurrentSoundDataInTemp(self):
         try:
@@ -388,3 +405,19 @@ class App(Tk):
             command=lambda : self.writeCurrentData(self.model.cardiograma(draw=True)),
             font=self.mainFont
         ).pack(anchor=N, fill=X, pady=[20, 0])
+    
+    
+    def imageUI(self, parent):
+        Button(
+            parent,
+            text="Смещение данных изображения",
+            command=lambda:self.writeCurrentImageData(self.processing.shift2D(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Умножение данных изображения на константу",
+            command=lambda:self.writeCurrentImageData(self.processing.multModel2D(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)

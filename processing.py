@@ -503,4 +503,24 @@ class Processing():
         
         return(result)
         
+    
+    def shift2D(self, image):
+        shifImage = int(self.parametrs.GetParametr("Parametrs", "shiftImage"))
+        new_image = np.array(image)
         
+        for i in range(len(new_image)):
+            for j in range(len(new_image[i])):
+                new_image[i][j] = new_image[i][j] + shifImage
+        
+        return new_image
+    
+    
+    def multModel2D(self, image):
+        multiImage = float(self.parametrs.GetParametr("Parametrs", "multiImage"))
+        
+        new_image = np.array(image)
+        for i in range(len(new_image)):
+            for j in range(len(new_image[i])):
+                new_image[i][j] = new_image[i][j] * multiImage
+        
+        return new_image

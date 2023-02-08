@@ -53,6 +53,10 @@ class Config():
         self.config.set("Parametrs", "n4", "4")
         self.config.set("Parametrs", "sN1", "0")
         self.config.set("Parametrs", "sN2", "0")
+        self.config.set("Parametrs", "shiftImage", "30")
+        self.config.set("Parametrs", "multiImage", "1.3")
+        
+        
         
         with open(self.path, "w") as configFiles:
             self.config .write(configFiles)

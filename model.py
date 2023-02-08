@@ -58,6 +58,20 @@ class Model:
         plt.show()
     
     
+    def drawImageData(self, image):
+        try:
+            size_w = image.size[0]
+            size_h = image.size[1]
+            plt.title(f"Размеры изображения: {size_w}x{size_h}")
+        except Exception:
+            print(Exception)
+        
+        plt.figure(figsize=(6,6))
+        plt.imshow(image)
+        plt.axis("off")
+        plt.show()
+    
+    
     def linerGraph(self, type=0, draw=False):
         '''
         Линейный график
