@@ -59,14 +59,10 @@ class Model:
     
     
     def drawImageData(self, image):
-        try:
-            size_w = image.size[0]
-            size_h = image.size[1]
-            plt.title(f"Размеры изображения: {size_w}x{size_h}")
-        except Exception:
-            print(Exception)
-        
+        size_w = image.size[0]
+        size_h = image.size[1]
         plt.figure(figsize=(6,6))
+        plt.title(f"Размеры изображения: {size_w}x{size_h}")
         plt.imshow(image)
         plt.axis("off")
         plt.show()

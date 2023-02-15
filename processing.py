@@ -2,6 +2,7 @@ from matplotlib import pyplot as plt
 from sympy import *
 import numpy as np
 import math
+import PIL.Image as pil
 
 from model import Model
 from config import Config
@@ -506,11 +507,13 @@ class Processing():
     
     def shift2D(self, image):
         shifImage = int(self.parametrs.GetParametr("Parametrs", "shiftImage"))
-        new_image = np.array(image)
+        data_image = np.array(image)
         
-        for i in range(len(new_image)):
-            for j in range(len(new_image[i])):
-                new_image[i][j] = new_image[i][j] + shifImage
+        for i in range(len(data_image)):
+            for j in range(len(data_image[i])):
+                data_image[i][j] = data_image[i][j] + shifImage
+                
+        new_image = pil.fromarray(data_image)
         
         return new_image
     
@@ -518,9 +521,11 @@ class Processing():
     def multModel2D(self, image):
         multiImage = float(self.parametrs.GetParametr("Parametrs", "multiImage"))
         
-        new_image = np.array(image)
-        for i in range(len(new_image)):
-            for j in range(len(new_image[i])):
-                new_image[i][j] = new_image[i][j] * multiImage
+        data_image = np.array(image)
+        for i in range(len(data_image)):
+            for j in range(len(data_image[i])):
+                data_image[i][j] = data_image[i][j] * multiImage
+        
+        new_image = pil.fromarray(data_image)
         
         return new_image
