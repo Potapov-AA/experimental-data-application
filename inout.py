@@ -93,7 +93,7 @@ class InOut():
             
             for i in range(0, len(bytes), 2):
                 
-                number = bytes[i] * 2 ** 8 + bytes[i+1]               
+                number = bytes[i] * 256 + bytes[i+1]               
                 data.append(number)
         
         
