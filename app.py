@@ -470,7 +470,33 @@ class App(Tk):
             font=self.mainFont
         ).pack(anchor=N, fill=X)
         
+        Button(
+            parent,
+            text="Сделать изображение негативным",   
+            command=lambda:self.writeCurrentImageData(self.processing.doNegative(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
         
+        Button(
+            parent,
+            text="Сделать изображение серым",   
+            command=lambda:self.writeCurrentImageData(self.processing.doGray(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Гамма-преобразование",   
+            command=lambda:self.writeCurrentImageData(self.processing.gammaTransform(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Логарифмическое преобразование",   
+            command=lambda:self.TEST(),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
         
         
         
@@ -479,10 +505,9 @@ class App(Tk):
         from matplotlib import pyplot as plt
         
         
-        im_rotate = self.currentImage.rotate(90, expand=True)
         
-        plt.figure(figsize=(6,6))
-        plt.imshow(im_rotate)
-        plt.axis("off")
-        plt.show()
+        # plt.figure(figsize=(6,6))
+        # plt.imshow(data_image)
+        # plt.axis("off")
+        # plt.show()
         

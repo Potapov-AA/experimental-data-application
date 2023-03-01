@@ -633,3 +633,69 @@ class Processing():
             im_rotate = image.rotate(90, expand=True)
         
         return im_rotate
+    
+    def doNegative(self, image):
+        data_image = np.array(image)
+        
+        L = data_image.max()
+        
+        for i in range(len(data_image)):
+            for j in range(len(data_image[i])):
+                data_image[i][j] = L - 1 - data_image[i][j]
+                
+        new_image = pil.fromarray(data_image)
+        
+        return new_image
+    
+    def doGray(self, image):
+        data_image = np.array(image)
+        
+        for i in range(len(data_image)):
+            for j in range(len(data_image[i])):
+                r = data_image[i][j][0]
+                g = data_image[i][j][1]
+                b = data_image[i][j][2]
+                
+                s = (r + g + b) // 3
+                
+                data_image[i][j][0] = s
+                data_image[i][j][1] = s
+                data_image[i][j][2] = s
+        
+        new_image = pil.fromarray(data_image)
+        
+        return new_image
+        
+    def gammaTransform(self, image):
+        C = float(self.parametrs.GetParametr("Parametrs", "C"))
+        y = float(self.parametrs.GetParametr("Parametrs", "y"))
+        
+        data_image = np.array(image)
+        
+        for i in range(len(data_image)):
+            for j in range(len(data_image[i])):
+                # print(data_image[i][j])
+                data_image[i][j] = C * data_image[i][j] ** y
+                # print(data_image[i][j])
+                # print()  
+
+        new_image = pil.fromarray(data_image)
+        
+        return new_image
+    
+    def logTransform(self, image):
+        C = float(self.parametrs.GetParametr("Parametrs", "C"))
+        
+        data_image = np.array(image)
+        
+        
+        for i in range(len(data_image)):
+            for j in range(len(data_image[i])):
+                # print(data_image[i][j])
+                data_image[i][j] = С * np.log(data_image[i][j] + 1)
+                # print(data_image[i][j])
+                # print()
+        
+        new_image = pil.fromarray(data_image)
+        
+        return new_image

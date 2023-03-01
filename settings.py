@@ -116,10 +116,15 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Множитель изображения").pack(anchor=N, fill=X, pady=[15, 10])             
               self.drawParameter("multiSize = ", "multiSize", parent)
               
+              Label(parent, text="Гамма и логарифмическое преобразование").pack(anchor=N, fill=X, pady=[15, 10])             
+              self.drawParameter("C = ", "C", parent)       
+              self.drawParameter("y = ", "y", parent)
+              
+              
             
        def centerWindow(self):
               w = 300
-              h = 780
+              h = 840
 
               sw = self.winfo_screenwidth()
               sh = self.winfo_screenheight()
