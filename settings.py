@@ -113,6 +113,9 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Умножение данных изображения на константу").pack(anchor=N, fill=X, pady=[15, 10])             
               self.drawParameter("multiImage = ", "multiImage", parent)
               
+              Label(parent, text="Множитель изображения").pack(anchor=N, fill=X, pady=[15, 10])             
+              self.drawParameter("multiSize = ", "multiSize", parent)
+              
             
        def centerWindow(self):
               w = 300

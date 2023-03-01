@@ -13,6 +13,7 @@ from config import Config
 from inout import InOut
 
 
+
 class App(Tk):
     def __init__(self):
         super().__init__()
@@ -70,8 +71,11 @@ class App(Tk):
         filemenu.add_command(label="Сохранить текущие звуковые данные", command=lambda : self.inout.saveSoundFile("saveData/data.wav", self.currentSoundData))
         
         filemenu.add_command(label="Открыть изображение", command=self.openImageFile)
+        filemenu.add_command(label="Открыть изображение из .xcr", command=self.openXcrFile)
+        filemenu.add_command(label="Открыть изображение из .bin", command=self.openBinFile)
         filemenu.add_command(label="Отобразить текущее изображение", command=lambda : self.model.drawImageData(self.currentImage))
         filemenu.add_command(label="Сохранить текущее изображение", command=lambda : self.inout.saveImage("saveData/img.jpg", self.currentImage))
+        filemenu.add_command(label="Сохранить текущее изображение в .bin", command=lambda : self.inout.saveBinImages("saveData/img.bin", self.currentImage))
         
         filemenu.add_command(label="Записать выбранный фрагмент звуковых данных во временную переменную", command=self.writeCurrentSoundDataInTemp)
         filemenu.add_command(label="Отобразить выбранный фрагмент звуковых данных", command=lambda : self.model.drawData(self.tempSoundData))
@@ -126,6 +130,7 @@ class App(Tk):
         self.filterUI(frame4)
         self.exampleUI(frame5)
         self.imageUI(frame6)
+     
         
     def openBinaryFile(self):
         name = fd.askopenfilename() 
@@ -139,6 +144,14 @@ class App(Tk):
         name = fd.askopenfilename() 
         self.currentImage = self.inout.readImages(name)
     
+    def openXcrFile(self):
+        name = fd.askopenfilename() 
+        self.currentImage = self.inout.readXcrImage(name)
+        
+    def openBinFile(self):
+        name = fd.askopenfilename() 
+        self.currentImage = self.inout.readBinImage(name)
+        
     
     def statisticCurrentFile(self):
         statisticText = self.analysis.statistics(self.currentData)
@@ -421,3 +434,53 @@ class App(Tk):
             command=lambda:self.writeCurrentImageData(self.processing.multModel2D(self.currentImage)),
             font=self.mainFont
         ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Привести к серому цвету",
+            command=lambda:self.writeCurrentImageData(self.processing.toGray(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Изменить размер изображения (ближайшие соседи)",
+            command=lambda:self.writeCurrentImageData(self.processing.resizeImage(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        
+    def TEST(self):
+        import PIL.Image as pil
+        from matplotlib import pyplot as plt
+        
+        w = self.currentImage.size[0]
+        h = self.currentImage.size[1]
+        
+        multiSize = 0.2
+        
+        newSizeW = int(w * multiSize)
+        newSizeH = int(h * multiSize)
+        
+        data_image = np.array(self.currentImage)
+        emptyImage=np.zeros((newSizeH, newSizeW, 3), np.uint8)
+        
+        sh = newSizeH / h
+        sw = newSizeW / w
+        
+        for i in range(newSizeH):
+            for j in range(newSizeW):
+                x=int(i/sh)
+                y=int(j/sw)
+                try:
+                    emptyImage[i,j]=data_image[x,y]
+                except:
+                    print(x, y)
+        
+        new_image = pil.fromarray(emptyImage)
+        
+        plt.figure(figsize=(6,6))
+        plt.imshow(new_image)
+        plt.axis("off")
+        plt.show()
+        

@@ -55,6 +55,8 @@ class Config():
         self.config.set("Parametrs", "sN2", "0")
         self.config.set("Parametrs", "shiftImage", "30")
         self.config.set("Parametrs", "multiImage", "1.3")
+        self.config.set("Parametrs", "multiSize", "1.7")
+        
         
         
         

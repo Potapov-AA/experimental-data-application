@@ -507,12 +507,13 @@ class Processing():
     
     def shift2D(self, image):
         shifImage = int(self.parametrs.GetParametr("Parametrs", "shiftImage"))
+        
         data_image = np.array(image)
         
         for i in range(len(data_image)):
             for j in range(len(data_image[i])):
-                data_image[i][j] = data_image[i][j] + shifImage
-                
+                if(data_image[i][j][0] + shifImage <= 255):
+                    data_image[i][j] = data_image[i][j] + shifImage
         new_image = pil.fromarray(data_image)
         
         return new_image
@@ -522,10 +523,63 @@ class Processing():
         multiImage = float(self.parametrs.GetParametr("Parametrs", "multiImage"))
         
         data_image = np.array(image)
+        
         for i in range(len(data_image)):
             for j in range(len(data_image[i])):
-                data_image[i][j] = data_image[i][j] * multiImage
+                if(data_image[i][j][0] * multiImage <= 255):
+                    data_image[i][j] = data_image[i][j] * multiImage
+                
         
         new_image = pil.fromarray(data_image)
+        
+        return new_image
+    
+    def toGray(self, image):
+        data_image = np.array(image)
+        
+        maxPixel = data_image.max();
+        minPixel = data_image.min();
+        
+        # Для показа пикселей
+        # print(maxPixel, minPixel)
+        
+        for i in range(len(data_image)):
+            for j in range(len(data_image[i])):
+                # print(data_image[i][j])
+                data_image[i][j] = ((data_image[i][j] - minPixel) / (maxPixel - minPixel)) * 255
+                # print(data_image[i][j])
+                # print()
+                
+        new_image = pil.fromarray(data_image)
+        
+        print(np.array(new_image))
+        
+        return new_image
+    
+    def resizeImage(self, image):
+        multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
+        
+        w = image.size[0]
+        h = image.size[1]
+        
+        newSizeW = int(w * multiSize)
+        newSizeH = int(h * multiSize)
+        
+        data_image = np.array(image)
+        emptyImage=np.zeros((newSizeH, newSizeW, 3), np.uint8)
+        
+        sh = newSizeH / h
+        sw = newSizeW / w
+        
+        for i in range(newSizeH):
+            for j in range(newSizeW):
+                x=int(i/sh)
+                y=int(j/sw)
+                try:
+                    emptyImage[i,j]=data_image[x,y]
+                except:
+                    print(x, y)
+        
+        new_image = pil.fromarray(emptyImage)
         
         return new_image

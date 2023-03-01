@@ -1,6 +1,8 @@
+import os
 import numpy as np
 import wave
 import imageio
+import PIL.Image as pil
 from struct import *
 from PIL import Image
 
@@ -80,3 +82,55 @@ class InOut():
             image.save(name)
         except Exception:
             imageio.imwrite(name, image)
+    
+    def readXcrImage(self, path):
+        size = os.path.getsize(path)
+        data = []
+        
+        with open(path, 'rb') as f:
+            f.read(2048)
+            bytes = f.read(size - 2048 - 8192)
+            
+            for i in range(0, len(bytes), 2):
+                
+                number = bytes[i] * 2 ** 8 + bytes[i+1]               
+                data.append(number)
+        
+        
+        data = np.asarray(data)
+        data = np.reshape(data, (1024, 1024))
+        
+        
+        
+        new_image = pil.fromarray(data)
+        
+        
+        return new_image
+    
+    def saveBinImages(self, name, image):
+        data_image = np.array(image)
+        with open(name, 'wb') as f:
+            for i in data_image:
+                for j in i:
+                    for k in j:
+                        number = pack("<f", k)
+                        f.write(number)
+    
+    def readBinImage(self, path):
+        data = []
+        with open(path, 'rb') as f:
+            number = f.read(4)
+            
+            while number:
+                tempTuple = unpack("<f", number)
+                tempValue = tempTuple[0]
+                data.append(int(tempValue))
+                number = f.read(4)
+        
+        data = np.asarray(data)
+        data = data.reshape(360, 480, 3)
+        print(data.shape)
+            
+        new_image = pil.fromarray((data).astype(np.uint8))
+        
+        return new_image
