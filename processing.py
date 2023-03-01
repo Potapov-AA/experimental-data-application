@@ -556,7 +556,7 @@ class Processing():
         
         return new_image
     
-    def resizeImage(self, image):
+    def resizeNearestImage(self, image):
         multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
         
         w = image.size[0]
@@ -583,3 +583,53 @@ class Processing():
         new_image = pil.fromarray(emptyImage)
         
         return new_image
+    
+    def resizeBinaryImage(self, image):
+        multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
+        
+        w = image.size[0]
+        h = image.size[1]
+        
+        newSizeW = int(w * multiSize)
+        newSizeH = int(h * multiSize)
+        
+        data_image = np.array(image)
+        emptyImage=np.zeros((newSizeH, newSizeW, 3), np.uint8)
+        value=[0,0,0]
+        
+        sh = newSizeH / h
+        sw = newSizeW / w
+        
+        for i in range(newSizeH):
+            for j in range(newSizeW):
+                x= i/sh
+                y= j/sw
+                p=(i+0.0)/sh-x
+                q=(j+0.0)/sw-y
+                x=int(x)-1
+                y=int(y)-1
+                for k in range(3):
+                    try:
+                        if x+1<newSizeH and y+1<newSizeW:
+                            value[k]=int(data_image[x][y][k]*(1-p)*(1-q)+
+                                    data_image[x][y+1][k]*q*(1-p)+
+                                    data_image[x+1][y][k]*(1-q)*p+
+                                    data_image[x+1][y+1][k]*p*q)
+                    except:
+                        print(x, y)
+                try:
+                    emptyImage[i, j] = (value[0], value[1], value[2])
+                except:
+                    print(x, y)
+        
+        new_image = pil.fromarray(emptyImage)
+        
+        return new_image
+    
+    def rotateImage(self, image, isRight = true):
+        if isRight:
+            im_rotate = image.rotate(-90, expand=True)
+        else:
+            im_rotate = image.rotate(90, expand=True)
+        
+        return im_rotate

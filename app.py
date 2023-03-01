@@ -445,42 +445,44 @@ class App(Tk):
         Button(
             parent,
             text="Изменить размер изображения (ближайшие соседи)",
-            command=lambda:self.writeCurrentImageData(self.processing.resizeImage(self.currentImage)),
+            command=lambda:self.writeCurrentImageData(self.processing.resizeNearestImage(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Изменить размер изображения (бинарный)",   
+            command=lambda:self.writeCurrentImageData(self.processing.resizeBinaryImage(self.currentImage)),
             font=self.mainFont
         ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Повернуть изображение налево",   
+            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage, False)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Повернуть изображение направо",   
+            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        
+        
         
         
     def TEST(self):
         import PIL.Image as pil
         from matplotlib import pyplot as plt
         
-        w = self.currentImage.size[0]
-        h = self.currentImage.size[1]
         
-        multiSize = 0.2
-        
-        newSizeW = int(w * multiSize)
-        newSizeH = int(h * multiSize)
-        
-        data_image = np.array(self.currentImage)
-        emptyImage=np.zeros((newSizeH, newSizeW, 3), np.uint8)
-        
-        sh = newSizeH / h
-        sw = newSizeW / w
-        
-        for i in range(newSizeH):
-            for j in range(newSizeW):
-                x=int(i/sh)
-                y=int(j/sw)
-                try:
-                    emptyImage[i,j]=data_image[x,y]
-                except:
-                    print(x, y)
-        
-        new_image = pil.fromarray(emptyImage)
+        im_rotate = self.currentImage.rotate(90, expand=True)
         
         plt.figure(figsize=(6,6))
-        plt.imshow(new_image)
+        plt.imshow(im_rotate)
         plt.axis("off")
         plt.show()
         
