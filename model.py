@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import math
 import time
+import PIL.Image as pil
 
 from config import Config
 
@@ -58,7 +59,15 @@ class Model:
         plt.show()
     
     
-    def drawImageData(self, image):
+    def drawImageData(self, dataImage):
+        try:
+            if(len(dataImage[0][0]) > 1):
+                dataImage = dataImage.astype('uint8')
+        except:
+            pass
+        image = pil.fromarray(dataImage)
+        
+        
         size_w = image.size[0]
         size_h = image.size[1]
         plt.figure(figsize=(6,6))

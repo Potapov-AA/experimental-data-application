@@ -505,68 +505,51 @@ class Processing():
         return(result)
         
     
-    def shift2D(self, image):
+    # Смещение данных изображения на заданный коэффицент
+    def shift2D(self, dataImage):
         shifImage = int(self.parametrs.GetParametr("Parametrs", "shiftImage"))
         
-        data_image = np.array(image)
+        for i in range(len(dataImage)):
+            for j in range(len(dataImage[i])):
+                dataImage[i][j] = dataImage[i][j] + shifImage
         
-        for i in range(len(data_image)):
-            for j in range(len(data_image[i])):
-                if(data_image[i][j][0] + shifImage <= 255):
-                    data_image[i][j] = data_image[i][j] + shifImage
-        new_image = pil.fromarray(data_image)
-        
-        return new_image
+        return dataImage
     
     
-    def multModel2D(self, image):
+    # Умножение данных изображения на заданный коэффицент
+    def multModel2D(self, dataImage):
         multiImage = float(self.parametrs.GetParametr("Parametrs", "multiImage"))
         
-        data_image = np.array(image)
-        
-        for i in range(len(data_image)):
-            for j in range(len(data_image[i])):
-                if(data_image[i][j][0] * multiImage <= 255):
-                    data_image[i][j] = data_image[i][j] * multiImage
-                
-        
-        new_image = pil.fromarray(data_image)
-        
-        return new_image
+        for i in range(len(dataImage)):
+            for j in range(len(dataImage[i])):
+                dataImage[i][j] = dataImage[i][j] * multiImage
+           
+        return dataImage
     
-    def toGray(self, image):
-        data_image = np.array(image)
-        
-        maxPixel = data_image.max();
-        minPixel = data_image.min();
-        
-        # Для показа пикселей
-        # print(maxPixel, minPixel)
-        
-        for i in range(len(data_image)):
-            for j in range(len(data_image[i])):
-                # print(data_image[i][j])
-                data_image[i][j] = ((data_image[i][j] - minPixel) / (maxPixel - minPixel)) * 255
-                # print(data_image[i][j])
-                # print()
-                
-        new_image = pil.fromarray(data_image)
-        
-        print(np.array(new_image))
-        
-        return new_image
     
-    def resizeNearestImage(self, image):
+    # Приведение к серому диапозону
+    def toGray(self, dataImage):
+        maxPixel = dataImage.max();
+        minPixel = dataImage.min();
+        
+        for i in range(len(dataImage)):
+            for j in range(len(dataImage[i])):
+                dataImage[i][j] = ((dataImage[i][j] - minPixel) / (maxPixel - minPixel)) * 255
+        
+        return dataImage
+    
+    
+    # Изменение размера методом ближайших соседей
+    def resizeNearestImage(self, dataImage):
         multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
         
-        w = image.size[0]
-        h = image.size[1]
+        w = dataImage.shape[1]
+        h = dataImage.shape[0]
         
         newSizeW = int(w * multiSize)
         newSizeH = int(h * multiSize)
         
-        data_image = np.array(image)
-        emptyImage=np.zeros((newSizeH, newSizeW, 3), np.uint8)
+        emptyImage=np.zeros((newSizeH, newSizeW, 3))
         
         sh = newSizeH / h
         sw = newSizeW / w
@@ -576,24 +559,23 @@ class Processing():
                 x=int(i/sh)
                 y=int(j/sw)
                 try:
-                    emptyImage[i,j]=data_image[x,y]
+                    emptyImage[i,j]=dataImage[x,y]
                 except:
                     print(x, y)
         
-        new_image = pil.fromarray(emptyImage)
-        
-        return new_image
+        return emptyImage
     
-    def resizeBinaryImage(self, image):
+    
+    # Изменение размера бинарным методом
+    def resizeBinaryImage(self, dataImage):
         multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
         
-        w = image.size[0]
-        h = image.size[1]
+        w = dataImage.shape[1]
+        h = dataImage.shape[0]
         
         newSizeW = int(w * multiSize)
         newSizeH = int(h * multiSize)
         
-        data_image = np.array(image)
         emptyImage=np.zeros((newSizeH, newSizeW, 3), np.uint8)
         value=[0,0,0]
         
@@ -611,10 +593,10 @@ class Processing():
                 for k in range(3):
                     try:
                         if x+1<newSizeH and y+1<newSizeW:
-                            value[k]=int(data_image[x][y][k]*(1-p)*(1-q)+
-                                    data_image[x][y+1][k]*q*(1-p)+
-                                    data_image[x+1][y][k]*(1-q)*p+
-                                    data_image[x+1][y+1][k]*p*q)
+                            value[k]=int(dataImage[x][y][k]*(1-p)*(1-q)+
+                                    dataImage[x][y+1][k]*q*(1-p)+
+                                    dataImage[x+1][y][k]*(1-q)*p+
+                                    dataImage[x+1][y+1][k]*p*q)
                     except:
                         print(x, y)
                 try:
@@ -622,80 +604,78 @@ class Processing():
                 except:
                     print(x, y)
         
-        new_image = pil.fromarray(emptyImage)
-        
-        return new_image
+        return dataImage
     
-    def rotateImage(self, image, isRight = true):
+    
+    # Поворот изображения
+    def rotateImage(self, dataImage, isRight = true):
+        dataImage = dataImage.astype('uint8')
+        image = pil.fromarray(dataImage)
+        
         if isRight:
             im_rotate = image.rotate(-90, expand=True)
         else:
             im_rotate = image.rotate(90, expand=True)
         
-        return im_rotate
+        dataImage = np.array(im_rotate)
+        dataImage = dataImage.astype('int32')
+        
+        return dataImage
     
-    def doNegative(self, image):
-        data_image = np.array(image)
+    # Делает изображение негативным
+    def doNegative(self, dataImage):
+        L = dataImage.max()
         
-        L = data_image.max()
+        for i in range(len(dataImage)):
+            for j in range(len(dataImage[i])):
+                dataImage[i][j] = L - 1 - dataImage[i][j]
         
-        for i in range(len(data_image)):
-            for j in range(len(data_image[i])):
-                data_image[i][j] = L - 1 - data_image[i][j]
-                
-        new_image = pil.fromarray(data_image)
-        
-        return new_image
+        return dataImage
     
-    def doGray(self, image):
-        data_image = np.array(image)
+    
+    # Делает цветное изображение серым
+    def doGray(self, dataImage):
         
-        for i in range(len(data_image)):
-            for j in range(len(data_image[i])):
-                r = data_image[i][j][0]
-                g = data_image[i][j][1]
-                b = data_image[i][j][2]
+        for i in range(len(dataImage)):
+            for j in range(len(dataImage[i])):
+                r = dataImage[i][j][0]
+                g = dataImage[i][j][1]
+                b = dataImage[i][j][2]
                 
                 s = (r + g + b) // 3
                 
-                data_image[i][j][0] = s
-                data_image[i][j][1] = s
-                data_image[i][j][2] = s
+                dataImage[i][j][0] = s
+                dataImage[i][j][1] = s
+                dataImage[i][j][2] = s
         
-        new_image = pil.fromarray(data_image)
-        
-        return new_image
-        
-    def gammaTransform(self, image):
+        return dataImage
+    
+    
+    # Гамма преобразование
+    def gammaTransform(self, dataImage):
         C = float(self.parametrs.GetParametr("Parametrs", "C"))
         y = float(self.parametrs.GetParametr("Parametrs", "y"))
         
-        data_image = np.array(image)
         
-        for i in range(len(data_image)):
-            for j in range(len(data_image[i])):
-                # print(data_image[i][j])
-                data_image[i][j] = C * data_image[i][j] ** y
-                # print(data_image[i][j])
-                # print()  
+        for i in range(len(dataImage)):
+            for j in range(len(dataImage[i])):
+                # print(dataImage[i][j])
+                dataImage[i][j] = C * dataImage[i][j] ** y
 
-        new_image = pil.fromarray(data_image)
+        dataImage = self.toGray(dataImage)
         
-        return new_image
+        return dataImage
     
-    def logTransform(self, image):
+    
+    # Логарифмическое преобразование
+    def logTransform(self, dataImage):
         C = float(self.parametrs.GetParametr("Parametrs", "C"))
         
-        data_image = np.array(image)
         
+        for i in range(len(dataImage)):
+            for j in range(len(dataImage[i])):
+                dataImage[i][j] = C * np.log(dataImage[i][j] + 1)
         
-        for i in range(len(data_image)):
-            for j in range(len(data_image[i])):
-                # print(data_image[i][j])
-                data_image[i][j] = С * np.log(data_image[i][j] + 1)
-                # print(data_image[i][j])
-                # print()
+        dataImage = self.toGray(dataImage)
         
-        new_image = pil.fromarray(data_image)
-        
-        return new_image
+        return dataImage

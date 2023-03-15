@@ -5,6 +5,7 @@ import imageio
 import PIL.Image as pil
 from struct import *
 from PIL import Image
+from processing import Processing
 
 class InOut():
     def __init__(self): pass
@@ -73,15 +74,19 @@ class InOut():
     def readImages(self, path):
         try:
             img = Image.open(path)
-            return img
+            dataImage = np.array(img)
+            dataImage = dataImage.astype('int32')
+            return dataImage
         except Exception:
             print(Exception)
             
-    def saveImage(self, name, image):
+    def saveImage(self, name, dataImage):
         try:
+            dataImage = dataImage.astype('uint8')
+            image = pil.fromarray(dataImage)
             image.save(name)
         except Exception:
-            imageio.imwrite(name, image)
+            print(Exception)
     
     def readXcrImage(self, path):
         size = os.path.getsize(path)
@@ -100,17 +105,11 @@ class InOut():
         data = np.asarray(data)
         data = np.reshape(data, (1024, 1024))
         
-        
-        
-        new_image = pil.fromarray(data)
-        
-        
-        return new_image
+        return data
     
-    def saveBinImages(self, name, image):
-        data_image = np.array(image)
+    def saveBinImages(self, name, dataImage):
         with open(name, 'wb') as f:
-            for i in data_image:
+            for i in dataImage:
                 for j in i:
                     for k in j:
                         number = pack("<f", k)
@@ -129,8 +128,5 @@ class InOut():
         
         data = np.asarray(data)
         data = data.reshape(360, 480, 3)
-        print(data.shape)
-            
-        new_image = pil.fromarray((data).astype(np.uint8))
         
-        return new_image
+        return data

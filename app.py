@@ -494,7 +494,7 @@ class App(Tk):
         Button(
             parent,
             text="Логарифмическое преобразование",   
-            command=lambda:self.TEST(),
+            command=lambda:self.writeCurrentImageData(self.processing.logTransform(self.currentImage)),
             font=self.mainFont
         ).pack(anchor=N, fill=X)
         
