@@ -33,6 +33,7 @@ class App(Tk):
         self.currentFilterSound = []
 
         self.currentImage = []
+        self.tempImage = []
         
         self.mainFont = font.Font(family="Time New Roman", size=12, weight="normal", slant="roman")
         
@@ -76,6 +77,7 @@ class App(Tk):
         filemenu.add_command(label="Отобразить текущее изображение", command=lambda : self.model.drawImageData(self.currentImage))
         filemenu.add_command(label="Сохранить текущее изображение", command=lambda : self.inout.saveImage("saveData/img.jpg", self.currentImage))
         filemenu.add_command(label="Сохранить текущее изображение в .bin", command=lambda : self.inout.saveBinImages("saveData/img.bin", self.currentImage))
+        filemenu.add_command(label="Записать текущее изображение в временную переменную", command=self.writeCurrentImageDataInTemp)
         
         filemenu.add_command(label="Записать выбранный фрагмент звуковых данных во временную переменную", command=self.writeCurrentSoundDataInTemp)
         filemenu.add_command(label="Отобразить выбранный фрагмент звуковых данных", command=lambda : self.model.drawData(self.tempSoundData))
@@ -175,6 +177,12 @@ class App(Tk):
     
     def writeCurrentImageData(self, function):
         self.currentImage = function
+    
+    def writeCurrentImageDataInTemp(self):
+        try:
+            self.tempImage = self.currentImage
+        except:
+            print("Текущих данных не существует")
     
     def writeCurrentSoundDataInTemp(self):
         try:
@@ -498,6 +506,43 @@ class App(Tk):
             font=self.mainFont
         ).pack(anchor=N, fill=X)
         
+        Button(
+            parent,
+            text="Гистограмма текущего изображения",   
+            command=lambda:self.analysis.ImageHistogram(self.currentImage),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Гистограмма текущего изображения с приведением к серому",   
+            command=lambda:self.analysis.ImageHistogramWithToGray(self.currentImage),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="RGB гистограмма текущего изображения",   
+            command=lambda:self.analysis.ImageRGBHistogram(self.currentImage),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Градиционное преобразование",   
+            command=lambda:self.writeCurrentImageData(self.processing.ImageGradientTransform(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Сравнение изображений",   
+            command=lambda:self.writeCurrentImageData(self.analysis.ResidualBetweenImages(self.currentImage, self.tempImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        
+        
         
         
     def TEST(self):
@@ -506,8 +551,19 @@ class App(Tk):
         
         
         
-        # plt.figure(figsize=(6,6))
-        # plt.imshow(data_image)
-        # plt.axis("off")
-        # plt.show()
+        try:
+            if(len(self.currentImage.shape) > 2):
+                h, w, _ = self.currentImage.shape
+            else:
+                h, w = self.currentImage.shape
+            
+            plt.hist(self.currentImage.ravel(), bins=256, rwidth=0.8, range=(0, 255))
+            plt.show()
+            print(self.currentImage.max())
+            print(self.currentImage.min())
+        except:
+            pass
+        
+          
+            
         
