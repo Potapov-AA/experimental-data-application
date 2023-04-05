@@ -1,4 +1,5 @@
 from random import randint
+import random
 from matplotlib import pyplot as plt
 import numpy as np
 import math
@@ -465,3 +466,28 @@ class Model:
             plt.show()
         
         return dataCardio
+    
+    # Метод зашумления изображения шумом типа "соль и перец"
+    def ToSolidAndPeaper(self, dataImage, n):
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        for h in range(height):
+            noisePixel = random.sample(list(np.arange(width)), n)
+            for i in range(n):
+                dataImage[h, noisePixel[i]] = 0 if random.randint(0, 1) else 255
+        
+        return dataImage
+
+    def ToRandomNoise(self, dataImage, scale):
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        length = int(np.ceil(np.abs(width)))
+        
+        for h in range(height):
+            dataY = np.array([int(random.uniform(-scale, scale)) for _ in range(0, length)])
+            dataImage[h] += dataY
+            
+        return dataImage
+            

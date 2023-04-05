@@ -698,7 +698,7 @@ class Processing():
                     newDataImage.append(j)
         
         pixelCountResult, _, _ = plt.hist(newDataImage, bins=256, rwidth=0.8, range=(0, 255))
-        plt.close()
+        plt.show()
         pixelCountResult = pixelCountResult / (M * N)
         
         cdf = []
@@ -720,4 +720,546 @@ class Processing():
         resultData = self.toGray(resultData)
         
         return resultData
+    
+    
+    
+    
+    ########################
+    # Кореляция
+    def ResultForLab5(self, dataImage):
+        STEP = 200
         
+        newDataImage = np.empty((dataImage.shape[0], dataImage.shape[1]))
+        
+        for h in range(dataImage.shape[0]):
+            for w in range(dataImage.shape[1]):
+                try:
+                    newDataImage[h, w] = dataImage[h, w]
+                except:
+                    newDataImage[h, w] = dataImage[h, w, 0]
+        
+        derivatives = self.GetDerivatives(STEP, dataImage)
+        
+        autoCorrelations = self.GetAutoCorr(derivatives)
+        correlations = self.GetCorrBetweenRows(derivatives)
+        
+        spectrAutoCorrelations = self.GetFourierSpectr(autoCorrelations)
+        spectraCorrelations = self.GetFourierSpectr(correlations)
+
+        spikesSpectrAutoCorrelations = self.GetFourierSpikes(spectrAutoCorrelations)
+        spikesSpectraCorrelations = self.GetFourierSpikes(spectraCorrelations)
+        
+        print("Максимумы спектров автокорреляций производных:", spikesSpectrAutoCorrelations)
+        print("Максимумы спектров взаимных корреляций производных:", spikesSpectraCorrelations)
+        
+        n = 3  # количество графиков
+        
+        plt.figure(figsize=(15, 4))
+        plt.title('Спектры исходных строк изображения')
+        for i in range(n):
+            func = Function(0, newDataImage.shape[1], 1)
+            func.Y = newDataImage[int(i * STEP)]
+            fourier = Function(0, newDataImage.shape[1], 1)
+            fourier.fourier_transform(func, 1, 1, False, True)
+            fourier.X = fourier.X / newDataImage.shape[1]
+            plt.subplot(1, 3, i + 1)
+            plt.plot(fourier.X, fourier.Y)
+            plt.title(str(i * STEP + 1) + " строк")
+            plt.xlabel("Частота")
+            plt.ylabel("Амплитуда")
+            plt.grid(True)
+            
+        plt.show()
+
+
+        plt.figure(figsize=(15, 4))
+        plt.title('Спектры производных строк изображения')
+        for i in range(n):
+            func = Function(0, derivatives.shape[1], 1)
+            func.Y = derivatives[i]
+            fourier = Function(0, derivatives.shape[1], 1)
+            fourier.fourier_transform(func, 1, 1, False, True)
+            fourier.X = fourier.X / newDataImage.shape[1]
+            plt.subplot(1, n, i + 1)
+            plt.plot(fourier.X, fourier.Y)
+            plt.title(str(i * STEP + 1) + " строк")
+            plt.xlabel("Частота")
+            plt.ylabel("Амплитуда")
+            plt.grid(True)
+        
+        plt.show()
+        
+        
+        plt.figure(figsize=(15, 4))
+        plt.title('Спектры автокорреляций производных')
+        for i in range(n):
+            func = Function(0, autoCorrelations.shape[1], 1)
+            func.Y = autoCorrelations[i]
+            fourier = Function(0, autoCorrelations.shape[1], 1)
+            fourier.fourier_transform(func, 1, 1, False, True)
+            fourier.X = fourier.X / newDataImage.shape[1]
+            plt.subplot(1, n, i + 1)
+            plt.plot(fourier.X, fourier.Y)
+            plt.title(str(i * STEP + 1) + " строк")
+            plt.xlabel("Частота")
+            plt.ylabel("Амплитуда")
+            plt.grid(True)
+
+        plt.show()
+        
+        
+        plt.figure(figsize=(15, 4))
+        plt.title('Спектры взаимных корреляций производных')
+        for i in range(2):
+            func = Function(0, correlations.shape[1], 1)
+            func.Y = correlations[i]
+            fourier = Function(0, correlations.shape[1], 1)
+            fourier.fourier_transform(func, 1, 1, False, True)
+            fourier.X = fourier.X / newDataImage.shape[1]
+            plt.subplot(1, 2, i + 1)
+            plt.plot(fourier.X, fourier.Y)
+            plt.title(str(i * STEP + 1) + " строк" + "и " + str((i + 1) * STEP + 1) + " строк")
+            plt.xlabel("Частота")
+            plt.ylabel("Амплитуда")
+            plt.grid(True)
+
+        plt.show()
+        
+        
+        bottom = 0.25  # нижняя частота
+        top = 0.35  # верхняя частота
+        m = 32  # параметр фильтрации (длина фильтра)
+
+        newDataImage = self.ImageFilter(newDataImage, 3, m, bottom, top)
+        
+        return newDataImage
+    
+    def __AutoCorr(self, func):
+        N = func.size
+        meanF = np.mean(func)
+        corr = np.empty(N)
+        for l in range(N):
+            sum1 = 0
+            sum2 = 0
+            for k in range(N - l):
+                sum1 += (func[k] - meanF) * (func[k + l] - meanF)
+            for k in range(N):
+                sum2 += (func[k] - meanF) * (func[k] - meanF)
+            corr[l] = sum1 / sum2
+        return corr
+
+    # Взаимная корреляция
+    def __Corr(self, func1, func2):
+        N = func1.size
+        meanF1 = np.mean(func1)
+        meanF2 = np.mean(func2)
+        corr = np.empty(N)
+        for l in range(N):
+            sum = 0
+            for k in range(N - l):
+                sum += (func1[k] - meanF1) * (func2[k + l] - meanF2)
+            corr[l] = sum / N
+        return corr
+    
+    
+    # Фуцнкция получения производных строк изображения
+    def GetDerivatives(self, step, dataImage):
+            try:
+                if len(dataImage[0][0]) != 3:
+                    sizeW, sizeH = dataImage.shape
+                else:
+                    sizeH, sizeW, _ = dataImage.shape
+            except:
+                sizeW, sizeH = dataImage.shape
+            
+            derHeight = int(np.ceil(sizeH / step))
+            derWidth = int(sizeW - 1)
+            
+            print(derWidth, derHeight)
+            
+            derivatives = np.empty((derHeight, derWidth))
+            
+            for h in range(derHeight):
+                for w in range(derWidth):
+                    try:
+                        derivatives[h, w] = dataImage[int(h * step), w + 1] - dataImage[int(h * step), w]
+                    except:
+                        derivatives[h, w] = dataImage[int(h * step), w + 1, 0] - dataImage[int(h * step), w, 0]
+            
+            return derivatives
+    
+    # Метод получения индексов максимумов в строках двумерного списка
+    def GetFourierSpikes(lself, listFourier):
+        lHeight = len(listFourier)
+        spikes = np.empty(lHeight)
+        for i in range(lHeight):
+            spikes[i] = listFourier[i].X[listFourier[i].Y.argmax()]
+        return spikes
+
+    
+    # Функция получения автокорреляций строк двумерного массива
+    def GetAutoCorr(self, arrRows):
+        corrHeight = arrRows.shape[0]
+        corrWidth = arrRows.shape[1]
+        correlations = np.empty((corrHeight, corrWidth))
+        
+        for h in range(corrHeight):
+            corr = self.__AutoCorr(arrRows[h])
+            for w in range(corrWidth):
+                correlations[h, w] = corr[w]
+        return correlations
+
+
+    # Метод получения взаимных корреляций строк двумерного массива
+    def GetCorrBetweenRows(self, arrRows):
+        corrHeight = arrRows.shape[0] - 1
+        corrWidth = arrRows.shape[1]
+        correlations = np.empty((corrHeight, corrWidth))
+        
+        for h in range(corrHeight):
+            corr = self.__Corr(arrRows[h], arrRows[h + 1])
+            for w in range(corrWidth):
+                correlations[h, w] = corr[w]
+        return correlations
+
+    # Метод получения амплитудных спектров Фурье строк двумерного массива
+    def GetFourierSpectr(self, arrRows):
+        arrHeight = arrRows.shape[0]
+        arrWidth = arrRows.shape[1]
+        
+        dt = 1 / arrWidth
+        spectra = []
+        
+        for i in range(arrHeight):
+            func = Function(0, arrWidth * dt, dt)
+            func.Y = arrRows[i].copy()
+            fourier = Function(0, arrWidth, 1)
+            fourier.fourier_transform(func, 1, 1, False, True)
+            fourier.X = fourier.X / arrWidth
+            spectra.append(fourier)
+        return spectra
+
+
+    def ImageFilter(self, dataImage, kind, m, fc1, fc2=None):
+        width = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        dt = 1 / width
+        filter_P = Function(0, 2 * m + 1, 1)
+        if kind == 1:
+            filter_P.lpf(fc1, dt, m)
+        elif kind == 2:
+            filter_P.hpf(fc1, dt, m)
+        elif kind == 3:
+            filter_P.bsf(fc1, fc2, dt, m)
+    
+        for h in range(height):
+            funcRow = Function(0, width * dt, dt)
+            funcRow.Y = dataImage[h].copy()
+            funcConv = Function(0, width * dt, dt)
+            funcConv.convolution_func(funcRow, filter_P)
+            for w in range(width):
+                if w < width - m:
+                    dataImage[h, w] = funcConv.Y[w + m]
+                else:
+                    dataImage[h, w] = funcConv.Y[w - width + m]
+
+        return dataImage
+    
+    #####################
+    # Усредняющий арифметический фильтр
+    def MiddleFilter(self, dataImage):
+        maskSize = 50
+        maskList = [np.zeros((maskSize, maskSize), dtype=float) + 1]
+        
+        a = int((maskList[0].shape[0] - 1) / 2)
+        b = int((maskList[0].shape[1] - 1) / 2)
+        
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        newDataImage = np.empty((height, width))
+        
+        for h in range(height):
+            for w in range(width):
+                sum1 = 0
+                for i in range(len(maskList)):
+                    sum2 = 0
+                    for s in range(-1 * a, a + 1):
+                        sum3 = 0
+                        for t in range(-1 * b, b + 1):
+                            try:
+                                sum3 += maskList[i][s + 1, t + 1] * dataImage[h + s, w + t]
+                            except:
+                                pass
+                        sum2 += sum3
+                    sum1 += np.abs(sum2)
+                newDataImage[h, w] = sum1
+        
+        newDataImage = newDataImage / (maskSize * maskSize)
+        
+        return newDataImage
+    
+    # Медианный фильтр
+    def MedianFilter(self, dataImage):
+        maskSize = 50
+        
+        a = int((maskSize - 1) / 2)
+        b = int((maskSize - 1) / 2)
+        
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        newDataImage = np.empty((height, width))
+        
+        for h in range(height):
+            for w in range(width):
+                l = []
+                for s in range(-1 * a, a + 1):
+                    for t in range(-1 * b, b + 1):
+                        try:
+                            l.append(dataImage[h + s, w + t])
+                        except:
+                            pass
+                newDataImage[h, w] = np.median(l)
+        
+        return newDataImage
+    
+
+        
+import numpy as np
+import random
+import matplotlib.pyplot as plt
+
+# Класс математических функций
+class Function:
+    # Конструктор класса
+    #
+    # start - начальное значение оси абсцисс
+    # end - конечное значение оси абсцисс
+    # step - шаг
+    def __init__(self, start=None, end=None, step=None):
+        if start is not None and end is not None and step is not None:
+            self.initializeX(start, end, step)
+            self.initializeY()
+
+    # Инициализация оси абсцисс
+    #
+    # start - начальное значение оси абсцисс
+    # end - конечное значение оси абсцисс
+    # step - шаг
+    def initializeX(self, start, end, step):
+        self.start = start
+        self.end = end
+        self.step = step
+        self.length = int(np.ceil(np.abs(end - start) / step))
+        self.X = np.arange(start, end, step)
+
+    # Инициализация оси ординат
+    def initializeY(self):
+        self.Y = np.zeros(self.length)
+
+    # Функция экспоненты вида b*exp^(-a*x)
+    def exp(self, a, b):
+        self.Y = np.exp(-a * self.X) * b
+
+    # Функция синусоиды
+    #
+    # A - амплитуда
+    # f - частота
+    def sin(self, A, f):
+        self.Y = A * np.sin(2 * np.pi * f * self.X)
+
+    # Функция сложной синусоиды
+    #
+    # arrA - массив амплитуд
+    # arrF - массив частот
+    def complex_sin(self, arrA, arrF):
+        for i in range(0, len(arrA)):
+            self.Y += arrA[i] * np.sin(2 * np.pi * arrF[i] * self.X)
+
+    # Функция случайного шума
+    #
+    # scale - диапазон шума
+    def rand(self, scale):
+        self.Y = np.array([random.uniform(-scale, scale) for _ in range(0, self.length)])
+
+    # Метод произведения функций
+    #
+    # arrFunc - массив функций
+    def multiply_func(self, arrFunc):
+        self.Y = 1
+        for i in range(0, len(arrFunc)):
+            self.Y *= arrFunc[i].Y.copy()
+
+    # Метод свёртки функций
+    def convolution_func(self, x, h):
+        N = x.length
+        M = h.length
+        self.Y = np.zeros(N + M)  # меняем количесвто значений функции
+        for k in range(0, N + M):
+            sum = 0
+            for j in range(0, M):
+                try:
+                    sum += x.Y[k - j] * h.Y[j]
+                except:
+                    sum += 0
+            self.Y[k] = sum
+        self.Y = np.array(list(self.Y)[: len(self.Y) - M])  # удаляем справа M значений
+
+    # Метод преобразований Фурье
+    #
+    # func - исходная функция
+    # window - окно [0..1]
+    # kind - тип преобразования
+    ## kind = 1 - Амплитудный спектр Фурье
+    ## kind = 2 - Прямое преобразование Фурье
+    ## kind = 3 - Обратное преобразование Фурье
+    # freq - привести шкалу абсцисс к [Гц]
+    # half - отобразить половину шкалы
+    # dt - шаг дискретизации
+    def fourier_transform(self, func, window, kind=1, freq=False, half=False, dt=1):
+        lenZeros = int(func.length * (1 - window) / 2)
+        for i in range(0, lenZeros):
+            func.Y[i] = 0
+            func.Y[N - i - 1] = 0
+        sumRe, sumIm = 0, 0
+        for k in range(0, func.length):
+            sumRe += func.Y[k] * np.cos(2 * np.pi * self.X * k / func.length)
+            sumIm += func.Y[k] * np.sin(2 * np.pi * self.X * k / func.length)
+        Re = (1 / func.length) * sumRe
+        Im = (1 / func.length) * sumIm
+        if kind == 1:
+            self.Y = (Re ** 2 + Im ** 2) ** 0.5
+        elif kind == 2:
+            self.Y = Re + Im
+        else:
+            self.Y = sumRe + sumIm
+        if freq:
+            # переходим от параметра n к f
+            df = 1 / (self.end * dt)
+            self.initializeX(self.start, self.end * df, df)
+        if half:
+            # берём первую половину графика
+            self.initializeX(self.start, int(self.end / 2), self.step)
+            self.Y = np.array(list(self.Y)[:self.length])
+
+    # Метод восстановления функции
+    #
+    # func1 - исходная функция
+    # func2 - искажающая функция
+    # alpha - параметр [0..1]
+    def recover(self, func1, func2, alpha2=0):
+        sumRe1, sumIm1 = 0, 0
+        sumRe2, sumIm2 = 0, 0
+        for k in range(0, func1.length):
+            sumRe1 += func1.Y[k] * np.cos(2 * np.pi * self.X * k / func1.length)
+            sumIm1 += func1.Y[k] * np.sin(2 * np.pi * self.X * k / func1.length)
+            sumRe2 += func2.Y[k] * np.cos(2 * np.pi * self.X * k / func2.length)
+            sumIm2 += func2.Y[k] * np.sin(2 * np.pi * self.X * k / func2.length)
+        Re1 = (1 / func1.length) * sumRe1
+        Im1 = (1 / func1.length) * sumIm1
+        Re2 = (1 / func2.length) * sumRe2
+        Im2 = (1 / func2.length) * sumIm2
+        self.Y = (Re1 * Re2 + Im1 * Im2 - Re1 * Im2 + Re2 * Im1) / (alpha2 + np.abs(Re2 ** 2 + Im2 ** 2))
+
+    # Метод нормализации функции
+    def normalize(self):
+        maxY = self.Y.max()
+        for i in range(0, self.length):
+            self.Y[i] = self.Y[i] / maxY
+
+    # Метод для расчёта весов фильтра низких частот Поттера
+    #
+    # fc - частота
+    # dt - шаг дискретизации
+    # m - параметр (длина фильтра)
+    def lpf(self, fc, dt, m):
+        d = [0.35577019, 0.2436983, 0.07211497, 0.00630165]
+        fact = float(2 * fc)
+        lpw = []
+        lpw.append(fact)
+        arg = fact * np.pi
+        for i in range(1, m + 1):
+            lpw.append(np.sin(arg * i) / (np.pi * i))
+        lpw[m] /= 2
+        sumg = lpw[0]
+        for i in range(1, m + 1):
+            sum = d[0]
+            arg = np.pi * i / m
+            for k in range(1, 4):
+                sum += 2 * d[k] * np.cos(arg * k)
+            lpw[i] *= sum
+            sumg += 2 * lpw[i]
+        for i in range(0, m + 1):
+            lpw[i] /= sumg
+        lpwRes = []
+        for i in range(len(lpw) - 1, 0, -1):
+            lpwRes.append(lpw[i])
+        self.Y = np.array(lpwRes + lpw)
+
+    # Метод для расчёта весов фильтра высоких частот Поттера
+    #
+    # fc - частота
+    # dt - шаг дискретизации
+    # m - параметр (длина фильтра)
+    def hpf(self, fc, dt, m):
+        lpw = Function(0, 2 * m + 1, 1)
+        lpw.lpf(fc, dt, m)
+        loper = 2 * m + 1
+        hpw = [0 for _ in range(0, loper)]
+        for k in range(0, loper):
+            if k == m:
+                hpw[k] = 1 - lpw.Y[k]
+            else:
+                hpw[k] = -1 * lpw.Y[k]
+        self.Y = np.array(hpw)
+
+    # Метод для расчёта весов полосового фильтра Поттера
+    #
+    # fc1 - нижняя частота
+    # fc2 - верхняя частота
+    # dt - шаг дискретизации
+    # m - параметр (длина фильтра)
+    def bpf(self, fc1, fc2, dt, m):
+        lpw1 = Function(0, 2 * m + 1, 1)
+        lpw1.lpf(fc1, dt, m)
+        lpw2 = Function(0, 2 * m + 1, 1)
+        lpw2.lpf(fc2, dt, m)
+        loper = 2 * m + 1
+        bpw = [0 for _ in range(0, loper)]
+        for k in range(0, loper):
+            bpw[k] = lpw2.Y[k] - lpw1.Y[k]
+        self.Y = np.array(bpw)
+
+    # Метод для расчёта весов режекторного фильтра Поттера
+    #
+    # fc1 - нижняя частота
+    # fc2 - верхняя частота
+    # dt - шаг дискретизации
+    # m - параметр (длина фильтра)
+    def bsf(self, fc1, fc2, dt, m):
+        lpw1 = Function(0, 2 * m + 1, 1)
+        lpw1.lpf(fc1, dt, m)
+        lpw2 = Function(0, 2 * m + 1, 1)
+        lpw2.lpf(fc2, dt, m)
+        loper = 2 * m + 1
+        bsw = [0 for _ in range(0, loper)]
+        for k in range(0, loper):
+            if k == m:
+                bsw[k] = 1 + lpw1.Y[k] - lpw2.Y[k]
+            else:
+                bsw[k] = lpw1.Y[k] - lpw2.Y[k]
+        self.Y = np.array(bsw)
+
+    # Метод для отображения графика функции
+    #
+    # title - название графика
+    # xlabel - название оси абсцисс
+    # ylabel - название оси ординат
+    def display(self, title, xlabel='x', ylabel='y'):
+        plt.plot(self.X, self.Y)
+        plt.title(title)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        #plt.grid(True)

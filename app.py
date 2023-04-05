@@ -111,6 +111,7 @@ class App(Tk):
         frame4 = ttk.Frame(notebook)
         frame5 = ttk.Frame(notebook)
         frame6 = ttk.Frame(notebook)
+        frame7 = ttk.Frame(notebook)
         
         frame1.pack(fill=BOTH, expand=True)
         frame2.pack(fill=BOTH, expand=True)
@@ -118,20 +119,23 @@ class App(Tk):
         frame4.pack(fill=BOTH, expand=True)
         frame5.pack(fill=BOTH, expand=True)
         frame6.pack(fill=BOTH, expand=True)
+        frame7.pack(fill=BOTH, expand=True)
         
         notebook.add(frame1, text="Станд. графики")
         notebook.add(frame2, text="Генератор шумов")
         notebook.add(frame3, text="Изменить данные")
         notebook.add(frame4, text="Фильтры")
         notebook.add(frame5, text="Примеры")
-        notebook.add(frame6, text="Работа с изображениями")
+        notebook.add(frame6, text="Работа с изображениями 1")
+        notebook.add(frame7, text="Работа с изображениями 2")
         
         self.standartFunctionUI(frame1)
         self.noiseGeneratorUI(frame2)
         self.changeCurrentDataUI(frame3)
         self.filterUI(frame4)
         self.exampleUI(frame5)
-        self.imageUI(frame6)
+        self.imageUI_1(frame6)
+        self.imageUI_2(frame7)
      
         
     def openBinaryFile(self):
@@ -428,7 +432,7 @@ class App(Tk):
         ).pack(anchor=N, fill=X, pady=[20, 0])
     
     
-    def imageUI(self, parent):
+    def imageUI_1(self, parent):
         Button(
             parent,
             text="Смещение данных изображения",
@@ -541,29 +545,49 @@ class App(Tk):
             font=self.mainFont
         ).pack(anchor=N, fill=X, pady=[20, 0])
         
+        Button(
+            parent,
+            text="Применить фильтр Гарри Поттера",   
+            command=lambda:self.writeCurrentImageData(self.processing.ResultForLab5(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
         
+    
+    def imageUI_2(self, parent):
+        Button(
+            parent,
+            text="Посолить и поперчить изображение",   
+            command=lambda:self.writeCurrentImageData(self.model.ToSolidAndPeaper(self.currentImage, n = 30)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
         
+        Button(
+            parent,
+            text="Прорандомить изображение",   
+            command=lambda:self.writeCurrentImageData(self.model.ToRandomNoise(self.currentImage, scale = 20)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Усредняющий арифметический фильтр",   
+            command=lambda:self.writeCurrentImageData(self.processing.MiddleFilter(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Медианный фильтр",   
+            command=lambda:self.writeCurrentImageData(self.processing.MedianFilter(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
         
         
     def TEST(self):
-        import PIL.Image as pil
+        
         from matplotlib import pyplot as plt
         
         
-        
-        try:
-            if(len(self.currentImage.shape) > 2):
-                h, w, _ = self.currentImage.shape
-            else:
-                h, w = self.currentImage.shape
             
-            plt.hist(self.currentImage.ravel(), bins=256, rwidth=0.8, range=(0, 255))
-            plt.show()
-            print(self.currentImage.max())
-            print(self.currentImage.min())
-        except:
-            pass
-        
-          
-            
-        
+
+
