@@ -104,7 +104,7 @@ class InOut():
         
         
         data = np.asarray(data)
-        # data = np.reshape(data, (2500, 2048))
+        #data = np.reshape(data, (2500, 2048))
         data = np.reshape(data, (1024, 1024))
         
         return data

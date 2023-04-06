@@ -730,7 +730,7 @@ class Processing():
     #          2) Сделать новый класс для работы и хранения изображения
     #          3) Сделать универсальное сохранение и открытие изображений в новом классе
     def ResultForLab5(self, dataImage):
-        STEP = 200
+        STEP = 100
         
         newDataImage = np.empty((dataImage.shape[0], dataImage.shape[1]))
         
@@ -755,13 +755,10 @@ class Processing():
         print("Максимумы спектров автокорреляций производных:", spikesSpectrAutoCorrelations)
         print("Максимумы спектров взаимных корреляций производных:", spikesSpectraCorrelations)
         
-        n = 3  # количество графиков
-                
-        
         
         plt.figure(figsize=(15, 4))
         plt.title('Спектры исходных строк изображения')
-        for i in range(n):
+        for i in range(3):
             dataX, dataY = self.__FourierTransform(newDataImage[int(i * STEP)], 0, newDataImage.shape[1], 1, 1, 1)
             
             dataX = dataX / newDataImage.shape[1]
@@ -780,7 +777,7 @@ class Processing():
         
         plt.figure(figsize=(15, 4))
         plt.title('Спектры производных строк изображения')
-        for i in range(n):
+        for i in range(3):
             dataX, dataY = self.__FourierTransform(derivatives[i], 0, derivatives.shape[1], 1, 1, 1)
             
             dataX = dataX / newDataImage.shape[1]
@@ -798,7 +795,7 @@ class Processing():
         
         plt.figure(figsize=(15, 4))
         plt.title('Спектры автокорреляций производных')
-        for i in range(n):
+        for i in range(3):
             dataX, dataY = self.__FourierTransform(autoCorrelations[i], 0, autoCorrelations.shape[1], 1, 1, 1)
             
             dataX = dataX / newDataImage.shape[1]
@@ -833,8 +830,8 @@ class Processing():
         plt.show()
         
         
-        bottom = 0.25  # нижняя частота
-        top = 0.35  # верхняя частота
+        bottom = 0.1  # нижняя частота
+        top = 0.2  # верхняя частота
         m = 32  # параметр фильтрации (длина фильтра)
         
         newDataImage = self.ImageFilter(newDataImage, 3, m, bottom, top)
@@ -901,7 +898,6 @@ class Processing():
     def GetFourierSpikes(lself, listFourier):
         lHeight = len(listFourier)
         spikes = np.empty(lHeight)
-        print(listFourier)
         for i in range(lHeight):
            spikes[i] = listFourier[i].max()
         return spikes
@@ -990,10 +986,11 @@ class Processing():
             dataFilter = self.NewHPF(fc1, dt, m)
         elif mode == 3:
             dataFilter = self.NewBSF(fc1, fc2, dt, m)
-    
+        
         for h in range(height): 
             dataRow = dataImage[h].copy()
-            dataConv = self.Convolution(dataRow, dataFilter)
+            
+            dataConv = self.Convolution(dataRow, dataFilter, 1)
             
             for w in range(width):
                 if w < width - m:
@@ -1003,9 +1000,12 @@ class Processing():
                     
         return dataImage
     
-    def Convolution(data1, data2, N, M, step):
-        N = int(np.ceil(np.abs(data1.shape[1]) / step))
-        M= int(np.ceil(np.abs(data1.shape[1]) / step))
+    
+    
+    def Convolution(self, data1, data2, step):
+        
+        N = int(np.ceil(np.abs(len(data1)) / step))
+        M= int(np.ceil(np.abs(len(data1)) / step))
         
         dataY = np.zeros(N + M)
         
@@ -1051,42 +1051,37 @@ class Processing():
 
     # Фильтр высоких частот Поттера
     def NewHPF(self, fc, dt, m):
-        lpw = Function(0, 2 * m + 1, 1)
-        lpw.lpf(fc, dt, m)
+        lpf = self.NewLPF(fc, dt, m)
         loper = 2 * m + 1
         hpw = [0 for _ in range(0, loper)]
         for k in range(0, loper):
             if k == m:
-                hpw[k] = 1 - lpw.Y[k]
+                hpw[k] = 1 - lpf[k]
             else:
-                hpw[k] = -1 * lpw.Y[k]
+                hpw[k] = -1 * lpf[k]
         return np.array(hpw)
 
     # Полосовой фильтр Поттера
     def NewBPF(self, fc1, fc2, dt, m):
-        lpw1 = Function(0, 2 * m + 1, 1)
-        lpw1.lpf(fc1, dt, m)
-        lpw2 = Function(0, 2 * m + 1, 1)
-        lpw2.lpf(fc2, dt, m)
+        lpw1 = self.NewLPF(fc1, dt, m)
+        lpw2 = self.NewLPF(fc2, dt, m)
         loper = 2 * m + 1
         bpw = [0 for _ in range(0, loper)]
         for k in range(0, loper):
-            bpw[k] = lpw2.Y[k] - lpw1.Y[k]
+            bpw[k] = lpw2[k] - lpw1[k]
         return np.array(bpw)
 
     # Режекторный фильтр Поттера
     def NewBSF(self, fc1, fc2, dt, m):
-        lpw1 = Function(0, 2 * m + 1, 1)
-        lpw1.lpf(fc1, dt, m)
-        lpw2 = Function(0, 2 * m + 1, 1)
-        lpw2.lpf(fc2, dt, m)
+        lpw1 = self.NewLPF(fc1, dt, m)
+        lpw2 = self.NewLPF(fc2, dt, m)
         loper = 2 * m + 1
         bsw = [0 for _ in range(0, loper)]
         for k in range(0, loper):
             if k == m:
-                bsw[k] = 1 + lpw1.Y[k] - lpw2.Y[k]
+                bsw[k] = 1 + lpw1[k] - lpw2[k]
             else:
-                bsw[k] = lpw1.Y[k] - lpw2.Y[k]
+                bsw[k] = lpw1[k] - lpw2[k]
         return np.array(bsw)
         
     #####################
@@ -1186,8 +1181,6 @@ class Processing():
         A = 10  # тестовая амплитуда гармонического процесса
         f = 4   # тестовая частота гармонического процесса
         
-        funcSin = Function(0, M * dt, dt)
-        funcSin.sin(A, f)
         
         sinDataX = np.arange(0, M * dt, dt)
         sinDataY = A * np.sin(2 * np.pi * f * sinDataX)
@@ -1244,7 +1237,6 @@ class Processing():
             
             dataX, dataY = self.__FourierTransform(dataLineY, 0, iter2, 1, 1, mode) 
             
-            # Отзеркаливаем, если считаем амплитудный спектр
             if mode == 1:
                 swap = np.empty(iter2)
                 for k in range(iter2):
@@ -1266,7 +1258,6 @@ class Processing():
             
             dataX, dataY = self.__FourierTransform(dataLineY, 0, iter1, 1, 1, mode) 
             
-            # Отзеркаливаем, если считаем амплитудный спектр
             if mode == 1:
                 swap = np.empty(iter1)
                 for k in range(iter1):
@@ -1282,3 +1273,6 @@ class Processing():
         dataImage = res.astype(float)
         
         return dataImage
+
+
+
