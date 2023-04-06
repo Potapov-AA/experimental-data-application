@@ -319,7 +319,7 @@ class App(Tk):
         Button(
             parent,
             text="Рассчитать для ФВЧ",
-            command= lambda: self.processing.hpf(draw=True),
+            command= lambda: self.processing.NewHPF(draw=True),
             font=self.mainFont
         ).pack(anchor=N, fill=X)
         
@@ -582,10 +582,25 @@ class App(Tk):
             font=self.mainFont
         ).pack(anchor=N, fill=X)
         
+        Button(
+            parent,
+            text="Сгенерировать изображение",   
+            command=lambda:self.writeCurrentImageData(self.processing.GenerateImageBlackAndWhiteSqard()),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Обратный Фурье",   
+            command=lambda:self.writeCurrentImageData(self.processing.InverseFurie(self.currentImage, mode = 3)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
         
     def TEST(self):
-        
         from matplotlib import pyplot as plt
+        
+        
         
         
             
