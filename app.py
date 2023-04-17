@@ -597,8 +597,22 @@ class App(Tk):
         ).pack(anchor=N, fill=X)
         
         
+        Button(
+            parent,
+            text="Тест старых функций",   
+            command=self.TEST,
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        
     def TEST(self):
-        from matplotlib import pyplot as plt
+        from image import Image
+        
+        path = fd.askopenfilename() 
+        image = Image(path)
+        image.save_last_image()
+        
+        
         
         
         
