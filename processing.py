@@ -730,7 +730,7 @@ class Processing():
     #          2) Сделать новый класс для работы и хранения изображения
     #          3) Сделать универсальное сохранение и открытие изображений в новом классе
     def ResultForLab5(self, dataImage):
-        STEP = 100
+        STEP = 400
         
         newDataImage = np.empty((dataImage.shape[0], dataImage.shape[1]))
         
@@ -830,8 +830,8 @@ class Processing():
         plt.show()
         
         
-        bottom = 0.1  # нижняя частота
-        top = 0.2  # верхняя частота
+        bottom = 0.2  # нижняя частота
+        top = 0.3  # верхняя частота
         m = 32  # параметр фильтрации (длина фильтра)
         
         newDataImage = self.ImageFilter(newDataImage, 3, m, bottom, top)
