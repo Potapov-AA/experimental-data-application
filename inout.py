@@ -71,6 +71,8 @@ class InOut():
             f.write(statistic.encode('utf-16').decode('utf-16'))
     
     
+    
+    ### ПЕРЕНЕС В ДРУГОЙ КЛАСС (ДЛЯ РАБОТЫ С ИЗОБРАЖЕНИЯМИ)
     def readImages(self, path):
         try:
             img = Image.open(path)
@@ -79,7 +81,9 @@ class InOut():
             return dataImage
         except Exception:
             print(Exception)
-            
+    
+    
+    ### ПЕРЕНЕС В ДРУГОЙ КЛАСС (ДЛЯ РАБОТЫ С ИЗОБРАЖЕНИЯМИ)
     def saveImage(self, name, dataImage):
         try:
             dataImage = dataImage.astype('uint8')
@@ -87,6 +91,7 @@ class InOut():
             image.save(name)
         except Exception:
             print(Exception)
+    
     
     def readXcrImage(self, path):
         size = os.path.getsize(path)
@@ -105,7 +110,7 @@ class InOut():
         
         data = np.asarray(data)
         #data = np.reshape(data, (2500, 2048))
-        data = np.reshape(data, (1024, 1024))
+        data = np.reshape(data, (1024, 1024)) 
         
         return data
     
