@@ -5,7 +5,7 @@ from tkinter import font
 
 import numpy as np
 
-from image import Image, TransformImage
+from image import Image, TransformImageData
 
 from settings import ParametrSettings
 from model import Model

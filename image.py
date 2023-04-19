@@ -178,7 +178,7 @@ class Image:
         return np.array(dataImage).astype('int32')
 
 
-class TransformImage:
+class TransformImageData:
     def do_negative(self, dataImage):
         L = dataImage.max()
         
