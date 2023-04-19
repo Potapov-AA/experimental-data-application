@@ -5,6 +5,8 @@ from tkinter import font
 
 import numpy as np
 
+from image import Image, TransformImage
+
 from settings import ParametrSettings
 from model import Model
 from analysis import Analysis
@@ -17,6 +19,10 @@ from inout import InOut
 class App(Tk):
     def __init__(self):
         super().__init__()
+        
+        self.image = Image()
+        
+        
         self.model = Model()
         self.analysis = Analysis()
         self.processing = Processing()
@@ -105,38 +111,131 @@ class App(Tk):
         notebook = ttk.Notebook()
         notebook.pack(expand=True, fill=BOTH)       
         
-        frame1 = ttk.Frame(notebook)
-        frame2 = ttk.Frame(notebook)
-        frame3 = ttk.Frame(notebook)
-        frame4 = ttk.Frame(notebook)
-        frame5 = ttk.Frame(notebook)
+        image = ttk.Frame(notebook)
+        image.pack(fill=BOTH, expand=True)
+        
+        notebook.add(image, text="РАБОТА С ИЗОБРАЖЕНИЯМИ")
+        
+        imageNotebook = ttk.Notebook(image)
+        imageNotebook.pack(expand=True, fill=BOTH)   
+        
+        self.imageFrame1 = ttk.Frame(notebook)
+        self.imageFrame1.pack(fill=BOTH, expand=True)
+        
+        imageNotebook.add(self.imageFrame1, text="Работа с файлами и отображение")
+        
+        self.image_open_save_show_UI(self.imageFrame1)
+        
+        
+        
+        # frame1 = ttk.Frame(notebook)
+        # frame2 = ttk.Frame(notebook)
+        # frame3 = ttk.Frame(notebook)
+        # frame4 = ttk.Frame(notebook)
+        # frame5 = ttk.Frame(notebook)
         frame6 = ttk.Frame(notebook)
         frame7 = ttk.Frame(notebook)
         
-        frame1.pack(fill=BOTH, expand=True)
-        frame2.pack(fill=BOTH, expand=True)
-        frame3.pack(fill=BOTH, expand=True)
-        frame4.pack(fill=BOTH, expand=True)
-        frame5.pack(fill=BOTH, expand=True)
+        # frame1.pack(fill=BOTH, expand=True)
+        # frame2.pack(fill=BOTH, expand=True)
+        # frame3.pack(fill=BOTH, expand=True)
+        # frame4.pack(fill=BOTH, expand=True)
+        # frame5.pack(fill=BOTH, expand=True)
         frame6.pack(fill=BOTH, expand=True)
         frame7.pack(fill=BOTH, expand=True)
         
-        notebook.add(frame1, text="Станд. графики")
-        notebook.add(frame2, text="Генератор шумов")
-        notebook.add(frame3, text="Изменить данные")
-        notebook.add(frame4, text="Фильтры")
-        notebook.add(frame5, text="Примеры")
+        # notebook.add(frame1, text="Станд. графики")
+        # notebook.add(frame2, text="Генератор шумов")
+        # notebook.add(frame3, text="Изменить данные")
+        # notebook.add(frame4, text="Фильтры")
+        # notebook.add(frame5, text="Примеры")
         notebook.add(frame6, text="Работа с изображениями 1")
         notebook.add(frame7, text="Работа с изображениями 2")
         
-        self.standartFunctionUI(frame1)
-        self.noiseGeneratorUI(frame2)
-        self.changeCurrentDataUI(frame3)
-        self.filterUI(frame4)
-        self.exampleUI(frame5)
+        # self.standartFunctionUI(frame1)
+        # self.noiseGeneratorUI(frame2)
+        # self.changeCurrentDataUI(frame3)
+        # self.filterUI(frame4)
+        # self.exampleUI(frame5)
         self.imageUI_1(frame6)
         self.imageUI_2(frame7)
-     
+    
+    
+    def image_open_save_show_UI(self, parent):
+        
+        buttonFrame = Frame(parent)
+        buttonFrame.pack(fill=X)
+        
+        Button(
+            buttonFrame,
+            text="Открыть изображение",
+            command=self.open_image,
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30], padx=[100, 0])
+        
+        Button(
+            buttonFrame,
+            text="Сохранить изображение",
+            command=lambda:self.save_image(index=int(self.spinbox.get())),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30])
+        
+        Button(
+            buttonFrame,
+            text="Отобразить изображение",
+            command=lambda: self.show_image(index=int(self.spinbox.get())),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30], padx=[0, 100])
+        
+        Label(
+            parent,
+            text="Индекс изображения"
+        ).pack()
+        
+        self.spinbox = Spinbox(
+            parent,
+            from_= -1,
+            to= self.image.get_last_index()
+        )
+        self.spinbox.pack()
+
+    
+    def work_with_image(self, function):
+        transofrmData = function(self, self.image.get_last_data())
+        
+        self.image.add_updated_data_to_list(transofrmData)
+        
+        self.spinbox.destroy()
+        self.spinbox = Spinbox(
+            self.imageFrame1,
+            from_= -1,
+            to= self.image.get_last_index()
+        )
+        self.spinbox.pack(anchor=N, pady=[20, 0])
+        
+    
+    def open_image(self):
+        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png')))
+        self.imageFrame1.update()
+        self.image = Image(path)
+        
+        self.spinbox.destroy()
+        self.spinbox = Spinbox(
+            self.imageFrame1,
+            from_= -1,
+            to= self.image.get_last_index()
+        )
+        self.spinbox.pack(anchor=N, pady=[20, 0])
+    
+    
+    def save_image(self, index):
+        self.image.save_image(index)
+    
+    
+    def show_image(self, index):
+        self.image.show_image(index)
+    
+    
         
     def openBinaryFile(self):
         name = fd.askopenfilename() 
