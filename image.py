@@ -72,7 +72,7 @@ class Image:
     
     def show_image(self, index = -1):
         """
-            Отображает изображение из списка
+            Выводит изображение из списка по индексу
 
         Args:
             index (int, optional): индекс массива для отображение. По умолчанию -1.
@@ -90,6 +90,24 @@ class Image:
         plt.imshow(image)
         plt.axis("off")
         plt.show()
+    
+    
+    def show_all_images(self):
+        """
+            Выводит все изображения
+        """
+        plotCount = len(self.dataImageList)
+        rowCount = int(plotCount // 3) + 1
+        
+        plt.figure(figsize=(5, 5))
+        
+        for p in range(plotCount):
+            image = PilImage.fromarray(self.dataImageList[p])
+            plt.subplot(rowCount, 3, p+1)
+            plt.imshow(image)
+            plt.axis("off")
+            
+        plt.show()    
     
     
     def __read_image(self, path):
@@ -179,6 +197,81 @@ class Image:
 
 
 class TransformImageData:
+    def data_to_gray_diapason(self, dataImage):
+        """_summary_
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            приведенный к серому диапазону
+        """
+        maxPixel = dataImage.max()
+        minPixel = dataImage.min()
+        
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = ((dataImage[h][w] - minPixel) / (maxPixel - minPixel)) * 255
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def shift_data_image(self, dataImage, shiftValue):
+        """
+            Смещает переданные данные на заданный коэффицент
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            shiftValue (int): значение смещения
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            смещенный на заданный коэффицент
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = dataImage[h][w] + shiftValue
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def multi_data_image(self, dataImage,  multiValue):
+        """
+            Умножает переданные данные на заданный коэффицент
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            multiValue (int): значение умножения
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            умноженный на заданный коэффицент
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = dataImage[h][w] * multiValue
+        
+        return np.array(transformData).astype('int32')
+    
+        
+    
+    
     def do_negative(self, dataImage):
         L = dataImage.max()
         
