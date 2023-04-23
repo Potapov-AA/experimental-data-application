@@ -59,6 +59,8 @@ class Config():
         self.config.set("Parametrs", "C", "0.6")
         self.config.set("Parametrs", "y", "1.1")
         
+        self.config.add_section("ImageParametrs")
+        self.config.set("ImageParametrs", "shiftMultiImage", "20")
         
         
         
