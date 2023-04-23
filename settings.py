@@ -13,6 +13,8 @@ class ParametrSettings(Toplevel):
               notebook = ttk.Notebook(self)
               notebook.pack(expand=True, fill=BOTH)       
               
+              
+              
               frame1 = ttk.Frame(notebook)
               frame2 = ttk.Frame(notebook)
               frame3 = ttk.Frame(notebook)
@@ -28,6 +30,20 @@ class ParametrSettings(Toplevel):
               self.page1UI(frame1)
               self.page2UI(frame2)
               self.page3UI(frame3)
+              
+              
+              imageFrame = ttk.Frame(notebook)
+              imageFrame.pack(fill=BOTH, expand=True)
+              notebook.add(imageFrame, text="Стр. 4")
+              self.pageImageUI(imageFrame)
+       
+       
+       def pageImageUI(self, parent):
+              Label(parent, text="Значение смещения/умножения").pack(anchor=N, fill=X, pady=[20, 10])
+              self.drawParameter("shiftMultiValue =", "shiftMultiImage", parent, section="ImageParametrs")
+       
+       
+       
        
        def page1UI(self, parent):
               Label(parent, text="Общие параметры").pack(anchor=N, fill=X, pady=[20, 10])
@@ -119,7 +135,9 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Гамма и логарифмическое преобразование").pack(anchor=N, fill=X, pady=[15, 10])             
               self.drawParameter("C = ", "C", parent)       
               self.drawParameter("y = ", "y", parent)
-              
+       
+       
+           
               
             
        def centerWindow(self):
@@ -133,18 +151,18 @@ class ParametrSettings(Toplevel):
               y = (sh - h) / 2
               self.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-       def drawParameter(self, text, parametrName, parent):
+       def drawParameter(self, text, parametrName, parent, section="Parametrs"):
               frame = ttk.Frame(parent)
               frame.pack(anchor=N, fill=X)
               Label(frame, text=text).pack(anchor=N, side=LEFT, padx=[15, 10], pady=[5,0], fill=X)
               entry = Entry(frame, width=6, justify=CENTER)
               entry.pack(anchor=N, side=LEFT, padx=[10, 0], pady=[5,0], fill=X)
-              entry.insert(0, self.parametrs.GetParametr("Parametrs", parametrName))
+              entry.insert(0, self.parametrs.GetParametr(section, parametrName))
               Button(frame, 
                      text="Сохранить",
-                     command=lambda: self.save(parametrName, entry.get())
+                     command=lambda: self.save(parametrName, entry.get(), section)
               ).pack(anchor=N, side=RIGHT, fill=X, padx=[0, 15])
        
-       def save(self, parameterName, value):
-              self.parametrs.UpdateParametr("Parametrs", parameterName, value)
+       def save(self, parameterName, value, section):
+              self.parametrs.UpdateParametr(section, parameterName, value)
         
