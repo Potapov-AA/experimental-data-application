@@ -506,6 +506,9 @@ class Processing():
         return(result)
         
     
+    
+    
+    ### ПЕРЕНЕС В ДРУГОЙ КЛАСС (ДЛЯ РАБОТЫ С ИЗОБРАЖЕНИЯМИ)
     # Смещение данных изображения на заданный коэффицент
     def shift2D(self, dataImage):
         shifImage = int(self.parametrs.GetParametr("Parametrs", "shiftImage"))
@@ -517,6 +520,7 @@ class Processing():
         return dataImage
     
     
+    ### ПЕРЕНЕС В ДРУГОЙ КЛАСС (ДЛЯ РАБОТЫ С ИЗОБРАЖЕНИЯМИ)
     # Умножение данных изображения на заданный коэффицент
     def multModel2D(self, dataImage):
         multiImage = float(self.parametrs.GetParametr("Parametrs", "multiImage"))
