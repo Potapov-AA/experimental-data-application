@@ -122,9 +122,14 @@ class App(Tk):
         self.imageFrame1 = ttk.Frame(notebook)
         self.imageFrame1.pack(fill=BOTH, expand=True)
         
+        imageFrame2 = ttk.Frame(notebook)
+        imageFrame2.pack(fill=BOTH, expand=True)
+        
         imageNotebook.add(self.imageFrame1, text="Работа с файлами и отображение")
+        imageNotebook.add(imageFrame2, text="Трансформация изображения")
         
         self.image_open_save_show_UI(self.imageFrame1)
+        self.image_transform_UI(imageFrame2)
         
         
         
@@ -176,56 +181,104 @@ class App(Tk):
         Button(
             buttonFrame,
             text="Сохранить изображение",
-            command=lambda:self.save_image(index=int(self.spinbox.get())),
+            command=lambda:self.save_image(index=int(self.indexSpinbox.get())),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30])
         
         Button(
             buttonFrame,
             text="Отобразить изображение",
-            command=lambda: self.show_image(index=int(self.spinbox.get())),
+            command=lambda: self.show_image(index=int(self.indexSpinbox.get())),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30], padx=[0, 100])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 10], padx=[0, 100])
+        
+        Button(
+            parent,
+            text="Отобразить все изображения",
+            command=lambda: self.image.show_all_images(),
+            font=self.mainFont
+        ).pack(pady=[0, 10])
         
         Label(
             parent,
             text="Индекс изображения"
-        ).pack()
+        ).pack(pady=[20, 0])
         
-        self.spinbox = Spinbox(
+        self.indexSpinbox = Spinbox(
             parent,
             from_= -1,
             to= self.image.get_last_index()
         )
-        self.spinbox.pack()
-
+        self.indexSpinbox.pack(anchor=N, pady=[10, 0])
+        
+        
     
-    def work_with_image(self, function):
-        transofrmData = function(self, self.image.get_last_data())
+    
+    def image_transform_UI(self, parent):
+        Button(
+            parent,
+            text="Приведение данныех изображения к серому диапазону",
+            command=lambda:self.work_with_image(TransformImageData.data_to_gray_diapason),
+            font=self.mainFont
+        ).pack(pady=[30, 0])
+        
+        Label(
+            parent,
+            text="Смещение/Умножение данных изображения"
+        ).pack(pady=[30, 0])
+        
+        shiftMultyFrame = Frame(parent)
+        shiftMultyFrame.pack(fill=X)
+        
+        shifMultiData = int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))
+        
+        Button(
+            shiftMultyFrame,
+            text="Смещение",
+            command=lambda:self.work_with_image(TransformImageData.shift_data_image, shifMultiData),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[300, 0])
+        
+        Button(
+            shiftMultyFrame,
+            text="Умножение",
+            command=lambda:self.work_with_image(TransformImageData.multi_data_image, shifMultiData),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 300])
+        
+        
+        
+        
+        
+    
+    def work_with_image(self, function, param=-1):
+        if param == -1:
+            transofrmData = function(self, self.image.get_last_data())
+        else:
+            transofrmData = function(self, self.image.get_last_data(), param)
         
         self.image.add_updated_data_to_list(transofrmData)
         
-        self.spinbox.destroy()
-        self.spinbox = Spinbox(
+        self.indexSpinbox.destroy()
+        self.indexSpinbox = Spinbox(
             self.imageFrame1,
             from_= -1,
             to= self.image.get_last_index()
         )
-        self.spinbox.pack(anchor=N, pady=[20, 0])
+        self.indexSpinbox.pack(anchor=N, pady=[20, 0])
         
     
     def open_image(self):
         path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png')))
-        self.imageFrame1.update()
         self.image = Image(path)
         
-        self.spinbox.destroy()
-        self.spinbox = Spinbox(
+        self.indexSpinbox.destroy()
+        self.indexSpinbox = Spinbox(
             self.imageFrame1,
             from_= -1,
             to= self.image.get_last_index()
         )
-        self.spinbox.pack(anchor=N, pady=[20, 0])
+        self.indexSpinbox.pack(anchor=N, pady=[10, 0])
     
     
     def save_image(self, index):
@@ -234,6 +287,14 @@ class App(Tk):
     
     def show_image(self, index):
         self.image.show_image(index)
+    
+    
+    
+    
+    
+    
+    
+    
     
     
         
