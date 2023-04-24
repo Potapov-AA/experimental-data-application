@@ -77,13 +77,6 @@ class App(Tk):
         filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawSoundData(self.currentSoundData))
         filemenu.add_command(label="Сохранить текущие звуковые данные", command=lambda : self.inout.saveSoundFile("saveData/data.wav", self.currentSoundData))
         
-        filemenu.add_command(label="Открыть изображение", command=self.openImageFile)
-        filemenu.add_command(label="Открыть изображение из .xcr", command=self.openXcrFile)
-        filemenu.add_command(label="Открыть изображение из .bin", command=self.openBinFile)
-        filemenu.add_command(label="Отобразить текущее изображение", command=lambda : self.model.drawImageData(self.currentImage))
-        filemenu.add_command(label="Сохранить текущее изображение", command=lambda : self.inout.saveImage("saveData/img.jpg", self.currentImage))
-        filemenu.add_command(label="Сохранить текущее изображение в .bin", command=lambda : self.inout.saveBinImages("saveData/img.bin", self.currentImage))
-        filemenu.add_command(label="Записать текущее изображение в временную переменную", command=self.writeCurrentImageDataInTemp)
         
         filemenu.add_command(label="Записать выбранный фрагмент звуковых данных во временную переменную", command=self.writeCurrentSoundDataInTemp)
         filemenu.add_command(label="Отобразить выбранный фрагмент звуковых данных", command=lambda : self.model.drawData(self.tempSoundData))
@@ -197,7 +190,7 @@ class App(Tk):
         
         Label(
             spinboxsFrame,
-            text="Высота и ширина изображения для xcr"
+            text="Высота и ширина изображения для xcr/bin"
         ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[100, 0])
         
         self.heightSpinbox = Spinbox(
@@ -293,7 +286,7 @@ class App(Tk):
         
     
     def open_image(self):
-        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr')))
+        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr'), ('BIN', '.bin')))
         
         if path == '': 
             return
@@ -333,18 +326,7 @@ class App(Tk):
     def openSoundFile(self):
         name = fd.askopenfilename() 
         self.currentSoundData = self.inout.readSoundFile(name)
-    
-    def openImageFile(self):
-        name = fd.askopenfilename() 
-        self.currentImage = self.inout.readImages(name)
-    
-    def openXcrFile(self):
-        name = fd.askopenfilename() 
-        self.currentImage = self.inout.readXcrImage(name)
-        
-    def openBinFile(self):
-        name = fd.askopenfilename() 
-        self.currentImage = self.inout.readBinImage(name)
+
         
     
     def statisticCurrentFile(self):
