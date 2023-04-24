@@ -1,5 +1,6 @@
 import os
 import re
+from struct import pack, unpack
 import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
@@ -59,13 +60,23 @@ class Image:
             path = fd.asksaveasfilename(confirmoverwrite=True, 
                                         defaultextension="jpg", 
                                         initialfile="image.jpg", 
-                                        filetypes = (('JPG', '.jpg'), ('PNG', '.png')))
+                                        filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('BIN', '.bin')))
             
             fileExtension = re.search(r'\w+$', path)[0]
             
             if fileExtension in ['jpg', 'png']:
                 fileData = PilImage.fromarray(self.dataImageList[index].astype('uint8'))
                 fileData.save(path)
+            elif fileExtension in ['bin']:
+                weight = self.dataImageList[index].shape[0]
+                height = self.dataImageList[index].shape[1]
+                
+                print(height, weight)
+                with open(path, 'wb') as f:                    
+                    for h in range(height):
+                        for w in range(weight):
+                            number = pack("<f", self.dataImageList[index][h][w])
+                            f.write(number)
             
         except Exception:
             print(Exception)
@@ -152,6 +163,25 @@ class Image:
                 # 1024 x 1024
                 # 2500 x 2048
                 dataImage = np.reshape(dataImage, (height, weight)) 
+                
+                return self.__transform_data_image_to_default(dataImage)
+            except Exception:
+                print(Exception)
+        elif fileExtension in ['bin']:
+            try:
+                dataImage = []
+                
+                with open(path, 'rb') as f:
+                    number = f.read(4)
+                    
+                    while number:
+                        tempTuple = unpack("<f", number)
+                        tempValue = tempTuple[0]
+                        dataImage.append(int(tempValue))
+                        number = f.read(4)
+                
+                dataImage = np.asarray(dataImage)
+                dataImage = dataImage.reshape(height, weight)
                 
                 return self.__transform_data_image_to_default(dataImage)
             except Exception:
