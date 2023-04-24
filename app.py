@@ -192,6 +192,44 @@ class App(Tk):
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 10], padx=[0, 100])
         
+        spinboxsFrame = Frame(parent)
+        spinboxsFrame.pack(fill=X)
+        
+        Label(
+            spinboxsFrame,
+            text="Высота и ширина изображения для xcr"
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[100, 0])
+        
+        self.heightSpinbox = Spinbox(
+            spinboxsFrame,
+            from_= 0,
+            to= 4000
+        )
+        self.heightSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[5, 0])
+        
+        self.weightSpinbox = Spinbox(
+            spinboxsFrame,
+            from_= 0,
+            to= 4000
+        )
+        self.weightSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 100])
+        
+        
+        self.spinboxFrame = Frame(parent)
+        self.spinboxFrame.pack(fill=X)
+        
+        Label(
+            self.spinboxFrame,
+            text="Индекс изображения"
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[250, 0])
+        
+        self.indexSpinbox = Spinbox(
+            self.spinboxFrame,
+            from_= -1,
+            to= self.image.get_last_index()
+        )
+        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
+        
         Button(
             parent,
             text="Отобразить все изображения",
@@ -199,20 +237,6 @@ class App(Tk):
             font=self.mainFont
         ).pack(pady=[0, 10])
         
-        Label(
-            parent,
-            text="Индекс изображения"
-        ).pack(pady=[20, 0])
-        
-        self.indexSpinbox = Spinbox(
-            parent,
-            from_= -1,
-            to= self.image.get_last_index()
-        )
-        self.indexSpinbox.pack(anchor=N, pady=[10, 0])
-        
-        
-    
     
     def image_transform_UI(self, parent):
         Button(
@@ -261,24 +285,28 @@ class App(Tk):
         
         self.indexSpinbox.destroy()
         self.indexSpinbox = Spinbox(
-            self.imageFrame1,
+            self.spinboxFrame,
             from_= -1,
             to= self.image.get_last_index()
         )
-        self.indexSpinbox.pack(anchor=N, pady=[20, 0])
+        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
         
     
     def open_image(self):
-        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png')))
-        self.image = Image(path)
+        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr')))
+        
+        if path == '': 
+            return
+        
+        self.image = Image(path, int(self.heightSpinbox.get()), int(self.weightSpinbox.get()))
         
         self.indexSpinbox.destroy()
         self.indexSpinbox = Spinbox(
-            self.imageFrame1,
+            self.spinboxFrame,
             from_= -1,
             to= self.image.get_last_index()
         )
-        self.indexSpinbox.pack(anchor=N, pady=[10, 0])
+        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
     
     
     def save_image(self, index):
@@ -592,28 +620,7 @@ class App(Tk):
         ).pack(anchor=N, fill=X, pady=[20, 0])
     
     
-    def imageUI_1(self, parent):
-        Button(
-            parent,
-            text="Смещение данных изображения",
-            command=lambda:self.writeCurrentImageData(self.processing.shift2D(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Умножение данных изображения на константу",
-            command=lambda:self.writeCurrentImageData(self.processing.multModel2D(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Привести к серому цвету",
-            command=lambda:self.writeCurrentImageData(self.processing.toGray(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
+    def imageUI_1(self, parent):        
         Button(
             parent,
             text="Изменить размер изображения (ближайшие соседи)",
