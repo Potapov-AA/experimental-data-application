@@ -324,7 +324,8 @@ class TransformImageData:
     
     
     def resize_image_nearest_neighbors(self, dataImage, multiplierValue):
-        """_summary_
+        """
+            Изменение размера изображения методом ближайщих соседий
 
         Args:
             dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
@@ -348,6 +349,55 @@ class TransformImageData:
                 y = int(w * (weight / newSizeWeight))
                 try:
                     transformData[h][w] = dataImage[x][y]
+                except Exception:
+                    print(Exception)
+        
+        return np.array(transformData).astype('int32')  
+    
+    
+    def resize_image_binary_method(self, dataImage, multiplierValue):
+        """
+            Изменение размера изображения методом билинейной интерполяции
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            multiplierValue (int): значение множителя изменения размера
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            размер изменен методом билинейной интерполяции
+        """
+        weight = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        newSizeWeight = int(weight * multiplierValue)
+        newSizeHeight = int(height * multiplierValue)
+        
+        transformData = np.zeros((newSizeHeight, newSizeWeight))
+        
+        value = 0
+        
+        sh = newSizeHeight / height
+        sw = newSizeWeight / weight
+        
+        for h in range(newSizeHeight):
+            for w in range(newSizeWeight):
+                x= h / sh
+                y= w / sw
+                
+                p=(h+0.0)/sh-x
+                q=(w+0.0)/sw-y
+                
+                x=int(x)-1
+                y=int(y)-1
+                try:
+                    if x+1<newSizeHeight and y+1<newSizeWeight:
+                        value = int(dataImage[x][y]*(1-p)*(1-q)+
+                                    dataImage[x][y+1]*q*(1-p)+
+                                    dataImage[x+1][y]*(1-q)*p+
+                                    dataImage[x+1][y+1]*p*q)
+                
+                    transformData[h][w] = value
                 except Exception:
                     print(Exception)
         
