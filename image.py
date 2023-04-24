@@ -1,3 +1,4 @@
+import os
 import re
 import PIL.Image as PilImage
 import numpy as np
@@ -5,10 +6,10 @@ from tkinter import filedialog as fd
 from matplotlib import pyplot as plt
 
 class Image:
-    def __init__(self, path = None) -> None:
+    def __init__(self, path=None, height=1024, weight=1024) -> None:
         self.dataImageList = []
         if path != None:
-            self.dataImageList.append(self.__read_image(path))
+            self.dataImageList.append(self.__read_image(path, height, weight))
         else:
             self.dataImageList.append(self.__generate_default_iamge())
             
@@ -110,7 +111,7 @@ class Image:
         plt.show()    
     
     
-    def __read_image(self, path):
+    def __read_image(self, path, height=1024, weight=1024):
         """
             Получает путь до файла и проверяет расширение, 
             если расширение допустимого формата, то проводит 
@@ -131,8 +132,30 @@ class Image:
                 return self.__transform_data_image_to_default(dataImage)
             except Exception:
                 print(Exception)
-        elif fileExtension in ['']:
-            pass
+        elif fileExtension in ['xcr']:
+            try:
+                size = os.path.getsize(path)
+            
+                dataImage = []
+                
+                with open(path, 'rb') as f:
+                    f.read(2048)
+                    bytes = f.read(size - 2048 - 8192)
+                    
+                    for i in range(0, len(bytes), 2):
+                        number = bytes[i] * 256 + bytes[i+1]               
+                        dataImage.append(number)
+                
+                
+                dataImage = np.asarray(dataImage)
+                
+                # 1024 x 1024
+                # 2500 x 2048
+                dataImage = np.reshape(dataImage, (height, weight)) 
+                
+                return self.__transform_data_image_to_default(dataImage)
+            except Exception:
+                print(Exception)
         else:
             print("NANI")
     
