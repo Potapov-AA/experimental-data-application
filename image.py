@@ -322,7 +322,36 @@ class TransformImageData:
         
         return np.array(transformData).astype('int32')
     
+    
+    def resize_image_nearest_neighbors(self, dataImage, multiplierValue):
+        """_summary_
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            multiplierValue (int): значение множителя изменения размера
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            размер изменен методом ближайшего соседа
+        """
+        weight = dataImage.shape[1]
+        height = dataImage.shape[0]
         
+        newSizeWeight = int(weight * multiplierValue)
+        newSizeHeight = int(height * multiplierValue)
+        
+        transformData = np.zeros((newSizeHeight, newSizeWeight))
+        
+        for h in range(newSizeHeight):
+            for w in range(newSizeWeight):
+                x = int(h * (height / newSizeHeight))
+                y = int(w * (weight / newSizeWeight))
+                try:
+                    transformData[h][w] = dataImage[x][y]
+                except Exception:
+                    print(Exception)
+        
+        return np.array(transformData).astype('int32')  
     
     
     def do_negative(self, dataImage):
