@@ -61,6 +61,7 @@ class Config():
         
         self.config.add_section("ImageParametrs")
         self.config.set("ImageParametrs", "shiftMultiImage", "20")
+        self.config.set("ImageParametrs", "resizeMultiImage", "2")
         
         
         
