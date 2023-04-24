@@ -252,14 +252,14 @@ class App(Tk):
             text="Смещение",
             command=lambda:self.work_with_image(TransformImageData.shift_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[300, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[290, 0])
         
         Button(
             shiftMultyFrame,
             text="Умножение",
             command=lambda:self.work_with_image(TransformImageData.multi_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 300])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 290])
         
         Label(
             parent,
@@ -274,14 +274,14 @@ class App(Tk):
             text="Метод ближайщих соседей",
             command=lambda:self.work_with_image(TransformImageData.resize_image_nearest_neighbors, float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[300, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[150, 0])
         
-        # Button(
-        #     shiftMultyFrame,
-        #     text="Умножение",
-        #     command=lambda:self.work_with_image(TransformImageData.multi_data_image, shifMultiData),
-        #     font=self.mainFont
-        # ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 300])
+        Button(
+            resizeFrame,
+            text="Метод билинейной интерполяции",
+            command=lambda:self.work_with_image(TransformImageData.resize_image_binary_method, float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 150])
         
     
     def work_with_image(self, function, param=-1):
