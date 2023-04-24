@@ -41,6 +41,11 @@ class ParametrSettings(Toplevel):
        def pageImageUI(self, parent):
               Label(parent, text="Значение смещения/умножения").pack(anchor=N, fill=X, pady=[20, 10])
               self.drawParameter("shiftMultiValue =", "shiftMultiImage", parent, section="ImageParametrs")
+              
+              Label(parent, text="Значение множителя изменения размера").pack(anchor=N, fill=X, pady=[20, 10])
+              self.drawParameter("resizeMultiImage =", "resizeMultiImage", parent, section="ImageParametrs")
+              
+              
        
        
        
