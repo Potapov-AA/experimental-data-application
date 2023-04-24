@@ -507,43 +507,6 @@ class Processing():
         
     
     
-    
-    ### ПЕРЕНЕС В ДРУГОЙ КЛАСС (ДЛЯ РАБОТЫ С ИЗОБРАЖЕНИЯМИ)
-    # Смещение данных изображения на заданный коэффицент
-    def shift2D(self, dataImage):
-        shifImage = int(self.parametrs.GetParametr("Parametrs", "shiftImage"))
-        
-        for i in range(len(dataImage)):
-            for j in range(len(dataImage[i])):
-                dataImage[i][j] = dataImage[i][j] + shifImage
-        
-        return dataImage
-    
-    
-    ### ПЕРЕНЕС В ДРУГОЙ КЛАСС (ДЛЯ РАБОТЫ С ИЗОБРАЖЕНИЯМИ)
-    # Умножение данных изображения на заданный коэффицент
-    def multModel2D(self, dataImage):
-        multiImage = float(self.parametrs.GetParametr("Parametrs", "multiImage"))
-        
-        for i in range(len(dataImage)):
-            for j in range(len(dataImage[i])):
-                dataImage[i][j] = dataImage[i][j] * multiImage
-           
-        return dataImage
-    
-    
-    # Приведение к серому диапозону
-    def toGray(self, dataImage):
-        maxPixel = dataImage.max();
-        minPixel = dataImage.min();
-        
-        for i in range(len(dataImage)):
-            for j in range(len(dataImage[i])):
-                dataImage[i][j] = ((dataImage[i][j] - minPixel) / (maxPixel - minPixel)) * 255
-        
-        return dataImage
-    
-    
     # Изменение размера методом ближайших соседей
     def resizeNearestImage(self, dataImage):
         multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
