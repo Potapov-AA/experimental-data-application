@@ -504,34 +504,6 @@ class Processing():
         plt.show()
         
         return(result)
-        
-    
-    
-    # Изменение размера методом ближайших соседей
-    def resizeNearestImage(self, dataImage):
-        multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
-        
-        w = dataImage.shape[1]
-        h = dataImage.shape[0]
-        
-        newSizeW = int(w * multiSize)
-        newSizeH = int(h * multiSize)
-        
-        emptyImage=np.zeros((newSizeH, newSizeW, 3))
-        
-        sh = newSizeH / h
-        sw = newSizeW / w
-        
-        for i in range(newSizeH):
-            for j in range(newSizeW):
-                x=int(i/sh)
-                y=int(j/sw)
-                try:
-                    emptyImage[i,j]=dataImage[x,y]
-                except:
-                    print(x, y)
-        
-        return emptyImage
     
     
     # Изменение размера бинарным методом
@@ -597,24 +569,6 @@ class Processing():
         for i in range(len(dataImage)):
             for j in range(len(dataImage[i])):
                 dataImage[i][j] = L - 1 - dataImage[i][j]
-        
-        return dataImage
-    
-    
-    # Делает цветное изображение серым
-    def doGray(self, dataImage):
-        
-        for i in range(len(dataImage)):
-            for j in range(len(dataImage[i])):
-                r = dataImage[i][j][0]
-                g = dataImage[i][j][1]
-                b = dataImage[i][j][2]
-                
-                s = (r + g + b) // 3
-                
-                dataImage[i][j][0] = s
-                dataImage[i][j][1] = s
-                dataImage[i][j][2] = s
         
         return dataImage
     
