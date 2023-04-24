@@ -247,25 +247,41 @@ class App(Tk):
         shiftMultyFrame = Frame(parent)
         shiftMultyFrame.pack(fill=X)
         
-        shifMultiData = int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))
-        
         Button(
             shiftMultyFrame,
             text="Смещение",
-            command=lambda:self.work_with_image(TransformImageData.shift_data_image, shifMultiData),
+            command=lambda:self.work_with_image(TransformImageData.shift_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[300, 0])
         
         Button(
             shiftMultyFrame,
             text="Умножение",
-            command=lambda:self.work_with_image(TransformImageData.multi_data_image, shifMultiData),
+            command=lambda:self.work_with_image(TransformImageData.multi_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 300])
         
+        Label(
+            parent,
+            text="Изменение размера изображения"
+        ).pack(pady=[30, 0])
         
+        resizeFrame = Frame(parent)
+        resizeFrame.pack(fill=X)
         
+        Button(
+            resizeFrame,
+            text="Метод ближайщих соседей",
+            command=lambda:self.work_with_image(TransformImageData.resize_image_nearest_neighbors, float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[300, 0])
         
+        # Button(
+        #     shiftMultyFrame,
+        #     text="Умножение",
+        #     command=lambda:self.work_with_image(TransformImageData.multi_data_image, shifMultiData),
+        #     font=self.mainFont
+        # ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 300])
         
     
     def work_with_image(self, function, param=-1):
@@ -327,16 +343,13 @@ class App(Tk):
         name = fd.askopenfilename() 
         self.currentSoundData = self.inout.readSoundFile(name)
 
-        
-    
     def statisticCurrentFile(self):
         statisticText = self.analysis.statistics(self.currentData)
         statisticText += '\n'
         statisticText += self.analysis.stationarity(self.currentData)
         
         self.inout.statisticSave("saveData/statistic.txt", statisticText)
-    
-    
+       
     def writeCurrentData(self, function):
         self.currentData = function
     
@@ -637,13 +650,6 @@ class App(Tk):
             command=lambda:self.writeCurrentImageData(self.processing.doNegative(self.currentImage)),
             font=self.mainFont
         ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Сделать изображение серым",   
-            command=lambda:self.writeCurrentImageData(self.processing.doGray(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
         
         Button(
             parent,
