@@ -230,6 +230,13 @@ class App(Tk):
             font=self.mainFont
         ).pack(pady=[0, 10])
         
+        Button(
+            parent,
+            text="Добавить новое изображение",
+            command=lambda: self.add_new_image(),
+            font=self.mainFont
+        ).pack(pady=[0, 10])
+        
     
     def image_transform_UI(self, parent):
         Button(
@@ -314,13 +321,7 @@ class App(Tk):
         
         self.image.add_updated_data_to_list(transofrmData)
         
-        self.indexSpinbox.destroy()
-        self.indexSpinbox = Spinbox(
-            self.spinboxFrame,
-            from_= -1,
-            to= self.image.get_last_index()
-        )
-        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
+        self.__reset_spinbox_count_images()
         
     
     def open_image(self):
@@ -331,13 +332,7 @@ class App(Tk):
         
         self.image = Image(path, int(self.heightSpinbox.get()), int(self.weightSpinbox.get()))
         
-        self.indexSpinbox.destroy()
-        self.indexSpinbox = Spinbox(
-            self.spinboxFrame,
-            from_= -1,
-            to= self.image.get_last_index()
-        )
-        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
+        self.__reset_spinbox_count_images()
     
     
     def save_image(self, index):
@@ -348,8 +343,25 @@ class App(Tk):
         self.image.show_image(index)
     
     
+    def add_new_image(self):
+        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr'), ('BIN', '.bin')))
+        
+        if path == '': 
+            return
+        
+        self.image.add_new_image(path, int(self.heightSpinbox.get()), int(self.weightSpinbox.get()))
+        
+        self.__reset_spinbox_count_images()
     
     
+    def __reset_spinbox_count_images(self):
+        self.indexSpinbox.destroy()
+        self.indexSpinbox = Spinbox(
+            self.spinboxFrame,
+            from_= -1,
+            to= self.image.get_last_index()
+        )
+        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
     
     
     
