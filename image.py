@@ -25,6 +25,18 @@ class Image:
         self.dataImageList.append(dataImage)
     
     
+    def add_new_image(self, path, height=1024, weight=1024):
+        """
+            Добавляет новое изображение к текущим
+
+        Args:
+            path (string): путь до файла
+            height (int, optional): высота изображения для данных формата bin, xmr. По умолчанию 1024.
+            weight (int, optional): ширина изображения для данных формата bin, xmr. По умолчанию 1024.
+        """
+        self.dataImageList.append(self.__read_image(path, height, weight))
+    
+    
     def get_last_data(self):
         """
             Возвращает последние данные из списка
@@ -97,7 +109,8 @@ class Image:
         width = image.size[0]
         hight = image.size[1]
         
-        plt.figure(figsize=(6,6))
+        fig = plt.figure(figsize=(6,6))
+        fig.patch.set_facecolor('#e8e8e8')
         plt.title(f"Размеры изображения: {width}x{hight}")
         plt.imshow(image)
         plt.axis("off")
@@ -111,7 +124,8 @@ class Image:
         plotCount = len(self.dataImageList)
         rowCount = int(plotCount // 3) + 1
         
-        plt.figure(figsize=(5, 5))
+        fig = plt.figure(figsize=(5, 5))
+        fig.patch.set_facecolor('#e8e8e8')
         
         for p in range(plotCount):
             image = PilImage.fromarray(self.dataImageList[p])
