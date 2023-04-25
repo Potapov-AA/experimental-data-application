@@ -508,35 +508,6 @@ class Processing():
     
     
     
-    # Гамма преобразование
-    def gammaTransform(self, dataImage):
-        C = float(self.parametrs.GetParametr("Parametrs", "C"))
-        y = float(self.parametrs.GetParametr("Parametrs", "y"))
-        
-        
-        for i in range(len(dataImage)):
-            for j in range(len(dataImage[i])):
-                # print(dataImage[i][j])
-                dataImage[i][j] = C * dataImage[i][j] ** y
-
-        dataImage = self.toGray(dataImage)
-        
-        return dataImage
-    
-    
-    # Логарифмическое преобразование
-    def logTransform(self, dataImage):
-        C = float(self.parametrs.GetParametr("Parametrs", "C"))
-        
-        
-        for i in range(len(dataImage)):
-            for j in range(len(dataImage[i])):
-                dataImage[i][j] = C * np.log(dataImage[i][j] + 1)
-        
-        dataImage = self.toGray(dataImage)
-        
-        return dataImage
-    
     # Градиционное преобразование
     def ImageGradientTransform(self, dataImage):
         newDataImage = []
