@@ -63,6 +63,8 @@ class Config():
         self.config.set("ImageParametrs", "shiftMultiImage", "20")
         self.config.set("ImageParametrs", "resizeMultiImage", "2")
         self.config.set("ImageParametrs", "blackAndWhiteFactorImage", "100")
+        self.config.set("ImageParametrs", "cImage", "5")
+        self.config.set("ImageParametrs", "yImage", "5")
         
         
         
