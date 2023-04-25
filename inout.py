@@ -1,11 +1,6 @@
-import os
 import numpy as np
 import wave
-import imageio
-import PIL.Image as pil
 from struct import *
-from PIL import Image
-from processing import Processing
 
 class InOut():
     def __init__(self): pass
