@@ -404,6 +404,50 @@ class TransformImageData:
         return np.array(transformData).astype('int32')  
     
     
+    def rotate_image_left(self, dataImage):
+        """
+            Поворот изображения налево
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+        """
+        weight = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        transformData = np.zeros((weight, height))
+        
+        for w in range(weight):
+            for h in range(height):
+                transformData[w][h] = dataImage[h][weight - w - 1]
+        
+        return np.array(transformData).astype('int32') 
+    
+    
+    def rotate_image_right(self, dataImage):
+        """
+            Поворот изображения направо
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+        """
+        weight = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        transformData = np.zeros((weight, height))
+        
+        for w in range(weight):
+            for h in range(height):
+                transformData[w][h] = dataImage[height - h - 1][w]
+        
+        return np.array(transformData).astype('int32')   
+    
+    
     def do_negative(self, dataImage):
         L = dataImage.max()
         
