@@ -506,61 +506,7 @@ class Processing():
         return(result)
     
     
-    # Изменение размера бинарным методом
-    def resizeBinaryImage(self, dataImage):
-        multiSize = float(self.parametrs.GetParametr("Parametrs", "multiSize"))
-        
-        w = dataImage.shape[1]
-        h = dataImage.shape[0]
-        
-        newSizeW = int(w * multiSize)
-        newSizeH = int(h * multiSize)
-        
-        emptyImage=np.zeros((newSizeH, newSizeW, 3), np.uint8)
-        value=[0,0,0]
-        
-        sh = newSizeH / h
-        sw = newSizeW / w
-        
-        for i in range(newSizeH):
-            for j in range(newSizeW):
-                x= i/sh
-                y= j/sw
-                p=(i+0.0)/sh-x
-                q=(j+0.0)/sw-y
-                x=int(x)-1
-                y=int(y)-1
-                for k in range(3):
-                    try:
-                        if x+1<newSizeH and y+1<newSizeW:
-                            value[k]=int(dataImage[x][y][k]*(1-p)*(1-q)+
-                                    dataImage[x][y+1][k]*q*(1-p)+
-                                    dataImage[x+1][y][k]*(1-q)*p+
-                                    dataImage[x+1][y+1][k]*p*q)
-                    except:
-                        print(x, y)
-                try:
-                    emptyImage[i, j] = (value[0], value[1], value[2])
-                except:
-                    print(x, y)
-        
-        return dataImage
     
-    
-    # Поворот изображения
-    def rotateImage(self, dataImage, isRight = true):
-        dataImage = dataImage.astype('uint8')
-        image = pil.fromarray(dataImage)
-        
-        if isRight:
-            im_rotate = image.rotate(-90, expand=True)
-        else:
-            im_rotate = image.rotate(90, expand=True)
-        
-        dataImage = np.array(im_rotate)
-        dataImage = dataImage.astype('int32')
-        
-        return dataImage
     
     # Делает изображение негативным
     def doNegative(self, dataImage):
