@@ -508,17 +508,6 @@ class Processing():
     
     
     
-    # Делает изображение негативным
-    def doNegative(self, dataImage):
-        L = dataImage.max()
-        
-        for i in range(len(dataImage)):
-            for j in range(len(dataImage[i])):
-                dataImage[i][j] = L - 1 - dataImage[i][j]
-        
-        return dataImage
-    
-    
     # Гамма преобразование
     def gammaTransform(self, dataImage):
         C = float(self.parametrs.GetParametr("Parametrs", "C"))
