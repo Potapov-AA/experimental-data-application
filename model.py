@@ -1,8 +1,10 @@
 from random import randint
+import random
 from matplotlib import pyplot as plt
 import numpy as np
 import math
 import time
+import PIL.Image as pil
 
 from config import Config
 
@@ -55,6 +57,24 @@ class Model:
             plt.title(f"Текущий звуковой файл. Частота: {framerate}. Длительность: {time}. Кол-во каналов: {nchannels}, {sampwidth}")   
             plt.xlabel("time")
         
+        plt.show()
+    
+    
+    def drawImageData(self, dataImage):
+        try:
+            if(len(dataImage[0][0]) > 1):
+                dataImage = dataImage.astype('uint8')
+        except:
+            pass
+        image = pil.fromarray(dataImage)
+        
+        
+        size_w = image.size[0]
+        size_h = image.size[1]
+        plt.figure(figsize=(6,6))
+        plt.title(f"Размеры изображения: {size_w}x{size_h}")
+        plt.imshow(image)
+        plt.axis("off")
         plt.show()
     
     
@@ -446,3 +466,28 @@ class Model:
             plt.show()
         
         return dataCardio
+    
+    # Метод зашумления изображения шумом типа "соль и перец"
+    def ToSolidAndPeaper(self, dataImage, n):
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        for h in range(height):
+            noisePixel = random.sample(list(np.arange(width)), n)
+            for i in range(n):
+                dataImage[h, noisePixel[i]] = 0 if random.randint(0, 1) else 255
+        
+        return dataImage
+
+    def ToRandomNoise(self, dataImage, scale):
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        length = int(np.ceil(np.abs(width)))
+        
+        for h in range(height):
+            dataY = np.array([int(random.uniform(-scale, scale)) for _ in range(0, length)])
+            dataImage[h] += dataY
+            
+        return dataImage
+            

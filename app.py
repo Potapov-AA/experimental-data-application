@@ -5,6 +5,8 @@ from tkinter import font
 
 import numpy as np
 
+from image import Image, TransformImageData
+
 from settings import ParametrSettings
 from model import Model
 from analysis import Analysis
@@ -13,9 +15,14 @@ from config import Config
 from inout import InOut
 
 
+
 class App(Tk):
     def __init__(self):
         super().__init__()
+        
+        self.image = Image()
+        
+        
         self.model = Model()
         self.analysis = Analysis()
         self.processing = Processing()
@@ -30,6 +37,9 @@ class App(Tk):
         
         self.currentFilter = []
         self.currentFilterSound = []
+
+        self.currentImage = []
+        self.tempImage = []
         
         self.mainFont = font.Font(family="Time New Roman", size=12, weight="normal", slant="roman")
         
@@ -67,6 +77,7 @@ class App(Tk):
         filemenu.add_command(label="Отобразить текущие звуковые данные", command=lambda : self.model.drawSoundData(self.currentSoundData))
         filemenu.add_command(label="Сохранить текущие звуковые данные", command=lambda : self.inout.saveSoundFile("saveData/data.wav", self.currentSoundData))
         
+        
         filemenu.add_command(label="Записать выбранный фрагмент звуковых данных во временную переменную", command=self.writeCurrentSoundDataInTemp)
         filemenu.add_command(label="Отобразить выбранный фрагмент звуковых данных", command=lambda : self.model.drawData(self.tempSoundData))
         
@@ -93,29 +104,270 @@ class App(Tk):
         notebook = ttk.Notebook()
         notebook.pack(expand=True, fill=BOTH)       
         
-        frame1 = ttk.Frame(notebook)
-        frame2 = ttk.Frame(notebook)
-        frame3 = ttk.Frame(notebook)
-        frame4 = ttk.Frame(notebook)
-        frame5 = ttk.Frame(notebook)
+        image = ttk.Frame(notebook)
+        image.pack(fill=BOTH, expand=True)
         
-        frame1.pack(fill=BOTH, expand=True)
-        frame2.pack(fill=BOTH, expand=True)
-        frame3.pack(fill=BOTH, expand=True)
-        frame4.pack(fill=BOTH, expand=True)
-        frame5.pack(fill=BOTH, expand=True)
+        notebook.add(image, text="РАБОТА С ИЗОБРАЖЕНИЯМИ")
         
-        notebook.add(frame1, text="Станд. графики")
-        notebook.add(frame2, text="Генератор шумов")
-        notebook.add(frame3, text="Изменить данные")
-        notebook.add(frame4, text="Фильтры")
-        notebook.add(frame5, text="Примеры")
+        imageNotebook = ttk.Notebook(image)
+        imageNotebook.pack(expand=True, fill=BOTH)   
         
-        self.standartFunctionUI(frame1)
-        self.noiseGeneratorUI(frame2)
-        self.changeCurrentDataUI(frame3)
-        self.filterUI(frame4)
-        self.exampleUI(frame5)
+        self.imageFrame1 = ttk.Frame(notebook)
+        self.imageFrame1.pack(fill=BOTH, expand=True)
+        
+        imageFrame2 = ttk.Frame(notebook)
+        imageFrame2.pack(fill=BOTH, expand=True)
+        
+        imageNotebook.add(self.imageFrame1, text="Работа с файлами и отображение")
+        imageNotebook.add(imageFrame2, text="Трансформация изображения")
+        
+        self.image_open_save_show_UI(self.imageFrame1)
+        self.image_transform_UI(imageFrame2)
+        
+        
+        
+        # frame1 = ttk.Frame(notebook)
+        # frame2 = ttk.Frame(notebook)
+        # frame3 = ttk.Frame(notebook)
+        # frame4 = ttk.Frame(notebook)
+        # frame5 = ttk.Frame(notebook)
+        frame6 = ttk.Frame(notebook)
+        frame7 = ttk.Frame(notebook)
+        
+        # frame1.pack(fill=BOTH, expand=True)
+        # frame2.pack(fill=BOTH, expand=True)
+        # frame3.pack(fill=BOTH, expand=True)
+        # frame4.pack(fill=BOTH, expand=True)
+        # frame5.pack(fill=BOTH, expand=True)
+        frame6.pack(fill=BOTH, expand=True)
+        frame7.pack(fill=BOTH, expand=True)
+        
+        # notebook.add(frame1, text="Станд. графики")
+        # notebook.add(frame2, text="Генератор шумов")
+        # notebook.add(frame3, text="Изменить данные")
+        # notebook.add(frame4, text="Фильтры")
+        # notebook.add(frame5, text="Примеры")
+        notebook.add(frame6, text="Работа с изображениями 1")
+        notebook.add(frame7, text="Работа с изображениями 2")
+        
+        # self.standartFunctionUI(frame1)
+        # self.noiseGeneratorUI(frame2)
+        # self.changeCurrentDataUI(frame3)
+        # self.filterUI(frame4)
+        # self.exampleUI(frame5)
+        self.imageUI_1(frame6)
+        self.imageUI_2(frame7)
+    
+    
+    def image_open_save_show_UI(self, parent):
+        
+        buttonFrame = Frame(parent)
+        buttonFrame.pack(fill=X)
+        
+        Button(
+            buttonFrame,
+            text="Открыть изображение",
+            command=self.open_image,
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30], padx=[100, 0])
+        
+        Button(
+            buttonFrame,
+            text="Сохранить изображение",
+            command=lambda:self.save_image(index=int(self.indexSpinbox.get())),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30])
+        
+        Button(
+            buttonFrame,
+            text="Отобразить изображение",
+            command=lambda: self.show_image(index=int(self.indexSpinbox.get())),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 10], padx=[0, 100])
+        
+        spinboxsFrame = Frame(parent)
+        spinboxsFrame.pack(fill=X)
+        
+        Label(
+            spinboxsFrame,
+            text="Высота и ширина изображения для xcr/bin"
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[100, 0])
+        
+        self.heightSpinbox = Spinbox(
+            spinboxsFrame,
+            from_= 0,
+            to= 4000
+        )
+        self.heightSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[5, 0])
+        
+        self.weightSpinbox = Spinbox(
+            spinboxsFrame,
+            from_= 0,
+            to= 4000
+        )
+        self.weightSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 100])
+        
+        
+        self.spinboxFrame = Frame(parent)
+        self.spinboxFrame.pack(fill=X)
+        
+        Label(
+            self.spinboxFrame,
+            text="Индекс изображения"
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[250, 0])
+        
+        self.indexSpinbox = Spinbox(
+            self.spinboxFrame,
+            from_= -1,
+            to= self.image.get_last_index()
+        )
+        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
+        
+        Button(
+            parent,
+            text="Отобразить все изображения",
+            command=lambda: self.image.show_all_images(),
+            font=self.mainFont
+        ).pack(pady=[0, 10])
+        
+        Button(
+            parent,
+            text="Добавить новое изображение",
+            command=lambda: self.add_new_image(),
+            font=self.mainFont
+        ).pack(pady=[0, 10])
+        
+    
+    def image_transform_UI(self, parent):
+        Button(
+            parent,
+            text="Приведение данныех изображения к серому диапазону",
+            command=lambda:self.work_with_image(TransformImageData.data_to_gray_diapason),
+            font=self.mainFont
+        ).pack(pady=[30, 0])
+        
+        Label(
+            parent,
+            text="Смещение/Умножение данных изображения"
+        ).pack(pady=[30, 0])
+        
+        shiftMultyFrame = Frame(parent)
+        shiftMultyFrame.pack(fill=X)
+        
+        Button(
+            shiftMultyFrame,
+            text="Смещение",
+            command=lambda:self.work_with_image(TransformImageData.shift_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[290, 0])
+        
+        Button(
+            shiftMultyFrame,
+            text="Умножение",
+            command=lambda:self.work_with_image(TransformImageData.multi_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 290])
+        
+        Label(
+            parent,
+            text="Изменение размера изображения"
+        ).pack(pady=[30, 0])
+        
+        resizeFrame = Frame(parent)
+        resizeFrame.pack(fill=X)
+        
+        Button(
+            resizeFrame,
+            text="Метод ближайщих соседей",
+            command=lambda:self.work_with_image(TransformImageData.resize_image_nearest_neighbors, float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[150, 0])
+        
+        Button(
+            resizeFrame,
+            text="Метод билинейной интерполяции",
+            command=lambda:self.work_with_image(TransformImageData.resize_image_binary_method, float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 150])
+        
+        Label(
+            parent,
+            text="Поворот изображения"
+        ).pack(pady=[30, 0])
+        
+        rotateFrame = Frame(parent)
+        rotateFrame.pack(fill=X)
+        
+        Button(
+            rotateFrame,
+            text="Налево",
+            command=lambda:self.work_with_image(TransformImageData.rotate_image_left),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[290, 0])
+        
+        Button(
+            rotateFrame,
+            text="Направо",
+            command=lambda:self.work_with_image(TransformImageData.rotate_image_right),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 290])
+        
+    
+    def work_with_image(self, function, param=-1):
+        if param == -1:
+            transofrmData = function(self, self.image.get_last_data())
+        else:
+            transofrmData = function(self, self.image.get_last_data(), param)
+        
+        self.image.add_updated_data_to_list(transofrmData)
+        
+        self.__reset_spinbox_count_images()
+        
+    
+    def open_image(self):
+        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr'), ('BIN', '.bin')))
+        
+        if path == '': 
+            return
+        
+        self.image = Image(path, int(self.heightSpinbox.get()), int(self.weightSpinbox.get()))
+        
+        self.__reset_spinbox_count_images()
+    
+    
+    def save_image(self, index):
+        self.image.save_image(index)
+    
+    
+    def show_image(self, index):
+        self.image.show_image(index)
+    
+    
+    def add_new_image(self):
+        path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr'), ('BIN', '.bin')))
+        
+        if path == '': 
+            return
+        
+        self.image.add_new_image(path, int(self.heightSpinbox.get()), int(self.weightSpinbox.get()))
+        
+        self.__reset_spinbox_count_images()
+    
+    
+    def __reset_spinbox_count_images(self):
+        self.indexSpinbox.destroy()
+        self.indexSpinbox = Spinbox(
+            self.spinboxFrame,
+            from_= -1,
+            to= self.image.get_last_index()
+        )
+        self.indexSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[10, 20], padx=[0, 250])
+    
+    
+    
+    
+    
+    
         
     def openBinaryFile(self):
         name = fd.askopenfilename() 
@@ -124,16 +376,14 @@ class App(Tk):
     def openSoundFile(self):
         name = fd.askopenfilename() 
         self.currentSoundData = self.inout.readSoundFile(name)
-    
-    
+
     def statisticCurrentFile(self):
         statisticText = self.analysis.statistics(self.currentData)
         statisticText += '\n'
         statisticText += self.analysis.stationarity(self.currentData)
         
         self.inout.statisticSave("saveData/statistic.txt", statisticText)
-    
-    
+       
     def writeCurrentData(self, function):
         self.currentData = function
     
@@ -145,6 +395,15 @@ class App(Tk):
     
     def writeCurrentSoundData(self, function):
         self.currentSoundData = function
+    
+    def writeCurrentImageData(self, function):
+        self.currentImage = function
+    
+    def writeCurrentImageDataInTemp(self):
+        try:
+            self.tempImage = self.currentImage
+        except:
+            print("Текущих данных не существует")
     
     def writeCurrentSoundDataInTemp(self):
         try:
@@ -277,7 +536,7 @@ class App(Tk):
         Button(
             parent,
             text="Рассчитать для ФВЧ",
-            command= lambda: self.processing.hpf(draw=True),
+            command= lambda: self.processing.NewHPF(draw=True),
             font=self.mainFont
         ).pack(anchor=N, fill=X)
         
@@ -388,3 +647,165 @@ class App(Tk):
             command=lambda : self.writeCurrentData(self.model.cardiograma(draw=True)),
             font=self.mainFont
         ).pack(anchor=N, fill=X, pady=[20, 0])
+    
+    
+    def imageUI_1(self, parent):        
+        Button(
+            parent,
+            text="Изменить размер изображения (ближайшие соседи)",
+            command=lambda:self.writeCurrentImageData(self.processing.resizeNearestImage(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Изменить размер изображения (бинарный)",   
+            command=lambda:self.writeCurrentImageData(self.processing.resizeBinaryImage(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Повернуть изображение налево",   
+            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage, False)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Повернуть изображение направо",   
+            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Сделать изображение негативным",   
+            command=lambda:self.writeCurrentImageData(self.processing.doNegative(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Гамма-преобразование",   
+            command=lambda:self.writeCurrentImageData(self.processing.gammaTransform(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Логарифмическое преобразование",   
+            command=lambda:self.writeCurrentImageData(self.processing.logTransform(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Гистограмма текущего изображения",   
+            command=lambda:self.analysis.ImageHistogram(self.currentImage),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Гистограмма текущего изображения с приведением к серому",   
+            command=lambda:self.analysis.ImageHistogramWithToGray(self.currentImage),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="RGB гистограмма текущего изображения",   
+            command=lambda:self.analysis.ImageRGBHistogram(self.currentImage),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Градиционное преобразование",   
+            command=lambda:self.writeCurrentImageData(self.processing.ImageGradientTransform(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Сравнение изображений",   
+            command=lambda:self.writeCurrentImageData(self.analysis.ResidualBetweenImages(self.currentImage, self.tempImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Применить фильтр Гарри Поттера",   
+            command=lambda:self.writeCurrentImageData(self.processing.ResultForLab5(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+    
+    def imageUI_2(self, parent):
+        Button(
+            parent,
+            text="Посолить и поперчить изображение",   
+            command=lambda:self.writeCurrentImageData(self.model.ToSolidAndPeaper(self.currentImage, n = 30)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Прорандомить изображение",   
+            command=lambda:self.writeCurrentImageData(self.model.ToRandomNoise(self.currentImage, scale = 20)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Усредняющий арифметический фильтр",   
+            command=lambda:self.writeCurrentImageData(self.processing.MiddleFilter(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Медианный фильтр",   
+            command=lambda:self.writeCurrentImageData(self.processing.MedianFilter(self.currentImage)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        Button(
+            parent,
+            text="Сгенерировать изображение",   
+            command=lambda:self.writeCurrentImageData(self.processing.GenerateImageBlackAndWhiteSqard()),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X, pady=[20, 0])
+        
+        Button(
+            parent,
+            text="Обратный Фурье",   
+            command=lambda:self.writeCurrentImageData(self.processing.InverseFurie(self.currentImage, mode = 3)),
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        
+        Button(
+            parent,
+            text="Тест старых функций",   
+            command=self.TEST,
+            font=self.mainFont
+        ).pack(anchor=N, fill=X)
+        
+        
+    def TEST(self):
+        from image import Image
+        
+        path = fd.askopenfilename() 
+        image = Image(path)
+        image.save_last_image()
+        
+        
+        
+        
+        
+        
+            
+
+
