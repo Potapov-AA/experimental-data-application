@@ -490,7 +490,7 @@ class TransformImageData:
     
     def do_black_and_white(self, dataImage, factor):
         """
-            Делает изображение сепия
+            Делает изображение черно-белым
 
         Args:
             dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
@@ -511,5 +511,53 @@ class TransformImageData:
                     transformData[h][w] = 255
                 else:
                     transformData[h][w] = 0
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def do_gamma_transform(self, dataImage, C, y):
+        """
+            Применяет к изображению гамма-преобразование
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = C * (dataImage[h][w] ** y)
+
+        transformData = self.data_to_gray_diapason(transformData)
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def do_logarithm_transform(self, dataImage, C):        
+        """
+            Применяет к изображению логарифмического-преобразование
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = C * np.log(dataImage[h][w] + 1)
+        
+        transformData = self.data_to_gray_diapason(transformData)
         
         return np.array(transformData).astype('int32')
