@@ -48,7 +48,9 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Фактор для применения эффекта черно-белое").pack(anchor=N, fill=X, pady=[20, 10])
               self.drawParameter("blackAndWhiteFactorImage =", "blackAndWhiteFactorImage", parent, section="ImageParametrs")
               
-              
+              Label(parent, text="Гамма и логарифмическое преобразования").pack(anchor=N, fill=X, pady=[20, 10])     
+              self.drawParameter("cImage =", "cImage", parent, section="ImageParametrs")       
+              self.drawParameter("yImage =", "yImage", parent, section="ImageParametrs")     
               
               
        
