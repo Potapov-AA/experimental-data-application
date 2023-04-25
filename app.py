@@ -283,6 +283,28 @@ class App(Tk):
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 150])
         
+        Label(
+            parent,
+            text="Поворот изображения"
+        ).pack(pady=[30, 0])
+        
+        rotateFrame = Frame(parent)
+        rotateFrame.pack(fill=X)
+        
+        Button(
+            rotateFrame,
+            text="Налево",
+            command=lambda:self.work_with_image(TransformImageData.rotate_image_left),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[290, 0])
+        
+        Button(
+            rotateFrame,
+            text="Направо",
+            command=lambda:self.work_with_image(TransformImageData.rotate_image_right),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 290])
+        
     
     def work_with_image(self, function, param=-1):
         if param == -1:
