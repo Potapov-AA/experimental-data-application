@@ -241,7 +241,7 @@ class App(Tk):
     def image_transform_UI(self, parent):
         Button(
             parent,
-            text="Приведение данныех изображения к серому диапазону",
+            text="Приведение данных изображения к серому диапазону",
             command=lambda:self.work_with_image(TransformImageData.data_to_gray_diapason),
             font=self.mainFont
         ).pack(pady=[30, 0])
@@ -257,16 +257,20 @@ class App(Tk):
         Button(
             shiftMultyFrame,
             text="Смещение",
-            command=lambda:self.work_with_image(TransformImageData.shift_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
+            width = 15,
+            command=lambda:self.work_with_image(TransformImageData.shift_data_image, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[290, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[245, 0])
         
         Button(
             shiftMultyFrame,
             text="Умножение",
-            command=lambda:self.work_with_image(TransformImageData.multi_data_image, int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
+            width = 15,
+            command=lambda:self.work_with_image(TransformImageData.multi_data_image, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 290])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 245])
         
         Label(
             parent,
@@ -279,16 +283,20 @@ class App(Tk):
         Button(
             resizeFrame,
             text="Метод ближайщих соседей",
-            command=lambda:self.work_with_image(TransformImageData.resize_image_nearest_neighbors, float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            width = 30,
+            command=lambda:self.work_with_image(TransformImageData.resize_image_nearest_neighbors, 
+                                                float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[150, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[110, 0])
         
         Button(
             resizeFrame,
             text="Метод билинейной интерполяции",
-            command=lambda:self.work_with_image(TransformImageData.resize_image_binary_method, float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            width = 30,
+            command=lambda:self.work_with_image(TransformImageData.resize_image_binary_method, 
+                                                float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 150])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 110])
         
         Label(
             parent,
@@ -301,6 +309,7 @@ class App(Tk):
         Button(
             rotateFrame,
             text="Налево",
+            width = 10,
             command=lambda:self.work_with_image(TransformImageData.rotate_image_left),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[290, 0])
@@ -308,16 +317,76 @@ class App(Tk):
         Button(
             rotateFrame,
             text="Направо",
+            width = 10,
             command=lambda:self.work_with_image(TransformImageData.rotate_image_right),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 290])
         
+        Label(
+            parent,
+            text="Применить эффект"
+        ).pack(pady=[30, 0])
+        
+        effectFrame = Frame(parent)
+        effectFrame.pack(fill=X)
+        
+        Button(
+            effectFrame,
+            text="Негатив",
+            width = 15,
+            command=lambda:self.work_with_image(TransformImageData.do_negative),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[245, 0])
+        
+        Button(
+            effectFrame,
+            text="Черно-белое",
+            width = 15,
+            command=lambda:self.work_with_image(TransformImageData.do_black_and_white, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "blackAndWhiteFactorImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 245])
+        
+        Label(
+            parent,
+            text="Применить преобразования"
+        ).pack(pady=[30, 0])
+        
+        transformFrame = Frame(parent)
+        transformFrame.pack(fill=X)
+        
+        Button(
+            transformFrame,
+            text="Гамма-преобразование",
+            width = 35,
+            command=lambda:self.work_with_image(TransformImageData.do_gamma_transform, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "cImage")),
+                                                int(self.parametrs.GetParametr("ImageParametrs", "yImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[65, 0])
+        
+        Button(
+            transformFrame,
+            text="Логарифмическое-преобразование",
+            width = 35,
+            command=lambda:self.work_with_image(TransformImageData.do_logarithm_transform, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "cImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 65])
+        
     
-    def work_with_image(self, function, param=-1):
-        if param == -1:
-            transofrmData = function(self, self.image.get_last_data())
+    def work_with_image(self, function, paramOne=-1, paramTwo=-1):
+        if int(self.indexSpinbox.get()) == -1:
+            data = self.image.get_last_data()
         else:
-            transofrmData = function(self, self.image.get_last_data(), param)
+            data = self.image.dataImageList[int(self.indexSpinbox.get())]
+            
+        if paramOne == -1 and paramTwo == -1:
+            transofrmData = function(TransformImageData(), data)
+        elif paramTwo == -1:
+            transofrmData = function(TransformImageData(), data, paramOne)
+        else:
+            transofrmData = function(TransformImageData(), data, paramOne, paramTwo)
         
         self.image.add_updated_data_to_list(transofrmData)
         

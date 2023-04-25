@@ -45,6 +45,13 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Значение множителя изменения размера").pack(anchor=N, fill=X, pady=[20, 10])
               self.drawParameter("resizeMultiImage =", "resizeMultiImage", parent, section="ImageParametrs")
               
+              Label(parent, text="Фактор для применения эффекта черно-белое").pack(anchor=N, fill=X, pady=[20, 10])
+              self.drawParameter("blackAndWhiteFactorImage =", "blackAndWhiteFactorImage", parent, section="ImageParametrs")
+              
+              Label(parent, text="Гамма и логарифмическое преобразования").pack(anchor=N, fill=X, pady=[20, 10])     
+              self.drawParameter("cImage =", "cImage", parent, section="ImageParametrs")       
+              self.drawParameter("yImage =", "yImage", parent, section="ImageParametrs")     
+              
               
        
        
@@ -146,7 +153,7 @@ class ParametrSettings(Toplevel):
               
             
        def centerWindow(self):
-              w = 300
+              w = 400
               h = 840
 
               sw = self.winfo_screenwidth()

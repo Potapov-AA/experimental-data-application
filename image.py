@@ -131,6 +131,7 @@ class Image:
             image = PilImage.fromarray(self.dataImageList[p])
             plt.subplot(rowCount, 3, p+1)
             plt.imshow(image)
+            plt.title(f"Индекс: {p}")
             plt.axis("off")
             
         plt.show()    
@@ -448,7 +449,7 @@ class TransformImageData:
             dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
 
         Returns:
-            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
         """
         weight = dataImage.shape[1]
         height = dataImage.shape[0]
@@ -463,6 +464,16 @@ class TransformImageData:
     
     
     def do_negative(self, dataImage):
+        """
+            Делает изображение негативным
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            сделанное негативным
+        """
         L = dataImage.max()
         
         height = dataImage.shape[0]
@@ -473,5 +484,80 @@ class TransformImageData:
         for h in range(height):
             for w in range(weight):
                 transformData[h][w] = L - 1 - dataImage[h][w]
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def do_black_and_white(self, dataImage, factor):
+        """
+            Делает изображение черно-белым
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            сделанное черно-белым
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                pixelValue = dataImage[h][w]
+                if (pixelValue * 3 > (((255 + factor) // 2) * 3)):
+                    transformData[h][w] = 255
+                else:
+                    transformData[h][w] = 0
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def do_gamma_transform(self, dataImage, C, y):
+        """
+            Применяет к изображению гамма-преобразование
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = C * (dataImage[h][w] ** y)
+
+        transformData = self.data_to_gray_diapason(transformData)
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def do_logarithm_transform(self, dataImage, C):        
+        """
+            Применяет к изображению логарифмического-преобразование
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = C * np.log(dataImage[h][w] + 1)
+        
+        transformData = self.data_to_gray_diapason(transformData)
         
         return np.array(transformData).astype('int32')
