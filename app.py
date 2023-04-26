@@ -5,7 +5,7 @@ from tkinter import font
 
 import numpy as np
 
-from image import Image, TransformImageData
+from image import Image, TransformImageData, AnalysisImageData
 
 from settings import ParametrSettings
 from model import Model
@@ -118,11 +118,17 @@ class App(Tk):
         imageFrame2 = ttk.Frame(notebook)
         imageFrame2.pack(fill=BOTH, expand=True)
         
+        imageFrame3 = ttk.Frame(notebook)
+        imageFrame3.pack(fill=BOTH, expand=True)
+        
         imageNotebook.add(self.imageFrame1, text="Работа с файлами и отображение")
         imageNotebook.add(imageFrame2, text="Трансформация изображения")
+        imageNotebook.add(imageFrame3, text="Анализ изображения")
         
         self.image_open_save_show_UI(self.imageFrame1)
         self.image_transform_UI(imageFrame2)
+        self.image_analysis_UI(imageFrame3)
+        
         
         
         
@@ -169,21 +175,21 @@ class App(Tk):
             text="Открыть изображение",
             command=self.open_image,
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30], padx=[100, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[30, 30], padx=[100, 0])
         
         Button(
             buttonFrame,
             text="Сохранить изображение",
             command=lambda:self.save_image(index=int(self.indexSpinbox.get())),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 30])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[30, 30])
         
         Button(
             buttonFrame,
             text="Отобразить изображение",
             command=lambda: self.show_image(index=int(self.indexSpinbox.get())),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[100, 10], padx=[0, 100])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[30, 10], padx=[0, 100])
         
         spinboxsFrame = Frame(parent)
         spinboxsFrame.pack(fill=X)
@@ -228,7 +234,7 @@ class App(Tk):
             text="Отобразить все изображения",
             command=lambda: self.image.show_all_images(),
             font=self.mainFont
-        ).pack(pady=[0, 10])
+        ).pack(pady=[10, 10])
         
         Button(
             parent,
@@ -261,7 +267,7 @@ class App(Tk):
             command=lambda:self.work_with_image(TransformImageData.shift_data_image, 
                                                 int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[245, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[245, 0])
         
         Button(
             shiftMultyFrame,
@@ -270,7 +276,7 @@ class App(Tk):
             command=lambda:self.work_with_image(TransformImageData.multi_data_image, 
                                                 int(self.parametrs.GetParametr("ImageParametrs", "shiftMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 245])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 245])
         
         Label(
             parent,
@@ -287,7 +293,7 @@ class App(Tk):
             command=lambda:self.work_with_image(TransformImageData.resize_image_nearest_neighbors, 
                                                 float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[110, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[110, 0])
         
         Button(
             resizeFrame,
@@ -296,7 +302,7 @@ class App(Tk):
             command=lambda:self.work_with_image(TransformImageData.resize_image_binary_method, 
                                                 float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 110])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 110])
         
         Label(
             parent,
@@ -312,7 +318,7 @@ class App(Tk):
             width = 10,
             command=lambda:self.work_with_image(TransformImageData.rotate_image_left),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[290, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[290, 0])
         
         Button(
             rotateFrame,
@@ -320,7 +326,7 @@ class App(Tk):
             width = 10,
             command=lambda:self.work_with_image(TransformImageData.rotate_image_right),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 290])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 290])
         
         Label(
             parent,
@@ -336,7 +342,7 @@ class App(Tk):
             width = 15,
             command=lambda:self.work_with_image(TransformImageData.do_negative),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[245, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[245, 0])
         
         Button(
             effectFrame,
@@ -345,7 +351,7 @@ class App(Tk):
             command=lambda:self.work_with_image(TransformImageData.do_black_and_white, 
                                                 int(self.parametrs.GetParametr("ImageParametrs", "blackAndWhiteFactorImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 245])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 245])
         
         Label(
             parent,
@@ -357,33 +363,103 @@ class App(Tk):
         
         Button(
             transformFrame,
-            text="Гамма-преобразование",
+            text="Гамма преобразование",
             width = 35,
             command=lambda:self.work_with_image(TransformImageData.do_gamma_transform, 
                                                 int(self.parametrs.GetParametr("ImageParametrs", "cImage")),
                                                 int(self.parametrs.GetParametr("ImageParametrs", "yImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[65, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[65, 0])
         
         Button(
             transformFrame,
-            text="Логарифмическое-преобразование",
+            text="Логарифмическое преобразование",
             width = 35,
             command=lambda:self.work_with_image(TransformImageData.do_logarithm_transform, 
                                                 int(self.parametrs.GetParametr("ImageParametrs", "cImage"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 65])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 65])
+        
+        Button(
+            parent,
+            text="Градиционное преобразование",
+            width = 72,
+            command=lambda:self.work_with_image(TransformImageData.do_gradient_transform),
+            font=self.mainFont
+        ).pack(pady=[5, 0])
+        
+        
+        Label(
+            parent,
+            text="Вычитание из последнего изображения, изображение по заданному индексу"
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            text="Произвести вычетание",
+            command=lambda:self.work_with_image(TransformImageData.get_difference_between_images,
+                                                paramOne=self.image.get_last_data()),
+            font=self.mainFont
+        ).pack( pady=[0, 0])
+    
+    
+    def image_analysis_UI(self, parent):
+        Label(
+            parent,
+            text="Гистограммы"
+        ).pack(pady=[30, 0])
+        
+        histogramFrame = Frame(parent)
+        histogramFrame.pack(fill=X)
+        
+        Button(
+            histogramFrame,
+            text="Классическая",
+            width = 20,
+            command=lambda:self.analysis_image(AnalysisImageData.classic_histogram),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[100, 0])
+        
+        Button(
+            histogramFrame,
+            text="В сером диапозон",
+            width = 20,
+            command=lambda: self.analysis_image(AnalysisImageData.classic_histogram_with_to_gray_diapason),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 0])
+        
+        Button(
+            histogramFrame,
+            text="Нормализованная",
+            width = 20,
+            command=lambda: self.analysis_image(AnalysisImageData.normalaized_histogram),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 100])
+        
+        Label(
+            parent,
+            text="Гистограммы"
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            text="Расчитать CDF",
+            command=lambda: self.analysis_image(AnalysisImageData.calculate_CDF),
+            font=self.mainFont
+        ).pack(pady=[0, 0])
         
     
-    def work_with_image(self, function, paramOne=-1, paramTwo=-1):
+    def work_with_image(self, function, paramOne=None, paramTwo=None):
         if int(self.indexSpinbox.get()) == -1:
             data = self.image.get_last_data()
         else:
             data = self.image.dataImageList[int(self.indexSpinbox.get())]
-            
-        if paramOne == -1 and paramTwo == -1:
+        
+        if type(paramOne) is np.ndarray :
+            transofrmData = function(TransformImageData(), data, paramOne)
+        elif paramOne == None and paramTwo == None:
             transofrmData = function(TransformImageData(), data)
-        elif paramTwo == -1:
+        elif paramTwo == None:
             transofrmData = function(TransformImageData(), data, paramOne)
         else:
             transofrmData = function(TransformImageData(), data, paramOne, paramTwo)
@@ -393,6 +469,15 @@ class App(Tk):
         self.__reset_spinbox_count_images()
         
     
+    def analysis_image(self, function):
+        if int(self.indexSpinbox.get()) == -1:
+            data = self.image.get_last_data()
+        else:
+            data = self.image.dataImageList[int(self.indexSpinbox.get())]
+
+        function(AnalysisImageData(), data)
+        
+        
     def open_image(self):
         path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr'), ('BIN', '.bin')))
         
@@ -464,15 +549,6 @@ class App(Tk):
     
     def writeCurrentSoundData(self, function):
         self.currentSoundData = function
-    
-    def writeCurrentImageData(self, function):
-        self.currentImage = function
-    
-    def writeCurrentImageDataInTemp(self):
-        try:
-            self.tempImage = self.currentImage
-        except:
-            print("Текущих данных не существует")
     
     def writeCurrentSoundDataInTemp(self):
         try:
@@ -718,76 +794,7 @@ class App(Tk):
         ).pack(anchor=N, fill=X, pady=[20, 0])
     
     
-    def imageUI_1(self, parent):        
-        Button(
-            parent,
-            text="Изменить размер изображения (ближайшие соседи)",
-            command=lambda:self.writeCurrentImageData(self.processing.resizeNearestImage(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Изменить размер изображения (бинарный)",   
-            command=lambda:self.writeCurrentImageData(self.processing.resizeBinaryImage(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Повернуть изображение налево",   
-            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage, False)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Повернуть изображение направо",   
-            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Сделать изображение негативным",   
-            command=lambda:self.writeCurrentImageData(self.processing.doNegative(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Гамма-преобразование",   
-            command=lambda:self.writeCurrentImageData(self.processing.gammaTransform(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Логарифмическое преобразование",   
-            command=lambda:self.writeCurrentImageData(self.processing.logTransform(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Гистограмма текущего изображения",   
-            command=lambda:self.analysis.ImageHistogram(self.currentImage),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Гистограмма текущего изображения с приведением к серому",   
-            command=lambda:self.analysis.ImageHistogramWithToGray(self.currentImage),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="RGB гистограмма текущего изображения",   
-            command=lambda:self.analysis.ImageRGBHistogram(self.currentImage),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
+    def imageUI_1(self, parent):    
         
         Button(
             parent,

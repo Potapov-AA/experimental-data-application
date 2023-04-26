@@ -5,6 +5,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
+from collections import Counter
 
 class Image:
     def __init__(self, path=None, height=1024, weight=1024) -> None:
@@ -104,7 +105,18 @@ class Image:
         if index == -1:
             index = self.get_last_index()
         
-        image = PilImage.fromarray(self.dataImageList[index])
+        height = self.dataImageList[index].shape[0]
+        weight = self.dataImageList[index].shape[1]
+        
+        dataForShow =  np.empty((height, weight))
+        for h in range(height):
+            for w in range(weight):
+                value = self.dataImageList[index][h][w]
+                while value > 255:
+                    value -= 255
+                dataForShow[h][w] = value
+        
+        image = PilImage.fromarray(dataForShow)
         
         width = image.size[0]
         hight = image.size[1]
@@ -128,7 +140,19 @@ class Image:
         fig.patch.set_facecolor('#e8e8e8')
         
         for p in range(plotCount):
-            image = PilImage.fromarray(self.dataImageList[p])
+            height = self.dataImageList[p].shape[0]
+            weight = self.dataImageList[p].shape[1]
+            
+            dataForShow =  np.empty((height, weight))
+            for h in range(height):
+                for w in range(weight):
+                    value = self.dataImageList[p][h][w]
+                    while value > 255:
+                        value -= 255
+                    dataForShow[h][w] = value
+            
+            
+            image = PilImage.fromarray(dataForShow)
             plt.subplot(rowCount, 3, p+1)
             plt.imshow(image)
             plt.title(f"Индекс: {p}")
@@ -561,3 +585,175 @@ class TransformImageData:
         transformData = self.data_to_gray_diapason(transformData)
         
         return np.array(transformData).astype('int32')
+    
+    
+    def do_gradient_transform(self, dataImage):
+        """
+            Применяет к изображению градиционное-преобразование
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        L = dataImage.max()
+        
+        countListNormolized = AnalysisImageData.normalaized_histogram(AnalysisImageData(), dataImage, mode=2)
+        cdf = AnalysisImageData.calculate_CDF(AnalysisImageData(), countListNormolized, mode=2)
+        
+        transformData = np.empty((height, weight))
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = cdf[int(dataImage[h][w])] * L
+        
+        transformData = self.data_to_gray_diapason(transformData)
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def get_difference_between_images(self, imageToSubtract, imageCurrent):
+        """
+            Вычитает из текущего изображения заданное
+
+        Args:
+            imageToSubtract (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            imageCurrent (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        transformData = imageCurrent - imageToSubtract
+        
+        transformData = self.data_to_gray_diapason(transformData)
+        
+        return np.array(transformData).astype('int32')
+
+class AnalysisImageData:
+    def classic_histogram(self, dataImage):
+        """
+            Выводит классическую гистограмму для данных изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        histogramData = []
+        for h in range(height):
+            for w in range(weight):
+                histogramData.append(dataImage[h][w])
+        
+        histogramData.sort()
+        
+        index = 0
+        histogramDataX = [None] * 257
+        histogramDataY = [0] * 257
+        for value in histogramData:
+            if value not in histogramDataX:
+                histogramDataX[index] = value
+                histogramDataY[index] += 1
+                index += 1
+            else:
+                histogramDataY[histogramDataX.index(value)] += 1
+        
+        plt.figure(figsize=(18, 5))
+        plt.title("Классическая гистограмма")
+        plt.scatter(histogramDataX, histogramDataY)
+        plt.show()
+    
+    
+    def classic_histogram_with_to_gray_diapason(self, imageData):
+        """
+            Выводит гистограмму с предварительным приведением в серый диапазон
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """      
+        histogramData = TransformImageData.data_to_gray_diapason(TransformImageData(), imageData)
+        plt.figure(figsize=(18, 5))
+        plt.title("Гистограмма с приведением к серому")
+        plt.hist(histogramData.ravel(), bins=256, rwidth=0.8, range=(0, 255))
+        plt.show()
+    
+    
+    def normalaized_histogram(self, dataImage, mode=1):
+        """
+            Выводит нормализованную гистограмму
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            mode (int, optional): режим работы. Если 1, то выводит график нормализации
+            Если 2, то возвращает нормализованные данные по оси Y. По умолчанию 1.
+
+        Returns:
+            histogramDataY (np.array): массив numpy приведенный к формату [0 0 0 0 ... 0 0 0]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        size = height * weight
+        
+        histogramData = []
+        for h in range(height):
+            for w in range(weight):
+                histogramData.append(dataImage[h][w])
+        
+        histogramData.sort()
+        
+        index = 0
+        histogramDataX = [None] * 257
+        histogramDataY = [0] * 257
+        for value in histogramData:
+            if value not in histogramDataX:
+                histogramDataX[index] = value
+                histogramDataY[index] += 1
+                index += 1
+            else:
+                histogramDataY[histogramDataX.index(value)] += 1
+        
+        for i in range(len(histogramDataY)):
+            histogramDataY[i] = histogramDataY[i] / size
+        
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("Нормализованная гистограмма")
+            plt.scatter(histogramDataX, histogramDataY)
+            plt.show()
+        else: 
+            return np.array(histogramDataY)
+    
+    
+    def calculate_CDF(self, normolizedData, mode=1):
+        """
+            Рассчитывает CDF
+
+        Args:
+            normolizedData (list): массив формата [0 0 0 0 ... 0 0 0]
+            mode (int, optional): режим работы. Если 1, то выводит график CDF
+            Если 2, то возвращает список данных cdf. По умолчанию 1.
+
+        Returns:
+            cdf (np.array): массив numpy приведенный к формату [0 0 0 0 ... 0 0 0]
+        """
+        
+        if type(normolizedData[0]) is np.ndarray:
+            normolizedData = self.normalaized_histogram(normolizedData, 2)
+            
+        cdf = []
+        cdf.append(normolizedData[0])
+        for i in range(1, len(normolizedData)):
+            cdf.append(cdf[int(i) - 1] + normolizedData[int(i)])
+        
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("CDF (Кумулятивная функция распределения)")
+            plt.plot(cdf)
+            plt.show()
+        else: 
+            return np.array(cdf)
+        
