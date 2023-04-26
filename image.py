@@ -5,6 +5,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
+from collections import Counter
 
 class Image:
     def __init__(self, path=None, height=1024, weight=1024) -> None:
@@ -561,3 +562,52 @@ class TransformImageData:
         transformData = self.data_to_gray_diapason(transformData)
         
         return np.array(transformData).astype('int32')
+    
+
+class AnalysisImageData:
+    def classic_histogram(self, dataImage):
+        """
+            Выводит классическую гистограмму для данных изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        histogramData = []
+        for h in range(height):
+            for w in range(weight):
+                histogramData.append(dataImage[h][w])
+        
+        histogramData.sort()
+        
+        index = 0
+        histogramDataX = [None] * len(Counter(histogramData).keys())
+        histogramDataY = [0] * len(Counter(histogramData).keys())
+        for value in histogramData:
+            if value not in histogramDataX:
+                histogramDataX[index] = value
+                histogramDataY[index] += 1
+                index += 1
+            else:
+                histogramDataY[histogramDataX.index(value)] += 1
+        
+        plt.figure(figsize=(18, 5))
+        plt.title("Классическая гистограмма")
+        plt.plot(histogramDataX, histogramDataY)
+        plt.show()
+    
+    
+    def classic_histogram_with_to_gray_diapason(self, imageData):
+        """
+            Выводит гистограмму с предварительным приведением в серый диапазон
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """      
+        histogramData = TransformImageData.data_to_gray_diapason(TransformImageData(), imageData)
+        plt.figure(figsize=(18, 5))
+        plt.title("Гистограмма с приведением к серому")
+        plt.hist(histogramData.ravel(), bins=256, rwidth=0.8, range=(0, 255))
+        plt.show()
