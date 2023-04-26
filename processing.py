@@ -505,52 +505,6 @@ class Processing():
         
         return(result)
     
-    
-    
-    
-    # Градиционное преобразование
-    def ImageGradientTransform(self, dataImage):
-        newDataImage = []
-        L = dataImage.max()
-        
-        if len(dataImage.shape) == 3:
-            M, N, _ = dataImage.shape
-            for i in dataImage:
-                for j in i:
-                    newDataImage.append(j[0])
-        else:
-            M, N = dataImage.shape
-            for i in dataImage:
-                for j in i:
-                    newDataImage.append(j)
-        
-        pixelCountResult, _, _ = plt.hist(newDataImage, bins=256, rwidth=0.8, range=(0, 255))
-        plt.show()
-        pixelCountResult = pixelCountResult / (M * N)
-        
-        cdf = []
-        cdf.append(pixelCountResult[0])
-        for i in range(1, len(pixelCountResult)):
-            cdf.append(cdf[int(i) - 1] + pixelCountResult[int(i)])
-        
-        plt.plot(cdf)
-        plt.show()
-        
-        resultData = []
-        for i in newDataImage:
-            resultData.append(cdf[int(i)] * L)
-        
-        resultData = np.array(resultData)        
-        
-        resultData = np.reshape(resultData, (M, N))
-        
-        resultData = self.toGray(resultData)
-        
-        return resultData
-    
-    
-    
-    
     ########################
     # Кореляция
     # Пометка. 1) Решить проблему с массивом изображения;
