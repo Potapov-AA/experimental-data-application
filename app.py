@@ -5,7 +5,7 @@ from tkinter import font
 
 import numpy as np
 
-from image import Image, TransformImageData
+from image import Image, TransformImageData, AnalysisImageData
 
 from settings import ParametrSettings
 from model import Model
@@ -118,11 +118,17 @@ class App(Tk):
         imageFrame2 = ttk.Frame(notebook)
         imageFrame2.pack(fill=BOTH, expand=True)
         
+        imageFrame3 = ttk.Frame(notebook)
+        imageFrame3.pack(fill=BOTH, expand=True)
+        
         imageNotebook.add(self.imageFrame1, text="Работа с файлами и отображение")
         imageNotebook.add(imageFrame2, text="Трансформация изображения")
+        imageNotebook.add(imageFrame3, text="Анализ изображения")
         
         self.image_open_save_show_UI(self.imageFrame1)
         self.image_transform_UI(imageFrame2)
+        self.image_analysis_UI(imageFrame3)
+        
         
         
         
@@ -373,6 +379,32 @@ class App(Tk):
                                                 int(self.parametrs.GetParametr("ImageParametrs", "cImage"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 65])
+    
+    
+    def image_analysis_UI(self, parent):
+        Label(
+            parent,
+            text="Гистограммы"
+        ).pack(pady=[30, 0])
+        
+        histogramFrame = Frame(parent)
+        histogramFrame.pack(fill=X)
+        
+        Button(
+            histogramFrame,
+            text="Классическая",
+            width = 15,
+            command=lambda:self.analysis_image(AnalysisImageData.classic_histogram),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[245, 0])
+        
+        Button(
+            histogramFrame,
+            text="С приведением в серый диапозон",
+            width = 15,
+            command=lambda: self.analysis_image(AnalysisImageData.classic_histogram_with_to_gray_diapason),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[10, 0], padx=[0, 245])
         
     
     def work_with_image(self, function, paramOne=-1, paramTwo=-1):
@@ -393,6 +425,15 @@ class App(Tk):
         self.__reset_spinbox_count_images()
         
     
+    def analysis_image(self, function):
+        if int(self.indexSpinbox.get()) == -1:
+            data = self.image.get_last_data()
+        else:
+            data = self.image.dataImageList[int(self.indexSpinbox.get())]
+
+        function(AnalysisImageData(), data)
+        
+        
     def open_image(self):
         path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr'), ('BIN', '.bin')))
         
@@ -709,27 +750,7 @@ class App(Tk):
         ).pack(anchor=N, fill=X, pady=[20, 0])
     
     
-    def imageUI_1(self, parent):              
-        Button(
-            parent,
-            text="Гистограмма текущего изображения",   
-            command=lambda:self.analysis.ImageHistogram(self.currentImage),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Гистограмма текущего изображения с приведением к серому",   
-            command=lambda:self.analysis.ImageHistogramWithToGray(self.currentImage),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="RGB гистограмма текущего изображения",   
-            command=lambda:self.analysis.ImageRGBHistogram(self.currentImage),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
+    def imageUI_1(self, parent):    
         
         Button(
             parent,
