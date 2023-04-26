@@ -239,11 +239,3 @@ class Analysis:
             
             plt.show()
         
-    
-    # Разность между изображениями
-    def ResidualBetweenImages(self, imageCurrent, imageTemp):
-        newImageData = imageCurrent - imageTemp
-        
-        print(newImageData)
-        
-        return newImageData
