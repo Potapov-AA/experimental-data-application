@@ -105,7 +105,18 @@ class Image:
         if index == -1:
             index = self.get_last_index()
         
-        image = PilImage.fromarray(self.dataImageList[index])
+        height = self.dataImageList[index].shape[0]
+        weight = self.dataImageList[index].shape[1]
+        
+        dataForShow =  np.empty((height, weight))
+        for h in range(height):
+            for w in range(weight):
+                value = self.dataImageList[index][h][w]
+                while value > 255:
+                    value -= 255
+                dataForShow[h][w] = value
+        
+        image = PilImage.fromarray(dataForShow)
         
         width = image.size[0]
         hight = image.size[1]
@@ -129,7 +140,19 @@ class Image:
         fig.patch.set_facecolor('#e8e8e8')
         
         for p in range(plotCount):
-            image = PilImage.fromarray(self.dataImageList[p])
+            height = self.dataImageList[p].shape[0]
+            weight = self.dataImageList[p].shape[1]
+            
+            dataForShow =  np.empty((height, weight))
+            for h in range(height):
+                for w in range(weight):
+                    value = self.dataImageList[p][h][w]
+                    while value > 255:
+                        value -= 255
+                    dataForShow[h][w] = value
+            
+            
+            image = PilImage.fromarray(dataForShow)
             plt.subplot(rowCount, 3, p+1)
             plt.imshow(image)
             plt.title(f"Индекс: {p}")
