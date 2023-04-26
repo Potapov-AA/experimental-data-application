@@ -969,23 +969,7 @@ class Processing():
         
         return newDataImage
     
-    def GenerateImageBlackAndWhiteSqard(self):
-        sizeBlackSqard = 256
-        sizeWhiteSqard = 30
-        
-        newDataImage = np.empty((sizeBlackSqard, sizeBlackSqard))
-        
-        indexForWhiteSqardStart = sizeBlackSqard/2 - sizeWhiteSqard/2
-        indexForWhiteSqardEnd = sizeBlackSqard/2 + sizeWhiteSqard/2
-        
-        for h in range(sizeBlackSqard):
-            for w in range(sizeBlackSqard):
-                if (w >= indexForWhiteSqardStart and w <= indexForWhiteSqardEnd) and (h >= indexForWhiteSqardStart and h <= indexForWhiteSqardEnd):
-                    newDataImage[h, w] = 0
-                else:
-                    newDataImage[h, w] = 256
-        
-        return newDataImage
+    
             
     
     # Обратный Фурье
