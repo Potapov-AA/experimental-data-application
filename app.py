@@ -465,15 +465,6 @@ class App(Tk):
     def writeCurrentSoundData(self, function):
         self.currentSoundData = function
     
-    def writeCurrentImageData(self, function):
-        self.currentImage = function
-    
-    def writeCurrentImageDataInTemp(self):
-        try:
-            self.tempImage = self.currentImage
-        except:
-            print("Текущих данных не существует")
-    
     def writeCurrentSoundDataInTemp(self):
         try:
             sN1=int(float(self.parametrs.GetParametr("Parametrs", "sN1")) * self.currentSoundData["framerate"])
@@ -718,56 +709,7 @@ class App(Tk):
         ).pack(anchor=N, fill=X, pady=[20, 0])
     
     
-    def imageUI_1(self, parent):        
-        Button(
-            parent,
-            text="Изменить размер изображения (ближайшие соседи)",
-            command=lambda:self.writeCurrentImageData(self.processing.resizeNearestImage(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Изменить размер изображения (бинарный)",   
-            command=lambda:self.writeCurrentImageData(self.processing.resizeBinaryImage(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Повернуть изображение налево",   
-            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage, False)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Повернуть изображение направо",   
-            command=lambda:self.writeCurrentImageData(self.processing.rotateImage(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Сделать изображение негативным",   
-            command=lambda:self.writeCurrentImageData(self.processing.doNegative(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Гамма-преобразование",   
-            command=lambda:self.writeCurrentImageData(self.processing.gammaTransform(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Логарифмическое преобразование",   
-            command=lambda:self.writeCurrentImageData(self.processing.logTransform(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
+    def imageUI_1(self, parent):              
         Button(
             parent,
             text="Гистограмма текущего изображения",   
