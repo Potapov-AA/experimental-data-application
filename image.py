@@ -827,8 +827,53 @@ class AnalysisImageData:
                 corr[value] = sumOne / sumTwo
             
             for w in range(weight):
-                correlations[h, w] = corr[w]
+                correlations[h][w] = corr[w]
         
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("Автокорреляция")
+            plt.plot(correlations)
+            plt.show()
+        else: 
+            return np.array(correlations)
+    
+    
+    def calculate_cross_correlation(self, dataImage, step, mode=1):
+        """
+            Расчитывает кросскорреляцию производных строк изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг для расчета производных
+            mode (int, optional): режим работы. Если 1, то выводит график кросскорреляции
+            Если 2, то возвращает список данные производных. По умолчанию 1.
+
+        Returns:
+            correlations (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        derivatives = self.calculate_derivatives(dataImage, step, mode=2)
+        
+        height = derivatives.shape[0] - 1
+        weight = derivatives.shape[1]
+        
+        correlations = np.empty((height, weight))
+        
+        for h in range(height):
+            meanValueOne = np.mean(derivatives[h])
+            meanValueTwo = np.mean(derivatives[h + 1])
+            
+            size = derivatives[h].size
+            
+            corr = np.empty(size)
+            for value in range(size):
+                sum = 0
+                for k in range(size - value):
+                    sum += (derivatives[h][k] - meanValueOne) * (derivatives[h + 1][k + value] - meanValueTwo)
+                corr[value] = sum / size
+            
+            for w in range(weight):
+                correlations[h][w] = corr[w]
+                
         if mode == 1:
             plt.figure(figsize=(18, 5))
             plt.title("Автокорреляция")
