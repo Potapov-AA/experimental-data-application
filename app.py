@@ -456,6 +456,7 @@ class App(Tk):
         Button(
             parent,
             text="Расчитать производные",
+            width = 42,
             command=lambda: self.analysis_image(AnalysisImageData.calculate_derivatives,
                                                 paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
             font=self.mainFont
@@ -471,16 +472,16 @@ class App(Tk):
             command=lambda:self.analysis_image(AnalysisImageData.calculate_auto_correlation,
                                                paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[100, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[200, 0])
         
         Button(
             correlationFrame,
             text="Кросскореляция",
             width = 20,
-            command=lambda:self.analysis_image(AnalysisImageData.calculate_auto_correlation,
+            command=lambda:self.analysis_image(AnalysisImageData.calculate_cross_correlation,
                                                paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 100])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 200])
         
     
     def work_with_image(self, function, paramOne=None, paramTwo=None):
