@@ -438,13 +438,26 @@ class App(Tk):
         
         Label(
             parent,
-            text="Гистограммы"
+            text="CDF"
         ).pack(pady=[30, 0])
         
         Button(
             parent,
-            text="Расчитать CDF",
+            text="Расчитать",
             command=lambda: self.analysis_image(AnalysisImageData.calculate_CDF),
+            font=self.mainFont
+        ).pack(pady=[0, 0])
+        
+        Label(
+            parent,
+            text="Производные строк"
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            text="Расчитать",
+            command=lambda: self.analysis_image(AnalysisImageData.calculate_derivatives,
+                                                paramOne =  int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
             font=self.mainFont
         ).pack(pady=[0, 0])
         
@@ -469,13 +482,17 @@ class App(Tk):
         self.__reset_spinbox_count_images()
         
     
-    def analysis_image(self, function):
+    def analysis_image(self, function, paramOne=None):
         if int(self.indexSpinbox.get()) == -1:
             data = self.image.get_last_data()
         else:
             data = self.image.dataImageList[int(self.indexSpinbox.get())]
 
-        function(AnalysisImageData(), data)
+        if paramOne == None:
+            function(AnalysisImageData(), data)
+        else:
+            function(AnalysisImageData(), data, paramOne)
+        
         
         
     def open_image(self):
