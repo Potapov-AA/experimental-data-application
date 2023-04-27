@@ -759,7 +759,8 @@ class AnalysisImageData:
     
     
     def calculate_derivatives(self, dataImage, step, mode=1):
-        """_summary_
+        """
+            Расчитывает производные строк изображения
 
         Args:
             dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
@@ -792,6 +793,18 @@ class AnalysisImageData:
     
     
     def calculate_auto_correlation(self, dataImage, step, mode=1):
+        """
+            Расчитывает автокорреляцию производных строк изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг для расчета производных
+            mode (int, optional): режим работы. Если 1, то выводит график авокорреляции
+            Если 2, то возвращает список данные производных. По умолчанию 1.
+
+        Returns:
+            correlations (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
         derivatives = self.calculate_derivatives(dataImage, step, mode=2)
         
         height = derivatives.shape[0]
