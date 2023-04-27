@@ -756,4 +756,38 @@ class AnalysisImageData:
             plt.show()
         else: 
             return np.array(cdf)
+    
+    
+    def calculate_derivatives(self, dataImage, step, mode=1):
+        """_summary_
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг
+            mode (int, optional): режим работы. Если 1, то выводит график производных
+            Если 2, то возвращает список данные производных. По умолчанию 1.
+
+        Returns:
+            derivatives (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
         
+        derivativesHeight = int(np.ceil(height / step))
+        derivativesWidht = int(weight - 1)
+        
+        derivatives =  np.empty((derivativesHeight, derivativesWidht))
+        
+        print(derivativesHeight, derivativesWidht)
+        
+        for h in range(derivativesHeight):
+            for w in range(derivativesWidht):
+                derivatives[h][w] = dataImage[int(h * step)][w + 1] - dataImage[int(h * step)][w]
+        
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("Производные")
+            plt.plot(derivatives)
+            plt.show()
+        else: 
+            return np.array(derivatives)
