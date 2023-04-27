@@ -778,8 +778,6 @@ class AnalysisImageData:
         
         derivatives =  np.empty((derivativesHeight, derivativesWidht))
         
-        print(derivativesHeight, derivativesWidht)
-        
         for h in range(derivativesHeight):
             for w in range(derivativesWidht):
                 derivatives[h][w] = dataImage[int(h * step)][w + 1] - dataImage[int(h * step)][w]
@@ -791,3 +789,37 @@ class AnalysisImageData:
             plt.show()
         else: 
             return np.array(derivatives)
+    
+    
+    def calculate_auto_correlation(self, dataImage, step, mode=1):
+        derivatives = self.calculate_derivatives(dataImage, step, mode=2)
+        
+        height = derivatives.shape[0]
+        weight = derivatives.shape[1]
+        
+        correlations = np.empty((height, weight))
+        
+        for h in range(height):
+            meanValue = np.mean(derivatives[h])
+            size = derivatives[h].size
+            
+            corr = np.empty(size)            
+            for value in range(size):
+                sumOne = 0
+                sumTwo = 0
+                for k in range(size - value):
+                    sumOne += (derivatives[h][k] - meanValue) * (derivatives[h][k + value] - meanValue)
+                for k in range(size):
+                    sumTwo += (derivatives[h][k] - meanValue) * (derivatives[h][k] - meanValue)
+                corr[value] = sumOne / sumTwo
+            
+            for w in range(weight):
+                correlations[h, w] = corr[w]
+        
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("Автокорреляция")
+            plt.plot(correlations)
+            plt.show()
+        else: 
+            return np.array(correlations)
