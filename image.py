@@ -5,7 +5,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
-from collections import Counter
+from scipy.fft import rfft, rfftfreq
 
 class Image:
     def __init__(self, path=None, height=1024, weight=1024) -> None:
@@ -876,8 +876,22 @@ class AnalysisImageData:
                 
         if mode == 1:
             plt.figure(figsize=(18, 5))
-            plt.title("Автокорреляция")
+            plt.title("Кросскорреляция")
             plt.plot(correlations)
             plt.show()
         else: 
             return np.array(correlations)
+    
+    
+    def calculate_fourier_transform(self, dataImage, step):
+        derivatives = self.calculate_derivatives(dataImage, step, mode=2)
+        
+        weight = derivatives.shape[1]
+        
+        yf = rfft(derivatives[0]) / weight
+        xf = rfftfreq(weight)
+        
+        plt.figure(figsize=(18, 5))
+        plt.title("Кросскорреляция")
+        plt.plot(xf, np.abs(yf))
+        plt.show()
