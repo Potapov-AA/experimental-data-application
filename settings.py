@@ -52,6 +52,9 @@ class ParametrSettings(Toplevel):
               self.drawParameter("cImage =", "cImage", parent, section="ImageParametrs")       
               self.drawParameter("yImage =", "yImage", parent, section="ImageParametrs")     
               
+              Label(parent, text="Шаг для производных строк изображения").pack(anchor=N, fill=X, pady=[20, 10])     
+              self.drawParameter("derivativesStep =", "derivativesStep", parent, section="ImageParametrs")    
+              
               
        
        

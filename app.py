@@ -438,16 +438,59 @@ class App(Tk):
         
         Label(
             parent,
-            text="Гистограммы"
+            text="CDF"
         ).pack(pady=[30, 0])
         
         Button(
             parent,
-            text="Расчитать CDF",
+            text="Расчитать",
             command=lambda: self.analysis_image(AnalysisImageData.calculate_CDF),
             font=self.mainFont
         ).pack(pady=[0, 0])
         
+        Label(
+            parent,
+            text="Работа с производными строк изображения"
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            text="Расчитать производные",
+            width = 42,
+            command=lambda: self.analysis_image(AnalysisImageData.calculate_derivatives,
+                                                paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
+            font=self.mainFont
+        ).pack(pady=[0, 0])
+        
+        correlationFrame = Frame(parent)
+        correlationFrame.pack(fill=X)
+        
+        Button(
+            correlationFrame,
+            text="Автокорреляция",
+            width = 20,
+            command=lambda:self.analysis_image(AnalysisImageData.calculate_auto_correlation,
+                                               paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[200, 0])
+        
+        Button(
+            correlationFrame,
+            text="Кросскореляция",
+            width = 20,
+            command=lambda:self.analysis_image(AnalysisImageData.calculate_cross_correlation,
+                                               paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 200])
+        
+        Button(
+            parent,
+            text="Расчитать амплитудный спектр Фурье",
+            width = 42,
+            command=lambda: self.analysis_image(AnalysisImageData.calculate_fourier_transform,
+                                                paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
+            font=self.mainFont
+        ).pack(pady=[0, 0])
     
     def work_with_image(self, function, paramOne=None, paramTwo=None):
         if int(self.indexSpinbox.get()) == -1:
@@ -469,13 +512,17 @@ class App(Tk):
         self.__reset_spinbox_count_images()
         
     
-    def analysis_image(self, function):
+    def analysis_image(self, function, paramOne=None):
         if int(self.indexSpinbox.get()) == -1:
             data = self.image.get_last_data()
         else:
             data = self.image.dataImageList[int(self.indexSpinbox.get())]
 
-        function(AnalysisImageData(), data)
+        if paramOne == None:
+            function(AnalysisImageData(), data)
+        else:
+            function(AnalysisImageData(), data, paramOne)
+        
         
         
     def open_image(self):

@@ -648,6 +648,7 @@ class Processing():
         return corr
     
     
+    #### ПЕРЕНЕС В КЛАСС АНАЛИЗА ИЗОБРАЖЕНИЙ
     # Фуцнкция получения производных строк изображения
     # Пометка. Переделать под универсальный массив изображений (глянуть библиотеку OpenCV)
     def GetDerivatives(self, step, dataImage):
@@ -684,6 +685,7 @@ class Processing():
         return spikes
 
     
+    #### ПЕРЕНЕС В КЛАСС АНАЛИЗА ИЗОБРАЖЕНИЙ
     # Функция получения автокорреляций строк двумерного массива
     def GetAutoCorr(self, arrRows):
         corrHeight = arrRows.shape[0]
@@ -696,7 +698,7 @@ class Processing():
                 correlations[h, w] = corr[w]
         return correlations
 
-
+    #### ПЕРЕНЕС В КЛАСС АНАЛИЗА ИЗОБРАЖЕНИЙ
     # Метод получения взаимных корреляций строк двумерного массива
     def GetCorrBetweenRows(self, arrRows):
         corrHeight = arrRows.shape[0] - 1

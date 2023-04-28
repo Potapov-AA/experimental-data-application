@@ -5,7 +5,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
-from collections import Counter
+from scipy.fft import rfft, rfftfreq
 
 class Image:
     def __init__(self, path=None, height=1024, weight=1024) -> None:
@@ -756,4 +756,142 @@ class AnalysisImageData:
             plt.show()
         else: 
             return np.array(cdf)
+    
+    
+    def calculate_derivatives(self, dataImage, step, mode=1):
+        """
+            Расчитывает производные строк изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг
+            mode (int, optional): режим работы. Если 1, то выводит график производных
+            Если 2, то возвращает список данные производных. По умолчанию 1.
+
+        Returns:
+            derivatives (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
         
+        derivativesHeight = int(np.ceil(height / step))
+        derivativesWidht = int(weight - 1)
+        
+        derivatives =  np.empty((derivativesHeight, derivativesWidht))
+        
+        for h in range(derivativesHeight):
+            for w in range(derivativesWidht):
+                derivatives[h][w] = dataImage[int(h * step)][w + 1] - dataImage[int(h * step)][w]
+        
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("Производные")
+            plt.plot(derivatives)
+            plt.show()
+        else: 
+            return np.array(derivatives)
+    
+    
+    def calculate_auto_correlation(self, dataImage, step, mode=1):
+        """
+            Расчитывает автокорреляцию производных строк изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг для расчета производных
+            mode (int, optional): режим работы. Если 1, то выводит график авокорреляции
+            Если 2, то возвращает список данные производных. По умолчанию 1.
+
+        Returns:
+            correlations (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        derivatives = self.calculate_derivatives(dataImage, step, mode=2)
+        
+        height = derivatives.shape[0]
+        weight = derivatives.shape[1]
+        
+        correlations = np.empty((height, weight))
+        
+        for h in range(height):
+            meanValue = np.mean(derivatives[h])
+            size = derivatives[h].size
+            
+            corr = np.empty(size)            
+            for value in range(size):
+                sumOne = 0
+                sumTwo = 0
+                for k in range(size - value):
+                    sumOne += (derivatives[h][k] - meanValue) * (derivatives[h][k + value] - meanValue)
+                for k in range(size):
+                    sumTwo += (derivatives[h][k] - meanValue) * (derivatives[h][k] - meanValue)
+                corr[value] = sumOne / sumTwo
+            
+            for w in range(weight):
+                correlations[h][w] = corr[w]
+        
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("Автокорреляция")
+            plt.plot(correlations)
+            plt.show()
+        else: 
+            return np.array(correlations)
+    
+    
+    def calculate_cross_correlation(self, dataImage, step, mode=1):
+        """
+            Расчитывает кросскорреляцию производных строк изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг для расчета производных
+            mode (int, optional): режим работы. Если 1, то выводит график кросскорреляции
+            Если 2, то возвращает список данные производных. По умолчанию 1.
+
+        Returns:
+            correlations (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        derivatives = self.calculate_derivatives(dataImage, step, mode=2)
+        
+        height = derivatives.shape[0] - 1
+        weight = derivatives.shape[1]
+        
+        correlations = np.empty((height, weight))
+        
+        for h in range(height):
+            meanValueOne = np.mean(derivatives[h])
+            meanValueTwo = np.mean(derivatives[h + 1])
+            
+            size = derivatives[h].size
+            
+            corr = np.empty(size)
+            for value in range(size):
+                sum = 0
+                for k in range(size - value):
+                    sum += (derivatives[h][k] - meanValueOne) * (derivatives[h + 1][k + value] - meanValueTwo)
+                corr[value] = sum / size
+            
+            for w in range(weight):
+                correlations[h][w] = corr[w]
+                
+        if mode == 1:
+            plt.figure(figsize=(18, 5))
+            plt.title("Кросскорреляция")
+            plt.plot(correlations)
+            plt.show()
+        else: 
+            return np.array(correlations)
+    
+    
+    def calculate_fourier_transform(self, dataImage, step):
+        derivatives = self.calculate_derivatives(dataImage, step, mode=2)
+        
+        weight = derivatives.shape[1]
+        
+        yf = rfft(derivatives[0]) / weight
+        xf = rfftfreq(weight)
+        
+        plt.figure(figsize=(18, 5))
+        plt.title("Кросскорреляция")
+        plt.plot(xf, np.abs(yf))
+        plt.show()
