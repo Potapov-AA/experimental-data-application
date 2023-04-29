@@ -61,7 +61,10 @@ class ParametrSettings(Toplevel):
               self.drawParameter("m =", "m", parent, section="ImageParametrs")    
               
               Label(parent, text="Количество битых пикселей (соль и перец)").pack(anchor=N, fill=X, pady=[20, 10])     
-              self.drawParameter("countBadPixekOnRow =", "countBadPixekOnRow", parent, section="ImageParametrs")      
+              self.drawParameter("countBadPixekOnRow =", "countBadPixekOnRow", parent, section="ImageParametrs")  
+              
+              Label(parent, text="Диапазон для рандомного шума").pack(anchor=N, fill=X, pady=[20, 10])     
+              self.drawParameter("noiseRange =", "noiseRange", parent, section="ImageParametrs")   
               
               
        
