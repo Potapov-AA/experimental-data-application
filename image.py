@@ -1,4 +1,5 @@
 import os
+import random
 import re
 from struct import pack, unpack
 import PIL.Image as PilImage
@@ -633,6 +634,31 @@ class TransformImageData:
         
         return np.array(transformData).astype('int32')
 
+    
+    def do_solid_and_peaper(self, dataImage, countBadPixekOnRow):
+        """
+            Применяет к переданым данным зашумление типа "Соль и перец"
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            countBadPixekOnRow (int): кол-во битых пикселей на строку
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        transformData = np.copy(dataImage)
+        
+        for h in range(height):
+            noisePixel = random.sample(list(np.arange(width)), countBadPixekOnRow)
+            for i in range(countBadPixekOnRow):
+                transformData[h, noisePixel[i]] = 0 if random.randint(0, 1) else 255
+        
+        return np.array(transformData).astype('int32')
+    
+    
 class AnalysisImageData:
     def classic_histogram(self, dataImage):
         """
