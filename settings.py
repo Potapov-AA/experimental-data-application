@@ -58,7 +58,10 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Фильтрация").pack(anchor=N, fill=X, pady=[20, 10])     
               self.drawParameter("freqOne =", "freqOne", parent, section="ImageParametrs")
               self.drawParameter("freqTwo =", "freqTwo", parent, section="ImageParametrs")   
-              self.drawParameter("m =", "m", parent, section="ImageParametrs")      
+              self.drawParameter("m =", "m", parent, section="ImageParametrs")    
+              
+              Label(parent, text="Количество битых пикселей (соль и перец)").pack(anchor=N, fill=X, pady=[20, 10])     
+              self.drawParameter("countBadPixekOnRow =", "countBadPixekOnRow", parent, section="ImageParametrs")      
               
               
        
