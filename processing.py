@@ -504,67 +504,7 @@ class Processing():
         plt.show()
         
         return(result)
-        
-    #####################
-    # Усредняющий арифметический фильтр
-    def MiddleFilter(self, dataImage):
-        maskSize = 10
-        maskList = [np.zeros((maskSize, maskSize), dtype=float) + 1]
-        
-        a = int((maskList[0].shape[0] - 1) / 2)
-        b = int((maskList[0].shape[1] - 1) / 2)
-        
-        height = dataImage.shape[0]
-        width = dataImage.shape[1]
-        
-        newDataImage = np.empty((height, width))
-        
-        for h in range(height):
-            for w in range(width):
-                sum1 = 0
-                for i in range(len(maskList)):
-                    sum2 = 0
-                    for s in range(-1 * a, a + 1):
-                        sum3 = 0
-                        for t in range(-1 * b, b + 1):
-                            try:
-                                sum3 += maskList[i][s + 1, t + 1] * dataImage[h + s, w + t]
-                            except:
-                                pass
-                        sum2 += sum3
-                    sum1 += np.abs(sum2)
-                newDataImage[h, w] = sum1
-        
-        newDataImage = newDataImage / (maskSize * maskSize)
-        
-        return newDataImage
     
-    # Медианный фильтр
-    def MedianFilter(self, dataImage):
-        maskSize = 5010
-        a = int((maskSize - 1) / 2)
-        b = int((maskSize - 1) / 2)
-        
-        height = dataImage.shape[0]
-        width = dataImage.shape[1]
-        
-        newDataImage = np.empty((height, width))
-        
-        for h in range(height):
-            for w in range(width):
-                l = []
-                for s in range(-1 * a, a + 1):
-                    for t in range(-1 * b, b + 1):
-                        try:
-                            l.append(dataImage[h + s, w + t])
-                        except:
-                            pass
-                newDataImage[h, w] = np.median(l)
-        
-        return newDataImage
-    
-    
-            
     
     # Обратный Фурье
     # Пометка. Решить все ту же проблему с универсальностью изображения (как вариант надо будет сделать проверку в классе на то находится ли изображение в сером диапозоне)
