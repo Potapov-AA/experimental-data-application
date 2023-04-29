@@ -682,6 +682,7 @@ class TransformImageData:
             transformData[h] += dataY
             
         return np.array(transformData).astype('int32')
+
     
 class AnalysisImageData:
     def classic_histogram(self, dataImage):
@@ -1190,3 +1191,78 @@ class FilterImageData:
             return np.array(transformData).astype('int32')
         else:
             return bsw  
+    
+    
+    def middle_filter(self, dataImage, maskSize=10):
+        """
+            Усредняющий арифметический фильтр
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            maskSize (int, optional): размер маски. По умолчанию 10.
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        maskList = [np.zeros((maskSize, maskSize), dtype=float) + 1]
+        
+        a = int((maskList[0].shape[0] - 1) / 2)
+        b = int((maskList[0].shape[1] - 1) / 2)
+        
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        transformData = np.empty((height, width))
+        
+        for h in range(height):
+            for w in range(width):
+                sumOne = 0
+                for i in range(len(maskList)):
+                    sumTwo = 0
+                    for s in range(-1 * a, a + 1):
+                        sumTree = 0
+                        for t in range(-1 * b, b + 1):
+                            try:
+                                sumTree += maskList[i][s + 1, t + 1] * dataImage[h + s, w + t]
+                            except:
+                                pass
+                        sumTwo += sumTree
+                    sumOne += np.abs(sumTwo)
+                transformData[h, w] = sumOne
+        
+        transformData = transformData / (maskSize * maskSize)
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def median_filter(self, dataImage, maskSize=10):
+        """
+            Медианный фильтр
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            maskSize (int, optional): размер маски. По умолчанию 10.
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        a = int((maskSize - 1) / 2)
+        b = int((maskSize - 1) / 2)
+        
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        transformData = np.empty((height, width))
+        
+        for h in range(height):
+            for w in range(width):
+                l = []
+                for s in range(-1 * a, a + 1):
+                    for t in range(-1 * b, b + 1):
+                        try:
+                            l.append(dataImage[h + s, w + t])
+                        except:
+                            pass
+                transformData[h, w] = np.median(l)
+        
+        return np.array(transformData).astype('int32')
