@@ -69,6 +69,7 @@ class Config():
         self.config.set("ImageParametrs", "freqOne", "0.2")
         self.config.set("ImageParametrs", "freqTwo", "0.4")
         self.config.set("ImageParametrs", "m", "32")
+        self.config.set("ImageParametrs", "countBadPixekOnRow", "50")
         
         
         
