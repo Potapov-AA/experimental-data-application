@@ -578,6 +578,36 @@ class App(Tk):
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 200])
         
+        Label(
+            parent,
+            text="Усредняющий арифметический фильтр"
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            text="Применить",
+            width = 15,
+            command=lambda:self.filter_image(FilterImageData.middle_filter,
+                                               paramOne=int(self.parametrs.GetParametr("ImageParametrs", "maskSize"))),
+            font=self.mainFont
+        ).pack(pady=[0, 0])
+        
+        Label(
+            parent,
+            text="Медианный фильтр"
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            text="Применить",
+            width = 15,
+            command=lambda:self.filter_image(FilterImageData.median_filter,
+                                               paramOne=int(self.parametrs.GetParametr("ImageParametrs", "maskSize"))),
+            font=self.mainFont
+        ).pack(pady=[0, 0])
+        
+        
+        
     
     def work_with_image(self, function, paramOne=None, paramTwo=None):
         if int(self.indexSpinbox.get()) == -1:
