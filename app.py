@@ -418,20 +418,20 @@ class App(Tk):
         Button(
             noizeFrame,
             text="Соль и перец",
-            width = 35,
+            width = 20,
             command=lambda:self.work_with_image(TransformImageData.do_solid_and_peaper, 
                                                 int(self.parametrs.GetParametr("ImageParametrs", "countBadPixekOnRow"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[250, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[200, 0])
         
         Button(
             noizeFrame,
-            text="Соль и перец",
-            width = 35,
-            command=lambda:self.work_with_image(TransformImageData.do_solid_and_peaper, 
-                                                int(self.parametrs.GetParametr("ImageParametrs", "countBadPixekOnRow"))),
+            text="Рандом",
+            width = 20,
+            command=lambda:self.work_with_image(TransformImageData.do_random_noise, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "noiseRange"))),
             font=self.mainFont
-        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 250])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 200])
         
     
     def image_analysis_UI(self, parent):
