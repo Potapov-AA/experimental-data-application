@@ -885,6 +885,15 @@ class AnalysisImageData:
     
     
     def calculate_fourier_transform(self, dataImage, step):
+        """
+            Выводит информацию об амплитуде спектра Фурье для производных,
+            автокорреляции, взаимокорреляции и исходных строк переданныех
+            данных изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг для расчета производных
+        """
         derivatives = self.calculate_derivatives(dataImage, step, mode=2)
         autoCorrelation = self.calculate_cross_correlation(dataImage, step, mode=2)
         crossCorrelation = self.calculate_cross_correlation(dataImage, step, mode=2)
@@ -945,6 +954,16 @@ class AnalysisImageData:
 
 class FilterImageData:
     def lpf(self, dataImage, freq, m, mode=1):
+        """
+        Фильтр низких чатсот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freq (float): частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
         width = dataImage.shape[1]
         height = dataImage.shape[0]
         
@@ -1000,6 +1019,16 @@ class FilterImageData:
     
     
     def hpf(self, dataImage, freq, m, mode=1):
+        """
+        Фильтр высоких чатсот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freq (float): частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
         width = dataImage.shape[1]
         height = dataImage.shape[0]
         
@@ -1031,6 +1060,17 @@ class FilterImageData:
     
     
     def bpf(self, dataImage, freqOne, freqTwo, m, mode=1):
+        """
+        Полосовой фильтр
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): первая частота
+            freqTwo (float): вторая частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
         width = dataImage.shape[1]
         height = dataImage.shape[0]
         
@@ -1060,6 +1100,17 @@ class FilterImageData:
     
     
     def bsw(self, dataImage, freqOne, freqTwo, m, mode=1):
+        """
+        Режекторный фильтр
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): первая частота
+            freqTwo (float): вторая частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
         width = dataImage.shape[1]
         height = dataImage.shape[0]
         
