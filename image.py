@@ -659,6 +659,30 @@ class TransformImageData:
         return np.array(transformData).astype('int32')
     
     
+    def do_random_noise(self, dataImage, noiseRange):
+        """
+            Применяет к переданым данным зашумление типа рандом
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            noiseRange (int): диапазон случайных значений
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        transformData = np.copy(dataImage)
+        
+        length = int(np.ceil(np.abs(width)))
+        
+        for h in range(height):
+            dataY = np.array([int(random.uniform(-noiseRange, noiseRange)) for _ in range(0, length)])
+            transformData[h] += dataY
+            
+        return np.array(transformData).astype('int32')
+    
 class AnalysisImageData:
     def classic_histogram(self, dataImage):
         """
