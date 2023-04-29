@@ -406,7 +406,33 @@ class App(Tk):
                                                 paramOne=self.image.get_last_data()),
             font=self.mainFont
         ).pack( pady=[0, 0])
-    
+
+        Label(
+            parent,
+            text="Зашумление изображения"
+        ).pack(pady=[30, 0])
+        
+        noizeFrame = Frame(parent)
+        noizeFrame.pack(fill=X)
+        
+        Button(
+            noizeFrame,
+            text="Соль и перец",
+            width = 35,
+            command=lambda:self.work_with_image(TransformImageData.do_solid_and_peaper, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "countBadPixekOnRow"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[250, 0])
+        
+        Button(
+            noizeFrame,
+            text="Соль и перец",
+            width = 35,
+            command=lambda:self.work_with_image(TransformImageData.do_solid_and_peaper, 
+                                                int(self.parametrs.GetParametr("ImageParametrs", "countBadPixekOnRow"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 250])
+        
     
     def image_analysis_UI(self, parent):
         Label(
