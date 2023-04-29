@@ -55,6 +55,11 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Шаг для производных строк изображения").pack(anchor=N, fill=X, pady=[20, 10])     
               self.drawParameter("derivativesStep =", "derivativesStep", parent, section="ImageParametrs")    
               
+              Label(parent, text="Фильтрация").pack(anchor=N, fill=X, pady=[20, 10])     
+              self.drawParameter("freqOne =", "freqOne", parent, section="ImageParametrs")
+              self.drawParameter("freqTwo =", "freqTwo", parent, section="ImageParametrs")   
+              self.drawParameter("m =", "m", parent, section="ImageParametrs")      
+              
               
        
        
