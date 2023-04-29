@@ -273,19 +273,23 @@ class Image:
             np.array: массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
         """
         sizeBlackSqard = 256
-        sizeWhiteSqard = 100
+        sizeWhiteSqardWight = 20
+        sizeWhiteSqardHeight = 30
         
         dataImage = np.empty((sizeBlackSqard, sizeBlackSqard))
         
-        indexForWhiteSqardStart = sizeBlackSqard/2 - sizeWhiteSqard/2
-        indexForWhiteSqardEnd = sizeBlackSqard/2 + sizeWhiteSqard/2
+        indexForWhiteSqardWightStart = sizeBlackSqard/2 - sizeWhiteSqardWight/2
+        indexForWhiteSqardWightEnd = sizeBlackSqard/2 + sizeWhiteSqardWight/2
+        
+        indexForWhiteSqardHeightStart = sizeBlackSqard/2 - sizeWhiteSqardHeight/2
+        indexForWhiteSqardHeightEnd = sizeBlackSqard/2 + sizeWhiteSqardHeight/2
         
         for h in range(sizeBlackSqard):
             for w in range(sizeBlackSqard):
-                if (w >= indexForWhiteSqardStart and w <= indexForWhiteSqardEnd) and (h >= indexForWhiteSqardStart and h <= indexForWhiteSqardEnd):
-                    dataImage[h, w] = 0
+                if (w >= indexForWhiteSqardWightStart and w <= indexForWhiteSqardWightEnd) and (h >= indexForWhiteSqardHeightStart and h <= indexForWhiteSqardHeightEnd):
+                    dataImage[h, w] = 255
                 else:
-                    dataImage[h, w] = 256
+                    dataImage[h, w] = 0
                     
         return np.array(dataImage).astype('int32')
 
@@ -1266,3 +1270,5 @@ class FilterImageData:
                 transformData[h, w] = np.median(l)
         
         return np.array(transformData).astype('int32')
+    
+    
