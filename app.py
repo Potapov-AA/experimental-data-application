@@ -5,7 +5,7 @@ from tkinter import font
 
 import numpy as np
 
-from image import Image, TransformImageData, AnalysisImageData
+from image import Image, TransformImageData, AnalysisImageData, FilterImageData
 
 from settings import ParametrSettings
 from model import Model
@@ -121,13 +121,18 @@ class App(Tk):
         imageFrame3 = ttk.Frame(notebook)
         imageFrame3.pack(fill=BOTH, expand=True)
         
+        imageFrame4 = ttk.Frame(notebook)
+        imageFrame4.pack(fill=BOTH, expand=True)
+        
         imageNotebook.add(self.imageFrame1, text="Работа с файлами и отображение")
         imageNotebook.add(imageFrame2, text="Трансформация изображения")
         imageNotebook.add(imageFrame3, text="Анализ изображения")
+        imageNotebook.add(imageFrame4, text="Фильтрация изображения")
         
         self.image_open_save_show_UI(self.imageFrame1)
         self.image_transform_UI(imageFrame2)
         self.image_analysis_UI(imageFrame3)
+        self.image_filters_UI(imageFrame4)
         
         
         
@@ -492,6 +497,62 @@ class App(Tk):
             font=self.mainFont
         ).pack(pady=[0, 0])
     
+    
+    def image_filters_UI(self, parent):
+        Label(
+            parent,
+            text="Фильтры Поттера"
+        ).pack(pady=[30, 0])
+        
+        filtersPotterFrameOne = Frame(parent)
+        filtersPotterFrameOne.pack(fill=X)
+        
+        Button(
+            filtersPotterFrameOne,
+            text="Фильтр низких частот",
+            width = 20,
+            command=lambda:self.filter_image(FilterImageData.lpf,
+                                               paramOne=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                               paramTwo=int(self.parametrs.GetParametr("ImageParametrs", "m"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[200, 0])
+        
+        Button(
+            filtersPotterFrameOne,
+            text="Фильтр высоких частот",
+            width = 20,
+            command=lambda:self.filter_image(FilterImageData.hpf,
+                                               paramOne=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                               paramTwo=int(self.parametrs.GetParametr("ImageParametrs", "m"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 200])
+        
+        filtersPotterFrameTwo = Frame(parent)
+        filtersPotterFrameTwo.pack(fill=X)
+        
+        Button(
+            filtersPotterFrameTwo,
+            text="Полосовой фильтр",
+            width = 20,
+            command=lambda:self.filter_image(FilterImageData.bpf,
+                                               paramOne=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                               paramTwo=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                               paramThree=int(self.parametrs.GetParametr("ImageParametrs", "m"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[200, 0])
+        
+        Button(
+            filtersPotterFrameTwo,
+            text="Режекторный фильтр",
+            width = 20,
+            command=lambda:self.filter_image(FilterImageData.bsw,
+                                               paramOne=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                               paramTwo=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                               paramThree=int(self.parametrs.GetParametr("ImageParametrs", "m"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 200])
+        
+    
     def work_with_image(self, function, paramOne=None, paramTwo=None):
         if int(self.indexSpinbox.get()) == -1:
             data = self.image.get_last_data()
@@ -523,8 +584,26 @@ class App(Tk):
         else:
             function(AnalysisImageData(), data, paramOne)
         
+    
+    def filter_image(self, function, paramOne=None, paramTwo=None, paramThree=None):
+        if int(self.indexSpinbox.get()) == -1:
+            data = self.image.get_last_data()
+        else:
+            data = self.image.dataImageList[int(self.indexSpinbox.get())]
         
+        if paramOne == None and paramTwo == None and paramThree == None:
+            transofrmData = function(FilterImageData(), data)
+        elif paramTwo == None and paramThree == None:
+            transofrmData = function(FilterImageData(), data, paramOne)
+        elif paramThree == None:
+            transofrmData = function(FilterImageData(), data, paramOne, paramTwo)
+        else:
+            transofrmData = function(FilterImageData(), data, paramOne, paramTwo, paramThree)
         
+        self.image.add_updated_data_to_list(transofrmData)
+        
+        self.__reset_spinbox_count_images()
+            
     def open_image(self):
         path = fd.askopenfilename(filetypes = (('JPG', '.jpg'), ('PNG', '.png'), ('XCR', '.xcr'), ('BIN', '.bin')))
         
