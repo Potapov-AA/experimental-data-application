@@ -66,6 +66,9 @@ class Config():
         self.config.set("ImageParametrs", "cImage", "5")
         self.config.set("ImageParametrs", "yImage", "5")
         self.config.set("ImageParametrs", "derivativesStep", "400")
+        self.config.set("ImageParametrs", "freqOne", "0.2")
+        self.config.set("ImageParametrs", "freqTwo", "0.4")
+        self.config.set("ImageParametrs", "m", "32")
         
         
         
