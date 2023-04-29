@@ -71,6 +71,7 @@ class Config():
         self.config.set("ImageParametrs", "m", "32")
         self.config.set("ImageParametrs", "countBadPixekOnRow", "50")
         self.config.set("ImageParametrs", "noiseRange", "100")
+        self.config.set("ImageParametrs", "maskSize", "10")
         
         
         
