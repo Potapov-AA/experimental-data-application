@@ -1,4 +1,5 @@
 import os
+import random
 import re
 from struct import pack, unpack
 import PIL.Image as PilImage
@@ -6,6 +7,7 @@ import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
 from scipy.fft import rfft, rfftfreq
+from scipy import signal
 
 class Image:
     def __init__(self, path=None, height=1024, weight=1024) -> None:
@@ -632,6 +634,55 @@ class TransformImageData:
         
         return np.array(transformData).astype('int32')
 
+    
+    def do_solid_and_peaper(self, dataImage, countBadPixekOnRow):
+        """
+            Применяет к переданым данным зашумление типа "Соль и перец"
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            countBadPixekOnRow (int): кол-во битых пикселей на строку
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        transformData = np.copy(dataImage)
+        
+        for h in range(height):
+            noisePixel = random.sample(list(np.arange(width)), countBadPixekOnRow)
+            for i in range(countBadPixekOnRow):
+                transformData[h, noisePixel[i]] = 0 if random.randint(0, 1) else 255
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def do_random_noise(self, dataImage, noiseRange):
+        """
+            Применяет к переданым данным зашумление типа рандом
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            noiseRange (int): диапазон случайных значений
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]
+        width = dataImage.shape[1]
+        
+        transformData = np.copy(dataImage)
+        
+        length = int(np.ceil(np.abs(width)))
+        
+        for h in range(height):
+            dataY = np.array([int(random.uniform(-noiseRange, noiseRange)) for _ in range(0, length)])
+            transformData[h] += dataY
+            
+        return np.array(transformData).astype('int32')
+    
 class AnalysisImageData:
     def classic_histogram(self, dataImage):
         """
@@ -884,14 +935,258 @@ class AnalysisImageData:
     
     
     def calculate_fourier_transform(self, dataImage, step):
+        """
+            Выводит информацию об амплитуде спектра Фурье для производных,
+            автокорреляции, взаимокорреляции и исходных строк переданныех
+            данных изображения
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (int): шаг для расчета производных
+        """
         derivatives = self.calculate_derivatives(dataImage, step, mode=2)
+        autoCorrelation = self.calculate_cross_correlation(dataImage, step, mode=2)
+        crossCorrelation = self.calculate_cross_correlation(dataImage, step, mode=2)
         
-        weight = derivatives.shape[1]
+        derivativesRowCount = derivatives.shape[0]
+        autoCorrelationRowCount = autoCorrelation.shape[0]
+        crossCorrelationRowCount = crossCorrelation.shape[0]
+        dataImgeRowCountForVisual = int(dataImage.shape[0] // step)
         
-        yf = rfft(derivatives[0]) / weight
-        xf = rfftfreq(weight)
+        derivativesWeight = derivatives.shape[1]
+        autoCorrelationWeight = autoCorrelation.shape[1]
+        crossCorrelationWeight = crossCorrelation.shape[1]
+        dataImageWeight = dataImage.shape[1]        
         
-        plt.figure(figsize=(18, 5))
-        plt.title("Кросскорреляция")
-        plt.plot(xf, np.abs(yf))
+        
+        plt.figure(figsize=(10,5))
+        plt.suptitle("Амплитудный спектр для исходных строк изображения")
+        for i in range(dataImgeRowCountForVisual):
+            yf = rfft(dataImage[i * step]) / dataImageWeight
+            xf = rfftfreq(dataImageWeight)
+            
+            plt.subplot(dataImgeRowCountForVisual, 3, i + 1)            
+            plt.title(f"Индекс строки {i * step}")
+            plt.plot(xf, np.abs(yf))
+        
+        plt.figure(figsize=(10,5))
+        plt.suptitle("Амплитудный спектр для производных строк изображения")  
+        for i in range(derivativesRowCount):
+            yf = rfft(derivatives[i]) / derivativesWeight
+            xf = rfftfreq(derivativesWeight)
+            
+            plt.subplot(derivativesRowCount, 3, i + 1)            
+            plt.title(f"Индекс строки {i}")
+            plt.plot(xf, np.abs(yf)) 
+        
+        plt.figure(figsize=(10,5))
+        plt.suptitle("Амплитудный спектр для автокорреляций производных")  
+        for i in range(autoCorrelationRowCount):
+            yf = rfft(autoCorrelation[i]) / autoCorrelationWeight
+            xf = rfftfreq(autoCorrelationWeight)
+            
+            plt.subplot(autoCorrelationRowCount, 3, i + 1)            
+            plt.title(f"Индекс строки {i}")
+            plt.plot(xf, np.abs(yf)) 
+            
+        plt.figure(figsize=(10,5))
+        plt.suptitle("Амплитудный спектр для взаимокорреляции производных")  
+        for i in range(crossCorrelationRowCount):
+            yf = rfft(crossCorrelation[i]) / crossCorrelationWeight
+            xf = rfftfreq(crossCorrelationWeight)
+            
+            plt.subplot(crossCorrelationRowCount, 3, i + 1)            
+            plt.title(f"Индекс строки {i}")
+            plt.plot(xf, np.abs(yf)) 
+         
         plt.show()
+
+
+class FilterImageData:
+    def lpf(self, dataImage, freq, m, mode=1):
+        """
+        Фильтр низких чатсот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freq (float): частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
+        width = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        d = [0.35577019, 0.2436983, 0.07211497, 0.00630165]
+        
+        fact = float(2 * freq)
+        
+        # dt = 1 / width
+        # fact = float(2 * freq) * dt
+        
+        lpw = []
+        lpw.append(fact)
+        
+        arg = fact * np.pi
+        
+        for i in range(1, m + 1):
+            lpw.append(np.sin(arg * i) / (np.pi * i))
+            
+        lpw[m] /= 2
+        sumg = lpw[0]
+        for i in range(1, m + 1):
+            sum = d[0]
+            arg = np.pi * i / m
+            for k in range(1, 4):
+                sum += 2 * d[k] * np.cos(arg * k)
+            lpw[i] *= sum
+            sumg += 2 * lpw[i]
+            
+        for i in range(0, m + 1):
+            lpw[i] /= sumg
+            
+        lpwReverse = []
+        for i in range(len(lpw) - 1, 0, -1):
+            lpwReverse.append(lpw[i])
+
+        lpwResult = np.array(lpwReverse + lpw)
+        
+        if mode == 1:
+            transformData = np.empty((height, width))
+            
+            for h in range(height): 
+                convolveData = signal.convolve(dataImage[h], lpwResult)
+                
+                for w in range(width):
+                    if w < width - m:
+                        transformData[h][w] = convolveData[w + m]
+                    else:
+                        transformData[h][w] = dataImage[h][w] 
+                                    
+            return np.array(transformData).astype('int32')
+        else:
+            return lpwResult
+    
+    
+    def hpf(self, dataImage, freq, m, mode=1):
+        """
+        Фильтр высоких чатсот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freq (float): частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
+        width = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        lpf = self.lpf(dataImage, freq, m, mode=2)
+        
+        loper = 2 * m + 1
+        hpw = [0 for _ in range(0, loper)]
+        for k in range(0, loper):
+            if k == m:
+                hpw[k] = 1 - lpf[k]
+            else:
+                hpw[k] = -1 * lpf[k]
+        
+        if mode == 1:
+            transformData = np.empty((height, width))
+            
+            for h in range(height): 
+                convolveData = signal.convolve(dataImage[h], hpw)
+                
+                for w in range(width):
+                    if w < width - m:
+                        transformData[h][w] = convolveData[w + m]
+                    else:
+                        transformData[h][w] = convolveData[w - width + m]
+                                    
+            return np.array(transformData).astype('int32')
+        else:
+            return hpw
+    
+    
+    def bpf(self, dataImage, freqOne, freqTwo, m, mode=1):
+        """
+        Полосовой фильтр
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): первая частота
+            freqTwo (float): вторая частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
+        width = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        lpwOne = self.lpf(dataImage, freqOne, m, mode=2)
+        lpwTwo = self.lpf(dataImage, freqTwo, m, mode=2)
+        
+        loper = 2 * m + 1
+        bpw = [0 for _ in range(0, loper)]
+        for k in range(0, loper):
+            bpw[k] = lpwTwo[k] - lpwOne[k]
+            
+        if mode == 1:
+            transformData = np.empty((height, width))
+            
+            for h in range(height): 
+                convolveData = signal.convolve(dataImage[h], bpw)
+                
+                for w in range(width):
+                    if w < width - m:
+                        transformData[h][w] = convolveData[w + m]
+                    else:
+                        transformData[h][w] = convolveData[w - width + m]
+                                    
+            return np.array(transformData).astype('int32')
+        else:
+            return bpw    
+    
+    
+    def bsw(self, dataImage, freqOne, freqTwo, m, mode=1):
+        """
+        Режекторный фильтр
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): первая частота
+            freqTwo (float): вторая частота
+            m (int): размер окна
+            mode (int, optional): режим работы. Если 1, то возвращает отфильтрованые данные
+            Если 2, то возвращает значение фильтра. По умолчанию 1.
+        """
+        width = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        lpwOne = self.lpf(dataImage, freqOne, m, mode=2)
+        lpwTwo = self.lpf(dataImage, freqTwo, m, mode=2)
+        
+        loper = 2 * m + 1
+        bsw = [0 for _ in range(0, loper)]
+        for k in range(0, loper):
+            if k == m:
+                bsw[k] = 1 + lpwOne[k] - lpwTwo[k]
+            else:
+                bsw[k] = lpwOne[k] - lpwTwo[k]
+                
+        if mode == 1:
+            transformData = np.empty((height, width))
+            
+            for h in range(height): 
+                convolveData = signal.convolve(dataImage[h], bsw)
+                
+                for w in range(width):
+                    if w < width - m:
+                        transformData[h][w] = convolveData[w + m]
+                    else:
+                        transformData[h][w] = convolveData[w - width + m]
+                                    
+            return np.array(transformData).astype('int32')
+        else:
+            return bsw  
