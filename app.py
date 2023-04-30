@@ -522,7 +522,24 @@ class App(Tk):
                                                 paramOne = int(self.parametrs.GetParametr("ImageParametrs", "derivativesStep"))),
             font=self.mainFont
         ).pack(pady=[0, 0])
-    
+
+        
+        ### ТЕСТ ФУНКЦИИ ДЛЯ 1D ОБРАТНОГО ФУРЬЕ ###
+        # Label(
+        #     parent,
+        #     text="Обратный Фурье 1D"
+        # ).pack(pady=[30, 0])
+        
+        # Button(
+        #     parent,
+        #     text="Демонстрация",
+        #     command=lambda: self.analysis_image(AnalysisImageData.inverse_fourier_transform_test_function),
+        #     font=self.mainFont
+        # ).pack(pady=[0, 0])
+        ############################################
+        
+        
+        
     
     def image_filters_UI(self, parent):
         Label(
