@@ -6,7 +6,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
-from scipy.fft import rfft, rfftfreq
+from scipy.fft import rfft, rfftfreq, irfft
 from scipy import signal
 
 class Image:
@@ -292,7 +292,7 @@ class Image:
                     dataImage[h, w] = 0
                     
         return np.array(dataImage).astype('int32')
-
+    
 
 class TransformImageData:
     def data_to_gray_diapason(self, dataImage):
@@ -1006,6 +1006,47 @@ class AnalysisImageData:
          
         plt.show()
 
+    
+    def inverse_fourier_transform_test_function(self, dataImage):
+        """
+            Тестовая функция для демонстрации
+
+        Args:
+            dataImage (all): заглушка
+        """
+        N = 200  # количество значений в сигнале
+        dt = 0.005  # шаг дискретизации
+
+        A = 10  # тестовая амплитуда гармонического процесса
+        f = 4   # тестовая частота гармонического процесса
+        
+        sinDataX = np.arange(0, N * dt, dt)
+        sinDataY = A * np.sin(2 * np.pi * f * sinDataX)
+        
+        plt.figure(figsize=(10,5))
+        
+        plt.subplot(1, 3, 1)            
+        plt.title(f"Начальный сигнал")
+        plt.plot(sinDataX, sinDataY)
+        plt.grid(True)
+        
+        yf = rfft(sinDataY) / N
+
+        plt.subplot(1, 3, 2)            
+        plt.title(f"Амплитудный спектр")
+        plt.plot(np.abs(yf))
+        plt.grid(True)
+        
+        inverseDataY = irfft(yf) * N
+        inverseDataX = np.arange(0, N * dt, dt)
+        
+        plt.subplot(1, 3, 3)            
+        plt.title(f"Обратное преобразование Фурье")
+        plt.plot(inverseDataX, inverseDataY)
+        plt.grid(True)
+        
+        plt.show()
+    
 
 class FilterImageData:
     def lpf(self, dataImage, freq, m, mode=1):
