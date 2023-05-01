@@ -134,40 +134,29 @@ class App(Tk):
         self.image_analysis_UI(imageFrame3)
         self.image_filters_UI(imageFrame4)
         
-        
-        
-        
         # frame1 = ttk.Frame(notebook)
         # frame2 = ttk.Frame(notebook)
         # frame3 = ttk.Frame(notebook)
         # frame4 = ttk.Frame(notebook)
         # frame5 = ttk.Frame(notebook)
-        frame6 = ttk.Frame(notebook)
-        frame7 = ttk.Frame(notebook)
         
         # frame1.pack(fill=BOTH, expand=True)
         # frame2.pack(fill=BOTH, expand=True)
         # frame3.pack(fill=BOTH, expand=True)
         # frame4.pack(fill=BOTH, expand=True)
         # frame5.pack(fill=BOTH, expand=True)
-        frame6.pack(fill=BOTH, expand=True)
-        frame7.pack(fill=BOTH, expand=True)
         
         # notebook.add(frame1, text="Станд. графики")
         # notebook.add(frame2, text="Генератор шумов")
         # notebook.add(frame3, text="Изменить данные")
         # notebook.add(frame4, text="Фильтры")
         # notebook.add(frame5, text="Примеры")
-        notebook.add(frame6, text="Работа с изображениями 1")
-        notebook.add(frame7, text="Работа с изображениями 2")
         
         # self.standartFunctionUI(frame1)
         # self.noiseGeneratorUI(frame2)
         # self.changeCurrentDataUI(frame3)
         # self.filterUI(frame4)
         # self.exampleUI(frame5)
-        self.imageUI_1(frame6)
-        self.imageUI_2(frame7)
     
     
     def image_open_save_show_UI(self, parent):
@@ -288,11 +277,11 @@ class App(Tk):
             text="Изменение размера изображения"
         ).pack(pady=[30, 0])
         
-        resizeFrame = Frame(parent)
-        resizeFrame.pack(fill=X)
+        resizeFrameOne = Frame(parent)
+        resizeFrameOne.pack(fill=X)
         
         Button(
-            resizeFrame,
+            resizeFrameOne,
             text="Метод ближайщих соседей",
             width = 30,
             command=lambda:self.work_with_image(TransformImageData.resize_image_nearest_neighbors, 
@@ -301,13 +290,35 @@ class App(Tk):
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[110, 0])
         
         Button(
-            resizeFrame,
+            resizeFrameOne,
             text="Метод билинейной интерполяции",
             width = 30,
             command=lambda:self.work_with_image(TransformImageData.resize_image_binary_method, 
                                                 float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 110])
+        
+        resizeFrameTwo = Frame(parent)
+        resizeFrameTwo.pack(fill=X)
+        
+        Button(
+            resizeFrameTwo,
+            text="Увеличить (Фурье)",
+            width = 30,
+            command=lambda:self.work_with_image(TransformImageData.resize_up_image_fourier, 
+                                                float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[110, 0])
+        
+        Button(
+            resizeFrameTwo,
+            text="Уменьшить (Фурье)",
+            width = 30,
+            command=lambda:self.work_with_image(TransformImageData.resize_up_image_fourier, 
+                                                float(self.parametrs.GetParametr("ImageParametrs", "resizeMultiImage"))),
+            font=self.mainFont,
+            state='disabled'
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 110])
         
         Label(
             parent,
@@ -1018,95 +1029,3 @@ class App(Tk):
             font=self.mainFont
         ).pack(anchor=N, fill=X, pady=[20, 0])
     
-    
-    def imageUI_1(self, parent):    
-        
-        Button(
-            parent,
-            text="Градиционное преобразование",   
-            command=lambda:self.writeCurrentImageData(self.processing.ImageGradientTransform(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Сравнение изображений",   
-            command=lambda:self.writeCurrentImageData(self.analysis.ResidualBetweenImages(self.currentImage, self.tempImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Применить фильтр Гарри Поттера",   
-            command=lambda:self.writeCurrentImageData(self.processing.ResultForLab5(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-    
-    def imageUI_2(self, parent):
-        Button(
-            parent,
-            text="Посолить и поперчить изображение",   
-            command=lambda:self.writeCurrentImageData(self.model.ToSolidAndPeaper(self.currentImage, n = 30)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Прорандомить изображение",   
-            command=lambda:self.writeCurrentImageData(self.model.ToRandomNoise(self.currentImage, scale = 20)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Усредняющий арифметический фильтр",   
-            command=lambda:self.writeCurrentImageData(self.processing.MiddleFilter(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Медианный фильтр",   
-            command=lambda:self.writeCurrentImageData(self.processing.MedianFilter(self.currentImage)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        Button(
-            parent,
-            text="Сгенерировать изображение",   
-            command=lambda:self.writeCurrentImageData(self.processing.GenerateImageBlackAndWhiteSqard()),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X, pady=[20, 0])
-        
-        Button(
-            parent,
-            text="Обратный Фурье",   
-            command=lambda:self.writeCurrentImageData(self.processing.InverseFurie(self.currentImage, mode = 3)),
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        
-        Button(
-            parent,
-            text="Тест старых функций",   
-            command=self.TEST,
-            font=self.mainFont
-        ).pack(anchor=N, fill=X)
-        
-        
-    def TEST(self):
-        from image import Image
-        
-        path = fd.askopenfilename() 
-        image = Image(path)
-        image.save_last_image()
-        
-        
-        
-        
-        
-        
-            
-
-
