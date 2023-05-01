@@ -538,7 +538,29 @@ class App(Tk):
         # ).pack(pady=[0, 0])
         ############################################
         
+        Label(
+            parent,
+            text="2D преобразования Фурье"
+        ).pack(pady=[30, 0])
         
+        fourierFrame = Frame(parent)
+        fourierFrame.pack(fill=X)
+        
+        Button(
+            fourierFrame,
+            text="Прямое",
+            width = 15,
+            command=lambda: self.analysis_image(AnalysisImageData.calculate_2D_fourier_transform, mode=1),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[245, 0])
+        
+        Button(
+            fourierFrame,
+            text="Обратное",
+            width = 15,
+            command=lambda: self.analysis_image(AnalysisImageData.calculate_inverse_2D_fourier_transform, mode=1),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 245])
         
     
     def image_filters_UI(self, parent):
@@ -646,16 +668,20 @@ class App(Tk):
         self.__reset_spinbox_count_images()
         
     
-    def analysis_image(self, function, paramOne=None):
+    def analysis_image(self, function, paramOne=None, mode=-1):
         if int(self.indexSpinbox.get()) == -1:
             data = self.image.get_last_data()
         else:
             data = self.image.dataImageList[int(self.indexSpinbox.get())]
 
         if paramOne == None:
-            function(AnalysisImageData(), data)
+            transofrmData =  function(AnalysisImageData(), data)
         else:
-            function(AnalysisImageData(), data, paramOne)
+            transofrmData =  function(AnalysisImageData(), data, paramOne)
+        
+        if mode != -1:
+            self.image.add_updated_data_to_list(transofrmData)
+            self.__reset_spinbox_count_images()
         
     
     def filter_image(self, function, paramOne=None, paramTwo=None, paramThree=None):
