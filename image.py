@@ -6,7 +6,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
-from scipy.fft import rfft, rfftfreq
+from scipy.fft import fft, ifft, fft2, ifft2, rfft, irfft, rfftfreq
 from scipy import signal
 
 class Image:
@@ -273,22 +273,26 @@ class Image:
             np.array: массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
         """
         sizeBlackSqard = 256
-        sizeWhiteSqard = 100
+        sizeWhiteSqardWight = 20
+        sizeWhiteSqardHeight = 30
         
         dataImage = np.empty((sizeBlackSqard, sizeBlackSqard))
         
-        indexForWhiteSqardStart = sizeBlackSqard/2 - sizeWhiteSqard/2
-        indexForWhiteSqardEnd = sizeBlackSqard/2 + sizeWhiteSqard/2
+        indexForWhiteSqardWightStart = sizeBlackSqard/2 - sizeWhiteSqardWight/2
+        indexForWhiteSqardWightEnd = sizeBlackSqard/2 + sizeWhiteSqardWight/2
+        
+        indexForWhiteSqardHeightStart = sizeBlackSqard/2 - sizeWhiteSqardHeight/2
+        indexForWhiteSqardHeightEnd = sizeBlackSqard/2 + sizeWhiteSqardHeight/2
         
         for h in range(sizeBlackSqard):
             for w in range(sizeBlackSqard):
-                if (w >= indexForWhiteSqardStart and w <= indexForWhiteSqardEnd) and (h >= indexForWhiteSqardStart and h <= indexForWhiteSqardEnd):
-                    dataImage[h, w] = 0
+                if (w >= indexForWhiteSqardWightStart and w <= indexForWhiteSqardWightEnd) and (h >= indexForWhiteSqardHeightStart and h <= indexForWhiteSqardHeightEnd):
+                    dataImage[h, w] = 255
                 else:
-                    dataImage[h, w] = 256
+                    dataImage[h, w] = 0
                     
         return np.array(dataImage).astype('int32')
-
+    
 
 class TransformImageData:
     def data_to_gray_diapason(self, dataImage):
@@ -1002,6 +1006,153 @@ class AnalysisImageData:
          
         plt.show()
 
+    
+    def calculate_2D_fourier_transform(self, dataImage):
+        """
+            Расчитывает 2Д-преобразование Фурье
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]  
+
+        Returns:
+            transformData: список формата [[0 0 0 0 ... 0 0 0]]
+        """
+        height = int(dataImage.shape[0])
+        widght = int(dataImage.shape[1])
+        
+        transformData = np.fft.fft2(dataImage)
+        
+        # transformData = np.empty((height, widght))    
+        
+        # for h in range(height):            
+        #     yf = rfft(dataImage[h])
+            
+        #     for w in range(int(widght/2)):
+        #         transformData[h][w] = yf[w]
+            
+        #     # transformData[h] = yf
+            
+        # transformData = np.transpose(transformData)
+        
+        # for w in range(widght):            
+        #     yf = rfft(transformData[w])
+            
+        #     for h in range(int(height/2)):
+        #         transformData[w][h] = yf[h]
+            
+        #     # transformData[w] = yf
+        
+        # transformData = np.transpose(transformData) 
+        
+        for h in range(height):
+            transformData[h] = np.roll(transformData[h], int(widght/2))
+        
+        transformData = np.transpose(transformData) 
+        
+        for w in range(widght):
+            transformData[w] = np.roll(transformData[w], int(height/2))
+        
+        transformData = np.transpose(transformData) 
+        
+        return transformData
+    
+    
+    def calculate_inverse_2D_fourier_transform(self, dataImage):
+        """
+            Расчитывает обратное 2Д-преобразование Фурье
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]  
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]  
+        widght = dataImage.shape[1] 
+        
+        dataImageForInverse = np.copy(dataImage)        
+        
+        for h in range(height):
+            dataImageForInverse[h] = np.roll(dataImageForInverse[h], -int(widght/2))
+        
+        dataImageForInverse = np.transpose(dataImageForInverse) 
+        
+        for w in range(widght):
+            dataImageForInverse[w] = np.roll(dataImageForInverse[w], -int(height/2))
+        
+        dataImageForInverse = np.transpose(dataImageForInverse) 
+        
+        # transformData = np.empty((height, widght))
+        
+        # for h in range(height):
+        #     yf = ifft(dataImageForInverse[h])
+            
+        #     # print(yf)
+        #     # print(yf[0].real)
+        #     # input()
+            
+        #     for w in range(widght):
+        #         transformData[h][w] = yf[w].real
+            
+        #     # transformData[h] = yf
+        
+        # transformData = np.transpose(transformData)
+        
+        # for w in range(widght):            
+        #     yf = np.abs(ifft(transformData[w]))
+            
+        #     for h in range(height):
+        #         transformData[w][h] = yf[h].real
+                
+        #     # transformData[w] = yf
+        
+        # transformData = np.transpose(transformData) 
+        
+        transformData = ifft2(dataImageForInverse)
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def __inverse_fourier_transform_test_function(self, dataImage):
+        """
+            Тестовая функция для демонстрации
+
+        Args:
+            dataImage (all): заглушка
+        """
+        N = 200  # количество значений в сигнале
+        dt = 0.005  # шаг дискретизации
+
+        A = 10  # тестовая амплитуда гармонического процесса
+        f = 4   # тестовая частота гармонического процесса
+        
+        sinDataX = np.arange(0, N * dt, dt)
+        sinDataY = A * np.sin(2 * np.pi * f * sinDataX)
+        
+        plt.figure(figsize=(10,5))
+        
+        plt.subplot(1, 3, 1)            
+        plt.title(f"Начальный сигнал")
+        plt.plot(sinDataX, sinDataY)
+        plt.grid(True)
+        
+        yf = rfft(sinDataY) / N
+
+        plt.subplot(1, 3, 2)            
+        plt.title(f"Амплитудный спектр")
+        plt.plot(np.abs(yf))
+        plt.grid(True)
+        
+        inverseDataY = irfft(yf) * N
+        inverseDataX = np.arange(0, N * dt, dt)
+        
+        plt.subplot(1, 3, 3)            
+        plt.title(f"Обратное преобразование Фурье")
+        plt.plot(inverseDataX, inverseDataY)
+        plt.grid(True)
+        
+        plt.show()
+    
 
 class FilterImageData:
     def lpf(self, dataImage, freq, m, mode=1):
@@ -1266,3 +1417,5 @@ class FilterImageData:
                 transformData[h, w] = np.median(l)
         
         return np.array(transformData).astype('int32')
+    
+    
