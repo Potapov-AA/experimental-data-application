@@ -6,7 +6,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
-from scipy.fft import rfft, rfftfreq, irfft
+from scipy.fft import fft, ifft, fft2, ifft2, rfft, irfft, rfftfreq
 from scipy import signal
 
 class Image:
@@ -1007,7 +1007,113 @@ class AnalysisImageData:
         plt.show()
 
     
-    def inverse_fourier_transform_test_function(self, dataImage):
+    def calculate_2D_fourier_transform(self, dataImage):
+        """
+            Расчитывает 2Д-преобразование Фурье
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]  
+
+        Returns:
+            transformData: список формата [[0 0 0 0 ... 0 0 0]]
+        """
+        height = int(dataImage.shape[0])
+        widght = int(dataImage.shape[1])
+        
+        transformData = np.fft.fft2(dataImage)
+        
+        # transformData = np.empty((height, widght))    
+        
+        # for h in range(height):            
+        #     yf = rfft(dataImage[h])
+            
+        #     for w in range(int(widght/2)):
+        #         transformData[h][w] = yf[w]
+            
+        #     # transformData[h] = yf
+            
+        # transformData = np.transpose(transformData)
+        
+        # for w in range(widght):            
+        #     yf = rfft(transformData[w])
+            
+        #     for h in range(int(height/2)):
+        #         transformData[w][h] = yf[h]
+            
+        #     # transformData[w] = yf
+        
+        # transformData = np.transpose(transformData) 
+        
+        for h in range(height):
+            transformData[h] = np.roll(transformData[h], int(widght/2))
+        
+        transformData = np.transpose(transformData) 
+        
+        for w in range(widght):
+            transformData[w] = np.roll(transformData[w], int(height/2))
+        
+        transformData = np.transpose(transformData) 
+        
+        return transformData
+    
+    
+    def calculate_inverse_2D_fourier_transform(self, dataImage):
+        """
+            Расчитывает обратное 2Д-преобразование Фурье
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]  
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        height = dataImage.shape[0]  
+        widght = dataImage.shape[1] 
+        
+        dataImageForInverse = np.copy(dataImage)        
+        
+        for h in range(height):
+            dataImageForInverse[h] = np.roll(dataImageForInverse[h], -int(widght/2))
+        
+        dataImageForInverse = np.transpose(dataImageForInverse) 
+        
+        for w in range(widght):
+            dataImageForInverse[w] = np.roll(dataImageForInverse[w], -int(height/2))
+        
+        dataImageForInverse = np.transpose(dataImageForInverse) 
+        
+        # transformData = np.empty((height, widght))
+        
+        # for h in range(height):
+        #     yf = ifft(dataImageForInverse[h])
+            
+        #     # print(yf)
+        #     # print(yf[0].real)
+        #     # input()
+            
+        #     for w in range(widght):
+        #         transformData[h][w] = yf[w].real
+            
+        #     # transformData[h] = yf
+        
+        # transformData = np.transpose(transformData)
+        
+        # for w in range(widght):            
+        #     yf = np.abs(ifft(transformData[w]))
+            
+        #     for h in range(height):
+        #         transformData[w][h] = yf[h].real
+                
+        #     # transformData[w] = yf
+        
+        # transformData = np.transpose(transformData) 
+        
+        transformData = ifft2(dataImageForInverse)
+        
+        return np.array(transformData).astype('int32')
+    
+    
+    def __inverse_fourier_transform_test_function(self, dataImage):
         """
             Тестовая функция для демонстрации
 
