@@ -488,6 +488,12 @@ class TransformImageData:
             
         transformData = np.transpose(transformData) 
         
+        imageData = np.copy(transformData)
+        imageData = np.array(imageData).astype('int32')  
+        image = PilImage.fromarray(imageData)
+        plt.imshow(image)
+        plt.show()
+        
         transformData = AnalysisImageData.calculate_inverse_2D_fourier_transform(AnalysisImageData(), transformData)
         
         transformData = self.data_to_gray_diapason(transformData)
