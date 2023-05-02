@@ -50,7 +50,7 @@ class App(Tk):
 
     def centerWindow(self):
         w = 800
-        h = 800
+        h = 900
 
         sw = self.winfo_screenwidth()
         sh = self.winfo_screenheight()
@@ -382,8 +382,8 @@ class App(Tk):
             text="Гамма преобразование",
             width = 35,
             command=lambda:self.work_with_image(TransformImageData.do_gamma_transform, 
-                                                int(self.parametrs.GetParametr("ImageParametrs", "cImage")),
-                                                int(self.parametrs.GetParametr("ImageParametrs", "yImage"))),
+                                                float(self.parametrs.GetParametr("ImageParametrs", "cImage")),
+                                                float(self.parametrs.GetParametr("ImageParametrs", "yImage"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[65, 0])
         
@@ -392,7 +392,7 @@ class App(Tk):
             text="Логарифмическое преобразование",
             width = 35,
             command=lambda:self.work_with_image(TransformImageData.do_logarithm_transform, 
-                                                int(self.parametrs.GetParametr("ImageParametrs", "cImage"))),
+                                                float(self.parametrs.GetParametr("ImageParametrs", "cImage"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 65])
         
@@ -443,6 +443,42 @@ class App(Tk):
                                                 int(self.parametrs.GetParametr("ImageParametrs", "noiseRange"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 200])
+        
+        Label(
+            parent,
+            text="Выделение контуров"
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            text="СГЕНЕРИРОВАТЬ МНОЖЕСТВО ВАРИАНТОВ",
+            width = 52,
+            command=lambda:self.work_with_image(TransformImageData.show_all_contoures),
+            font=self.mainFont
+        ).pack(pady=[0, 5])
+        
+        contoursFrame = Frame(parent)
+        contoursFrame.pack(fill=X)
+        
+        Button(
+            contoursFrame,
+            text="Частотными фильтрами (ФНЧ)",
+            width = 25,
+            command=lambda:self.work_with_image(TransformImageData.select_contours_freq_lpf_filters,
+                                                paramOne=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                                paramTwo=float(self.parametrs.GetParametr("ImageParametrs", "freqTwo"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[155, 0])
+        
+        Button(
+            contoursFrame,
+            text="Частотными фильтрами (ФВЧ)",
+            width = 25,
+            command=lambda:self.work_with_image(TransformImageData.select_contours_freq_hpf_filters,
+                                                paramOne=float(self.parametrs.GetParametr("ImageParametrs", "freqOne")),
+                                                paramTwo=float(self.parametrs.GetParametr("ImageParametrs", "freqTwo"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 155])
         
     
     def image_analysis_UI(self, parent):
