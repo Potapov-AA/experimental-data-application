@@ -498,8 +498,8 @@ class TransformImageData:
         
         transformData = self.data_to_gray_diapason(transformData)
         
-        return np.array(transformData).astype('int32')  
-
+        return np.array(transformData).astype('int32')      
+    
     
     def rotate_image_left(self, dataImage):
         """
@@ -739,6 +739,146 @@ class TransformImageData:
             
         return np.array(transformData).astype('int32')
 
+
+    def select_contours_freq_lpf_filters(self, dataImage, freqOne, freqTwo):
+        """
+            Возвращает контур изображения полученный за счет фильтра низких частот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): частота для строк
+            freqTwo (float): частота для столбцов
+
+        Returns:
+            result - контур изображаения
+        """
+        transformData = np.copy(dataImage)
+        
+        lpfDataOne = FilterImageData.lpf(FilterImageData(), transformData, freqOne, m=32, mode=1)
+        
+        transformData = np.transpose(transformData)
+        
+        lpfDataTwo = FilterImageData.lpf(FilterImageData(), transformData, freqTwo, m=32, mode=1)
+        lpfDataTwo = np.transpose(lpfDataTwo)
+        
+        lpfData = lpfDataOne + lpfDataTwo
+        
+        result = dataImage - lpfData
+        
+        return result
+    
+    
+    def select_contours_freq_hpf_filters(self, dataImage, freqOne, freqTwo):
+        """
+            Возвращает контур изображения полученный за счет фильтра высоких частот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): частота для строк
+            freqTwo (float): частота для столбцов
+
+        Returns:
+            result - контур изображаения
+        """
+        transformData = np.copy(dataImage)
+        
+        hpfDataOne = FilterImageData.hpf(FilterImageData(), transformData, freqOne, m=32, mode=1)
+        
+        transformData = np.transpose(transformData)
+        
+        hpfDataTwo = FilterImageData.hpf(FilterImageData(), transformData, freqTwo, m=32, mode=1)
+        hpfDataTwo = np.transpose(hpfDataTwo)
+        
+        result = hpfDataOne + hpfDataTwo
+        
+        return result
+    
+    
+    def show_all_contoures(self, dataImage, step=0.1):
+        """
+            Перебирает и сохраняет все варианты контуров с разными частотами и с разными фильтрами частот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (float): шаг изменения частоты. По умолчанию 0.1.
+
+        Returns:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        transformData = np.copy(dataImage)
+        
+        freqOne = 0.1
+        freqTwo = 0.1
+        
+        while freqOne < 1:
+            while freqTwo < 1:
+                result = self.select_contours_freq_lpf_filters(transformData, freqOne, freqTwo)
+
+                result = np.array(result)
+                height = result.shape[0]
+                weight = result.shape[1]
+        
+                dataForShow =  np.empty((height, weight))
+                for h in range(height):
+                    for w in range(weight):
+                        value = result[h][w]
+                        while value > 255:
+                            value -= 255
+                        dataForShow[h][w] = value
+        
+                image = PilImage.fromarray(dataForShow)
+                
+                fig = plt.figure(figsize=(6,6))
+                fig.patch.set_facecolor('#e8e8e8')
+                plt.title(f"Частоты для строк {round(freqOne, 2)}, для столбцов {round(freqTwo, 2)}")
+                plt.imshow(image)
+                plt.axis("off")
+                fileName = 'generate data/lpf ' + str(round(freqOne, 2)) + ' ' + str(round(freqTwo, 2)) + '.png'
+                plt.savefig(fileName)
+                plt.close()
+                
+                freqTwo += step
+            
+            freqOne += step
+            freqTwo = 0.1
+        
+        freqOne = 0.1
+        freqTwo = 0.1
+        
+        while freqOne < 1:
+            while freqTwo < 1:
+                result = self.select_contours_freq_hpf_filters(transformData, freqOne, freqTwo)
+
+                result = np.array(result)
+                height = result.shape[0]
+                weight = result.shape[1]
+        
+                dataForShow =  np.empty((height, weight))
+                for h in range(height):
+                    for w in range(weight):
+                        value = result[h][w]
+                        while value > 255:
+                            value -= 255
+                        dataForShow[h][w] = value
+        
+                image = PilImage.fromarray(dataForShow)
+                
+                fig = plt.figure(figsize=(6,6))
+                fig.patch.set_facecolor('#e8e8e8')
+                plt.title(f"Частоты для строк {round(freqOne, 2)}, для столбцов {round(freqTwo, 2)}")
+                plt.imshow(image)
+                plt.axis("off")
+                fileName = 'generate data/hpf ' + str(round(freqOne, 2)) + ' ' + str(round(freqTwo, 2)) + '.png'
+                plt.savefig(fileName)
+                plt.close()
+                
+                freqTwo += step
+            
+            freqOne += step
+            freqTwo = 0.1
+        
+        return dataImage
+        
     
 class AnalysisImageData:
     def classic_histogram(self, dataImage):
