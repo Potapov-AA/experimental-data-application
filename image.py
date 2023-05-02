@@ -448,6 +448,58 @@ class TransformImageData:
         
         return np.array(transformData).astype('int32')  
     
+
+    def resize_up_image_fourier(self, dataImage, multiplierValue):
+        """
+            Увеличение размера изображения методом Фурье
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            multiplierValue (int): значение множителя изменения размера
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]],
+            размер изменен методом билинейной интерполяции
+        """
+        weight = dataImage.shape[1]
+        height = dataImage.shape[0]
+        
+        dataFourier = AnalysisImageData.calculate_2D_fourier_transform(AnalysisImageData(), dataImage)
+        
+        newSizeHeight = int(multiplierValue*height)
+        newSizeWeight = int(multiplierValue*weight)
+        
+        zeroCountWeight = int((newSizeWeight - weight) / 2)
+        zeroCountHeight = int((newSizeHeight - height) / 2)
+        
+        transformData = np.zeros((newSizeHeight, newSizeWeight), dtype=complex)
+        
+        for h in range(height):
+            for w in range(weight):
+                transformData[h][w] = dataFourier[h][w]
+        
+        for h in range(newSizeHeight):
+            transformData[h] = np.roll(transformData[h], zeroCountWeight)
+        
+        transformData = np.transpose(transformData) 
+        
+        for w in range(newSizeWeight):
+            transformData[w] = np.roll(transformData[w], zeroCountHeight)
+            
+        transformData = np.transpose(transformData) 
+        
+        imageData = np.copy(transformData)
+        imageData = np.array(imageData).astype('int32')  
+        image = PilImage.fromarray(imageData)
+        plt.imshow(image)
+        plt.show()
+        
+        transformData = AnalysisImageData.calculate_inverse_2D_fourier_transform(AnalysisImageData(), transformData)
+        
+        transformData = self.data_to_gray_diapason(transformData)
+        
+        return np.array(transformData).astype('int32')  
+
     
     def rotate_image_left(self, dataImage):
         """
