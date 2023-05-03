@@ -50,7 +50,7 @@ class App(Tk):
 
     def centerWindow(self):
         w = 800
-        h = 900
+        h = 800
 
         sw = self.winfo_screenwidth()
         sh = self.winfo_screenheight()
@@ -115,8 +115,11 @@ class App(Tk):
         self.imageFrame1 = ttk.Frame(notebook)
         self.imageFrame1.pack(fill=BOTH, expand=True)
         
-        imageFrame2 = ttk.Frame(notebook)
-        imageFrame2.pack(fill=BOTH, expand=True)
+        imageFrame2_1 = ttk.Frame(notebook)
+        imageFrame2_1.pack(fill=BOTH, expand=True)
+        
+        imageFrame2_2 = ttk.Frame(notebook)
+        imageFrame2_2.pack(fill=BOTH, expand=True)
         
         imageFrame3 = ttk.Frame(notebook)
         imageFrame3.pack(fill=BOTH, expand=True)
@@ -125,12 +128,14 @@ class App(Tk):
         imageFrame4.pack(fill=BOTH, expand=True)
         
         imageNotebook.add(self.imageFrame1, text="Работа с файлами и отображение")
-        imageNotebook.add(imageFrame2, text="Трансформация изображения")
+        imageNotebook.add(imageFrame2_1, text="Трансформация стр. 1")
+        imageNotebook.add(imageFrame2_2, text="Трансформация стр. 2")
         imageNotebook.add(imageFrame3, text="Анализ изображения")
         imageNotebook.add(imageFrame4, text="Фильтрация изображения")
         
         self.image_open_save_show_UI(self.imageFrame1)
-        self.image_transform_UI(imageFrame2)
+        self.image_transform_UI_1(imageFrame2_1)
+        self.image_transform_UI_2(imageFrame2_2)
         self.image_analysis_UI(imageFrame3)
         self.image_filters_UI(imageFrame4)
         
@@ -159,8 +164,7 @@ class App(Tk):
         # self.exampleUI(frame5)
     
     
-    def image_open_save_show_UI(self, parent):
-        
+    def image_open_save_show_UI(self, parent):        
         buttonFrame = Frame(parent)
         buttonFrame.pack(fill=X)
         
@@ -238,7 +242,7 @@ class App(Tk):
         ).pack(pady=[0, 10])
         
     
-    def image_transform_UI(self, parent):
+    def image_transform_UI_1(self, parent):
         Button(
             parent,
             text="Приведение данных изображения к серому диапазону",
@@ -407,17 +411,32 @@ class App(Tk):
         
         Label(
             parent,
-            text="Вычитание из последнего изображения, изображение по заданному индексу"
+            text="Арифмитиченские операции"
         ).pack(pady=[30, 0])
         
+        mathFrame = Frame(parent)
+        mathFrame.pack(fill=X)
+        
         Button(
-            parent,
+            mathFrame,
             text="Произвести вычетание",
             command=lambda:self.work_with_image(TransformImageData.get_difference_between_images,
                                                 paramOne=self.image.get_last_data()),
+            width = 25,
             font=self.mainFont
-        ).pack( pady=[0, 0])
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[155, 0])
 
+        Button(
+            mathFrame,
+            text="Произвести суммирование",
+            command=lambda:self.work_with_image(TransformImageData.get_sum_between_images,
+                                                paramOne=self.image.get_last_data()),
+            width = 25,
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 155])
+        
+        
+        
         Label(
             parent,
             text="Зашумление изображения"
@@ -444,6 +463,8 @@ class App(Tk):
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 200])
         
+    
+    def image_transform_UI_2(self, parent):
         Label(
             parent,
             text="Выделение контуров"
@@ -457,11 +478,11 @@ class App(Tk):
             font=self.mainFont
         ).pack(pady=[0, 5])
         
-        contoursFrame = Frame(parent)
-        contoursFrame.pack(fill=X)
+        contoursFreqFrame = Frame(parent)
+        contoursFreqFrame.pack(fill=X)
         
         Button(
-            contoursFrame,
+            contoursFreqFrame,
             text="Частотными фильтрами (ФНЧ)",
             width = 25,
             command=lambda:self.work_with_image(TransformImageData.select_contours_freq_lpf_filters,
@@ -471,7 +492,7 @@ class App(Tk):
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[155, 0])
         
         Button(
-            contoursFrame,
+            contoursFreqFrame,
             text="Частотными фильтрами (ФВЧ)",
             width = 25,
             command=lambda:self.work_with_image(TransformImageData.select_contours_freq_hpf_filters,
@@ -480,7 +501,45 @@ class App(Tk):
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[0, 0], padx=[0, 155])
         
-    
+        contoursGradientFrameOne = Frame(parent)
+        contoursGradientFrameOne.pack(fill=X)
+        
+        Button(
+            contoursGradientFrameOne,
+            text="Собель",
+            width = 25,
+            command=lambda:self.work_with_image(TransformImageData.select_contours_sobel),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[155, 0])
+        
+        Button(
+            contoursGradientFrameOne,
+            text="Превит",
+            width = 25,
+            command=lambda:self.work_with_image(TransformImageData.select_contours_prevet),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 155])
+
+        contoursGradientFrameTwo = Frame(parent)
+        contoursGradientFrameTwo.pack(fill=X)
+        
+        Button(
+            contoursGradientFrameTwo,
+            text="Робертс",
+            width = 25,
+            command=lambda:self.work_with_image(TransformImageData.select_contours_roberts),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[155, 0])
+        
+        Button(
+            contoursGradientFrameTwo,
+            text="Лапласиана",
+            width = 25,
+            command=lambda:self.work_with_image(TransformImageData.select_contours_laplasian,
+                                                paramOne=float(self.parametrs.GetParametr("ImageParametrs", "A"))),
+            font=self.mainFont
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 155])
+          
     def image_analysis_UI(self, parent):
         Label(
             parent,
