@@ -6,7 +6,7 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
-from scipy.fft import fft, ifft, fft2, ifft2, rfft, irfft, rfftfreq
+from scipy.fft import ifft2, rfft, irfft, rfftfreq
 from scipy import signal
 
 class Image:
@@ -114,8 +114,10 @@ class Image:
         for h in range(height):
             for w in range(weight):
                 value = self.dataImageList[index][h][w]
-                while value > 255:
-                    value -= 255
+                # if value > 255:
+                #     value = 255
+                # if value < 0:
+                #     value = 0
                 dataForShow[h][w] = value
         
         image = PilImage.fromarray(dataForShow)
@@ -686,10 +688,24 @@ class TransformImageData:
         """
         transformData = imageCurrent - imageToSubtract
         
-        transformData = self.data_to_gray_diapason(transformData)
-        
         return np.array(transformData).astype('int32')
 
+    
+    def get_sum_between_images(self, imageToSubtract, imageCurrent):
+        """
+            Прибавляет к текущему изображению заданное
+
+        Args:
+            imageToSubtract (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            imageCurrent (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        transformData = imageCurrent + imageToSubtract
+        
+        return np.array(transformData).astype('int32')
+    
     
     def do_solid_and_peaper(self, dataImage, countBadPixekOnRow):
         """
@@ -878,7 +894,74 @@ class TransformImageData:
             freqTwo = 0.1
         
         return dataImage
+    
+    
+    def select_contours_sobel(self, dataImage):
+        x = np.matrix([[-1, 0, 1],
+                       [-2, 0, 2],
+                       [-1, 0, 1]])
         
+        y = np.matrix([[1, 2, 1],
+                       [0, 0, 0],
+                       [-1, -2, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        G = np.abs(gX) + np.abs(gY)
+        
+        return G
+    
+    
+    def select_contours_prevet(self, dataImage):
+        x = np.matrix([[-1, 0, 1],
+                       [-1, 0, 1],
+                       [-1, 0, 1]])
+        
+        y = np.matrix([[1, 1, 1],
+                       [0, 0, 0],
+                       [-1, -1, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        G = np.abs(gX) + np.abs(gY)
+        
+        return G
+    
+    
+    def select_contours_roberts(self, dataImage):
+        x = np.matrix([[0, 1],
+                       [-1, 0]])
+        
+        y = np.matrix([[1, 0],
+                       [0, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        G = np.abs(gX) + np.abs(gY)
+        
+        return G
+    
+    
+    def select_contours_laplasian(self, dataImage, A):
+        x = np.matrix([[0, -1, 0],
+                       [-1, A+4, -1],
+                       [0, -1, 0]])
+        
+        y = np.matrix([[-1, -1, -1],
+                       [-1, A+8, -1],
+                       [-1, -1, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        # G = np.abs(gX) + np.abs(gY)
+        G = gX + gY
+        
+        return G
+    
     
 class AnalysisImageData:
     def classic_histogram(self, dataImage):
