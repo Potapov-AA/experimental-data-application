@@ -211,6 +211,21 @@ class App(Tk):
         )
         self.weightSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 100])
         
+        byteSizeFrame = Frame(parent)
+        byteSizeFrame.pack(fill=X)
+        
+        Label(
+            byteSizeFrame,
+            text="Количество байт для bin"
+        ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[250, 0])
+        
+        self.byteSizeSpinbox = Spinbox(
+            byteSizeFrame,
+            from_= 0,
+            to= 4000
+        )
+        self.byteSizeSpinbox.pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 250])
+        
         
         self.spinboxFrame = Frame(parent)
         self.spinboxFrame.pack(fill=X)
@@ -539,7 +554,34 @@ class App(Tk):
                                                 paramOne=float(self.parametrs.GetParametr("ImageParametrs", "A"))),
             font=self.mainFont
         ).pack(side=LEFT, anchor=N, expand=True, pady=[5, 0], padx=[0, 155])
-          
+        
+        Button(
+            parent,
+            width = 52,
+            text="Эрозия",
+            command=lambda:self.work_with_image(TransformImageData.select_contours_erosia),
+            font=self.mainFont
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            width = 52,
+            text="Дилатация",
+            command=lambda:self.work_with_image(TransformImageData.select_contours_dilation),
+            font=self.mainFont
+        ).pack(pady=[30, 0])
+        
+        Button(
+            parent,
+            width = 52,
+            text="Эквализация",
+            command=lambda:self.work_with_image(TransformImageData.eqialisation,
+                                                paramOne=self.image.get_last_data()),
+            font=self.mainFont
+        ).pack(pady=[30, 0])
+        
+        
+        
     def image_analysis_UI(self, parent):
         Label(
             parent,
@@ -815,7 +857,7 @@ class App(Tk):
         if path == '': 
             return
         
-        self.image = Image(path, int(self.heightSpinbox.get()), int(self.weightSpinbox.get()))
+        self.image = Image(path, int(self.heightSpinbox.get()), int(self.weightSpinbox.get()), int(self.byteSizeSpinbox.get()))
         
         self.__reset_spinbox_count_images()
     
