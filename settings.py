@@ -69,6 +69,9 @@ class ParametrSettings(Toplevel):
               Label(parent, text="Размер маски").pack(anchor=N, fill=X, pady=[20, 10])     
               self.drawParameter("maskSize =", "maskSize", parent, section="ImageParametrs")  
               
+              Label(parent, text="Лапласиан").pack(anchor=N, fill=X, pady=[20, 10])     
+              self.drawParameter("A =", "A", parent, section="ImageParametrs")  
+              
               
        
        

@@ -6,14 +6,14 @@ import PIL.Image as PilImage
 import numpy as np
 from tkinter import filedialog as fd 
 from matplotlib import pyplot as plt
-from scipy.fft import fft, ifft, fft2, ifft2, rfft, irfft, rfftfreq
+from scipy.fft import ifft2, rfft, irfft, rfftfreq
 from scipy import signal
 
 class Image:
-    def __init__(self, path=None, height=1024, weight=1024) -> None:
+    def __init__(self, path=None, height=1024, weight=1024, byte=4) -> None:
         self.dataImageList = []
         if path != None:
-            self.dataImageList.append(self.__read_image(path, height, weight))
+            self.dataImageList.append(self.__read_image(path, height, weight, byte))
         else:
             self.dataImageList.append(self.__generate_default_iamge())
             
@@ -114,8 +114,10 @@ class Image:
         for h in range(height):
             for w in range(weight):
                 value = self.dataImageList[index][h][w]
-                while value > 255:
-                    value -= 255
+                # if value > 255:
+                #     value = 255
+                # if value < 0:
+                #     value = 0
                 dataForShow[h][w] = value
         
         image = PilImage.fromarray(dataForShow)
@@ -163,7 +165,7 @@ class Image:
         plt.show()    
     
     
-    def __read_image(self, path, height=1024, weight=1024):
+    def __read_image(self, path, height=1024, weight=1024, byte=4):
         """
             Получает путь до файла и проверяет расширение, 
             если расширение допустимого формата, то проводит 
@@ -213,13 +215,13 @@ class Image:
                 dataImage = []
                 
                 with open(path, 'rb') as f:
-                    number = f.read(4)
+                    number = f.read(byte)
                     
                     while number:
-                        tempTuple = unpack("<f", number)
+                        tempTuple = unpack("<h", number)
                         tempValue = tempTuple[0]
                         dataImage.append(int(tempValue))
-                        number = f.read(4)
+                        number = f.read(byte)
                 
                 dataImage = np.asarray(dataImage)
                 dataImage = dataImage.reshape(height, weight)
@@ -498,8 +500,8 @@ class TransformImageData:
         
         transformData = self.data_to_gray_diapason(transformData)
         
-        return np.array(transformData).astype('int32')  
-
+        return np.array(transformData).astype('int32')      
+    
     
     def rotate_image_left(self, dataImage):
         """
@@ -586,10 +588,19 @@ class TransformImageData:
         
         transformData = np.empty((height, weight))
         
+        # for h in range(height):
+        #     for w in range(weight):
+        #         pixelValue = dataImage[h][w]
+        #         if (pixelValue * 3 > (((255 + factor) // 2) * 3)):
+        #             transformData[h][w] = 255
+        #         else:
+        #             transformData[h][w] = 0
+        
+        ####only for model####
         for h in range(height):
             for w in range(weight):
                 pixelValue = dataImage[h][w]
-                if (pixelValue * 3 > (((255 + factor) // 2) * 3)):
+                if (pixelValue > factor):
                     transformData[h][w] = 255
                 else:
                     transformData[h][w] = 0
@@ -616,7 +627,7 @@ class TransformImageData:
             for w in range(weight):
                 transformData[h][w] = C * (dataImage[h][w] ** y)
 
-        transformData = self.data_to_gray_diapason(transformData)
+        #transformData = self.data_to_gray_diapason(transformData)
         
         return np.array(transformData).astype('int32')
     
@@ -634,13 +645,15 @@ class TransformImageData:
         height = dataImage.shape[0]
         weight = dataImage.shape[1]
         
+        print(dataImage)
+        
         transformData = np.empty((height, weight))
         
         for h in range(height):
             for w in range(weight):
                 transformData[h][w] = C * np.log(dataImage[h][w] + 1)
         
-        transformData = self.data_to_gray_diapason(transformData)
+        #transformData = self.data_to_gray_diapason(transformData)
         
         return np.array(transformData).astype('int32')
     
@@ -686,10 +699,37 @@ class TransformImageData:
         """
         transformData = imageCurrent - imageToSubtract
         
-        transformData = self.data_to_gray_diapason(transformData)
-        
         return np.array(transformData).astype('int32')
 
+    
+    def get_sum_between_images(self, imageToSubtract, imageCurrent):
+        """
+            Прибавляет к текущему изображению заданное
+
+        Args:
+            imageToSubtract (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            imageCurrent (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+
+        Returns:
+            transformData (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        
+        height = imageToSubtract.shape[0]
+        weight = imageToSubtract.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(height):
+            for w in range(weight):
+                if imageCurrent[h][w] >= 255:
+                    # print(1)
+                    transformData[h][w] = imageToSubtract[h][w]
+                else:
+                    transformData[h][w] = imageCurrent[h][w]
+        
+        
+        return np.array(transformData).astype('int32')
+    
     
     def do_solid_and_peaper(self, dataImage, countBadPixekOnRow):
         """
@@ -739,6 +779,282 @@ class TransformImageData:
             
         return np.array(transformData).astype('int32')
 
+
+    def select_contours_freq_lpf_filters(self, dataImage, freqOne, freqTwo):
+        """
+            Возвращает контур изображения полученный за счет фильтра низких частот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): частота для строк
+            freqTwo (float): частота для столбцов
+
+        Returns:
+            result - контур изображаения
+        """
+        transformData = np.copy(dataImage)
+        
+        lpfDataOne = FilterImageData.lpf(FilterImageData(), transformData, freqOne, m=32, mode=1)
+        
+        transformData = np.transpose(transformData)
+        
+        lpfDataTwo = FilterImageData.lpf(FilterImageData(), transformData, freqTwo, m=32, mode=1)
+        lpfDataTwo = np.transpose(lpfDataTwo)
+        
+        lpfData = lpfDataOne + lpfDataTwo
+        
+        result = dataImage - lpfData
+        
+        return result
+    
+    
+    def select_contours_freq_hpf_filters(self, dataImage, freqOne, freqTwo):
+        """
+            Возвращает контур изображения полученный за счет фильтра высоких частот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            freqOne (float): частота для строк
+            freqTwo (float): частота для столбцов
+
+        Returns:
+            result - контур изображаения
+        """
+        transformData = np.copy(dataImage)
+        
+        hpfDataOne = FilterImageData.hpf(FilterImageData(), transformData, freqOne, m=32, mode=1)
+        
+        transformData = np.transpose(transformData)
+        
+        hpfDataTwo = FilterImageData.hpf(FilterImageData(), transformData, freqTwo, m=32, mode=1)
+        hpfDataTwo = np.transpose(hpfDataTwo)
+        
+        result = hpfDataOne + hpfDataTwo
+        
+        return result
+    
+    
+    def show_all_contoures(self, dataImage, step=0.1):
+        """
+            Перебирает и сохраняет все варианты контуров с разными частотами и с разными фильтрами частот
+
+        Args:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+            step (float): шаг изменения частоты. По умолчанию 0.1.
+
+        Returns:
+            dataImage (np.array): массив numpy приведенный к формату [[0 0 0 0 ... 0 0 0]]
+        """
+        transformData = np.copy(dataImage)
+        
+        freqOne = 0.1
+        freqTwo = 0.1
+        
+        while freqOne < 1:
+            while freqTwo < 1:
+                result = self.select_contours_freq_lpf_filters(transformData, freqOne, freqTwo)
+
+                result = np.array(result)
+                height = result.shape[0]
+                weight = result.shape[1]
+        
+                dataForShow =  np.empty((height, weight))
+                for h in range(height):
+                    for w in range(weight):
+                        value = result[h][w]
+                        while value > 255:
+                            value -= 255
+                        dataForShow[h][w] = value
+        
+                image = PilImage.fromarray(dataForShow)
+                
+                fig = plt.figure(figsize=(6,6))
+                fig.patch.set_facecolor('#e8e8e8')
+                plt.title(f"Частоты для строк {round(freqOne, 2)}, для столбцов {round(freqTwo, 2)}")
+                plt.imshow(image)
+                plt.axis("off")
+                fileName = 'generate data/lpf ' + str(round(freqOne, 2)) + ' ' + str(round(freqTwo, 2)) + '.png'
+                plt.savefig(fileName)
+                plt.close()
+                
+                freqTwo += step
+            
+            freqOne += step
+            freqTwo = 0.1
+        
+        freqOne = 0.1
+        freqTwo = 0.1
+        
+        while freqOne < 1:
+            while freqTwo < 1:
+                result = self.select_contours_freq_hpf_filters(transformData, freqOne, freqTwo)
+
+                result = np.array(result)
+                height = result.shape[0]
+                weight = result.shape[1]
+        
+                dataForShow =  np.empty((height, weight))
+                for h in range(height):
+                    for w in range(weight):
+                        value = result[h][w]
+                        while value > 255:
+                            value -= 255
+                        dataForShow[h][w] = value
+        
+                image = PilImage.fromarray(dataForShow)
+                
+                fig = plt.figure(figsize=(6,6))
+                fig.patch.set_facecolor('#e8e8e8')
+                plt.title(f"Частоты для строк {round(freqOne, 2)}, для столбцов {round(freqTwo, 2)}")
+                plt.imshow(image)
+                plt.axis("off")
+                fileName = 'generate data/hpf ' + str(round(freqOne, 2)) + ' ' + str(round(freqTwo, 2)) + '.png'
+                plt.savefig(fileName)
+                plt.close()
+                
+                freqTwo += step
+            
+            freqOne += step
+            freqTwo = 0.1
+        
+        return dataImage
+    
+    
+    def select_contours_sobel(self, dataImage):
+        x = np.matrix([[-1, 0, 1],
+                       [-2, 0, 2],
+                       [-1, 0, 1]])
+        
+        y = np.matrix([[1, 2, 1],
+                       [0, 0, 0],
+                       [-1, -2, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        G = np.abs(gX) + np.abs(gY)
+        
+        return G
+    
+    
+    def select_contours_prevet(self, dataImage):
+        x = np.matrix([[-1, 0, 1],
+                       [-1, 0, 1],
+                       [-1, 0, 1]])
+        
+        y = np.matrix([[1, 1, 1],
+                       [0, 0, 0],
+                       [-1, -1, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        G = np.abs(gX) + np.abs(gY)
+        
+        return G
+    
+    
+    def select_contours_roberts(self, dataImage):
+        x = np.matrix([[0, 1],
+                       [-1, 0]])
+        
+        y = np.matrix([[1, 0],
+                       [0, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        G = np.abs(gX) + np.abs(gY)
+        
+        return G
+    
+    
+    def select_contours_laplasian(self, dataImage, A):
+        x = np.matrix([[0, -1, 0],
+                       [-1, A+4, -1],
+                       [0, -1, 0]])
+        
+        y = np.matrix([[-1, -1, -1],
+                       [-1, A+8, -1],
+                       [-1, -1, -1]])
+        
+        gX = signal.convolve2d(dataImage, x, "same", "symm")
+        gY = signal.convolve2d(dataImage, y, "same", "symm")
+        
+        G = np.abs(gX) 
+        # G = np.abs(gY) 
+        # G = gX
+        # G = gY
+        
+          
+        height = G.shape[0]
+        weight = G.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(1, height - 1):
+            for w in range(1, weight - 1):
+                transformData[h][w] = 5 * G[h][w] - (G[h+1][w] + G[h-1][w] + G[h][w+1] + G[h][w-1])
+        
+        
+        resultImage = dataImage + transformData
+        
+        return resultImage
+    
+    
+    def select_contours_erosia(self, dataImage):
+        mask = np.matrix([[0, 0, 1, 0, 0],
+                          [0, 1, 1, 1, 0],
+                          [1, 1, 1, 1, 1],
+                          [0, 1, 1, 1, 0],
+                          [0, 0, 1, 0, 0]])
+                
+        g = signal.convolve2d(dataImage, mask, "same", "symm")
+        
+        G = np.abs(g)
+        
+        G = self.data_to_gray_diapason(G)
+        res = G - dataImage
+        
+        return np.array(res)
+    
+    
+    def select_contours_dilation(self, dataImage):
+        mask = np.matrix([[1, 1, 0, 1, 1],
+                          [1, 0, 0, 0, 1],
+                          [0, 0, 0, 0, 0],
+                          [1, 0, 0, 0, 1],
+                          [1, 1, 0, 1, 1]])
+        
+        g = signal.convolve2d(dataImage, mask, "same", "symm")
+        
+        G = np.abs(g)
+        
+        G = self.data_to_gray_diapason(G)
+        res = G - dataImage
+        
+        return np.array(res)
+    
+    
+    def eqialisation(self, dataImage, mask):
+        height = dataImage.shape[0]
+        weight = dataImage.shape[1]
+        
+        transformData = np.empty((height, weight))
+        
+        for h in range(1, height - 1):
+            for w in range(1, weight - 1):
+                if mask[h][w] == 255:
+                    transformData[h][w] = dataImage[h][w]
+                else:
+                    transformData[h][w] = 0
+        
+        return transformData       
+    
+    
+    def autoUpdateImage(self, dataImage):
+        pass
+    
     
 class AnalysisImageData:
     def classic_histogram(self, dataImage):
